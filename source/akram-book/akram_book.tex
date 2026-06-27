@@ -252,13 +252,13 @@
 \newcommand{\ArabicPlaceholderText}[1]{\textcolor{BalighMuted}{#1}}
 
 \newcommand{\BalighTableHeader}{\rowcolor{BalighDarkGreen}\color{white}}
-\newcommand{\GedGuiSlot}[1]{%
+\newcommand{\GuiScreenshotSlot}[1]{%
   \begin{tikzpicture}
     \node[draw=BalighLine, fill=BalighSoft, rounded corners=4pt,
           minimum width=0.42\textwidth, minimum height=5.2cm, align=center,
           text=BalighMuted] {\textbf{GUI Screenshot Slot}\\#1\\[4pt]
-          Replace this placeholder with a final editor screenshot\\
-          showing GED output from the Baligh GUI.};
+          Replace this placeholder with a final screenshot\\
+          showing the system GUI.};
   \end{tikzpicture}%
 }
 
@@ -370,9 +370,9 @@ Somia Saad Ismail El-Shemy & \href{mailto:somia.elshemy02@eng-st.cu.edu.eg}{somi
 \newcommand{\AbstractPage}{%
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-Arabic digital writing still suffers from a shortage of integrated tools that can correct Modern Standard Arabic text accurately, respond in real time, and explain their feedback in a way that helps users learn. Existing tools often focus on surface spelling fixes or black-box suggestions without exposing the grammatical reasoning behind the correction. Baligh addresses this problem by providing an Arabic writing assistant that combines grammatical error detection, grammatical error correction, spelling-aware editing, next-word suggestion, and explanatory feedback in a single user-facing system. The project aims to support students, educators, and Arabic content writers by improving writing quality while also making the correction process more understandable and educational.
+Arabic digital writing still suffers from a shortage of integrated tools that can correct Modern Standard Arabic text accurately, respond in real time, and explain their feedback in a way that helps users learn. Existing tools often focus on surface spelling fixes or black-box suggestions without exposing the grammatical reasoning behind the correction. Baligh addresses this problem by providing an Arabic writing assistant that combines grammatical error detection, grammatical error correction, spelling-aware editing, automatic vowelization (Tashkeel), next-word suggestion, and explanatory feedback in a single user-facing system. The project aims to support students, educators, and Arabic content writers by improving writing quality while also making the correction process more understandable and educational.
 
-The implemented system follows a modular pipeline. A preprocessing layer performs normalization, word-boundary handling, segmentation, and morphological analysis and disambiguation. On top of that, Baligh integrates a grammatical error detection engine that fuses rule-based, lexicon-based, and machine-learning detectors, then passes its findings to correction components built around ontology-guided reasoning, dictionary lookup, and text-editing models. In parallel, a next-word suggestion module supports both next-word prediction and word auto-completion. The final system highlights issues, proposes corrections, returns ranked suggestions, and presents grammar-oriented explanations to the user in an interactive workflow.
+The implemented system follows a modular pipeline. A preprocessing layer performs normalization, word-boundary handling, segmentation, and morphological analysis and disambiguation. On top of that, Baligh integrates a grammatical error detection engine that fuses rule-based, lexicon-based, and machine-learning detectors, then passes its findings to correction components built around ontology-guided reasoning, dictionary lookup, text-editing models, and automatic vowelization support. In parallel, a next-word suggestion module supports both next-word prediction and word auto-completion. The final system highlights issues, proposes corrections, returns ranked suggestions, generates Tashkeel when needed, and presents grammar-oriented explanations to the user in an interactive workflow.
 
 The project outputs include the preprocessing pipeline, grammatical error detection and correction services, the next-word suggestion subsystem, and a working user application. Testing and validation relied on automated unit and integration tests together with evaluation on established Arabic linguistic resources, including QALB14, QALB15, and ZAEBUC. Overall, Baligh demonstrates that a modular and explainable Arabic writing assistant can combine linguistic processing and machine learning into a practical platform for improving Arabic writing quality.
 \clearpage
@@ -396,11 +396,7 @@ The project outputs include the preprocessing pipeline, grammatical error detect
 \newcommand{\AcknowledgmentPage}{%
 \chapter*{Acknowledgment}
 \addcontentsline{toc}{chapter}{Acknowledgment}
-I would like to express my sincere gratitude to Dr. Ayman AboElhassan for his guidance, support, and constructive feedback throughout this graduation project. His direction helped me shape both the research and engineering sides of the work, especially while translating Arabic NLP literature into practical design decisions.
-
-I am also thankful to my teammates for the collaborative environment we maintained during the project. Building Baligh required continuous coordination between research, backend services, and the user-facing product, and this teamwork made it possible to move from isolated ideas to an integrated system.
-
-Finally, I am deeply grateful to my family and friends for their patience and encouragement throughout the graduation-project journey. Their support made it easier to stay consistent through the long phases of experimentation, debugging, writing, and refinement.
+\PlaceholderText{Write your acknowledgments here.}
 \clearpage
 }
 
@@ -411,17 +407,7 @@ Finally, I am deeply grateful to my family and friends for their patience and en
 \toprule
 \textbf{Abbreviation} & \textbf{Meaning} \\
 \midrule
-AI & Artificial Intelligence \\
-API & Application Programming Interface \\
-CRF & Conditional Random Field \\
-GEC & Grammatical Error Correction \\
-GED & Grammatical Error Detection \\
-GUI & Graphical User Interface \\
-MSA & Modern Standard Arabic \\
-NLP & Natural Language Processing \\
-NWP & Next-Word Prediction \\
-POS & Part of Speech \\
-\textenglish{QALB} & Qatar Arabic Language Bank \\
+\PlaceholderText{ABB} & \PlaceholderText{Abbreviation Meaning} \\
 \bottomrule
 \end{longtable}
 \clearpage
@@ -434,10 +420,7 @@ POS & Part of Speech \\
 \toprule
 \textbf{Symbol} & \textbf{Meaning} \\
 \midrule
-$P$ & Precision in evaluation metrics \\
-$R$ & Recall in evaluation metrics \\
-$F_1$ & Harmonic mean of precision and recall \\
-$K$ & Number of top-ranked suggestions returned to the user \\
+\PlaceholderText{Sym} & \PlaceholderText{Symbol Meaning} \\
 \bottomrule
 \end{longtable}
 \clearpage
@@ -478,8 +461,6 @@ This chapter introduces the project, justifies the need for it, states the proje
 \section{Motivation and Justification}
 \PlaceholderText{Explain why the project is needed, what problem it addresses, why the problem is significant, and who benefits from the project.}
 
-Arabic writing tools often provide corrections without explaining the grammatical reasoning behind them. Baligh focuses not only on correction, but also on understandable explanations that help users improve their writing over time.
-
 \section{Project Objectives and Problem Definition}
 \PlaceholderText{State the project objectives clearly and end with a formal problem definition.}
 
@@ -490,7 +471,7 @@ Arabic writing tools often provide corrections without explaining the grammatica
 \PlaceholderText{Briefly describe the following chapters.}
 
 \chapter{Market Visibility Study}
-This chapter surveys the market related to the project and discusses similar tools or platforms. It should explain their limitations and justify the need for Baligh.
+This chapter surveys the market related to the project and discusses similar tools or platforms. It should explain their limitations and justify the need for the project.
 
 \section{Targeted Customers}
 \PlaceholderText{Mention the intended customers/users and how they benefit from the project.}
@@ -499,10 +480,10 @@ This chapter surveys the market related to the project and discusses similar too
 \PlaceholderText{List competing or related products. Discuss each one in a subsection and explain its pros and cons.}
 
 \subsection{Competitive Product 1}
-\PlaceholderText{Describe the product, strengths, weaknesses, and relevance to Baligh.}
+\PlaceholderText{Describe the product, strengths, weaknesses, and relevance to the project.}
 
 \subsection{Competitive Product 2}
-\PlaceholderText{Describe the product, strengths, weaknesses, and relevance to Baligh.}
+\PlaceholderText{Describe the product, strengths, weaknesses, and relevance to the project.}
 
 \section{Business Case and Financial Analysis}
 \PlaceholderText{Describe the possible business case, expected users, pricing assumptions, CapEx, OpEx, revenue, cash flow, and break-even point.}
@@ -526,25 +507,24 @@ This chapter surveys the market related to the project and discusses similar too
 \chapter{Literature Survey}
 This chapter should include necessary engineering and non-engineering background, followed by a concise literature review of recent work related to the project.
 
-\section{Background on Arabic NLP}
-\PlaceholderText{Explain the most important concepts needed to understand the project, such as morphology, spelling correction, grammatical error correction, and language modeling.}
+\section{Background on [Domain 1]}
+\PlaceholderText{Explain the most important concepts needed to understand the project.}
 
-\section{Background on Writing Assistance Systems}
-\PlaceholderText{Explain writing assistants, correction pipelines, feedback generation, and user-facing explanations.}
+\section{Background on [Domain 2]}
+\PlaceholderText{Explain relevant system types, pipelines, data flows, and presentation layers.}
 
 \section{Comparative Study of Previous Work}
 \PlaceholderText{Classify and compare previous work. Focus on relevance, strengths, limitations, datasets, methods, and results.}
 
 \begin{table}[H]
-\caption{Comparison of Related Arabic Writing Assistance Approaches}
+\caption{Comparison of Related Approaches}
 \centering
 \begin{tabularx}{\textwidth}{p{0.2\textwidth}YYY}
 \toprule
 \textbf{Work/System} & \textbf{Main Approach} & \textbf{Strengths} & \textbf{Limitations} \\
 \midrule
-System 1 & Rule-based & Explainable & Limited coverage \\
-System 2 & Neural & Strong accuracy & Less interpretable \\
-System 3 & Hybrid & Balanced & Requires integration effort \\
+System 1 & Approach A & High precision & Low coverage \\
+System 2 & Approach B & High recall & Less interpretable \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -562,38 +542,25 @@ This chapter is the main body of the report. It should answer: what has been don
 \PlaceholderText{Describe the overall architecture and how modules communicate.}
 
 \subsection{Block Diagram}
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}[node distance=1.6cm, every node/.style={draw, rounded corners, align=center, fill=BalighSoft, minimum width=3.1cm, minimum height=1cm}]
-\node (input) {User Text\\Input};
-\node[right=of input] (pipeline) {Baligh\\Processing Pipeline};
-\node[right=of pipeline] (models) {Language Models\\and Rules};
-\node[below=of pipeline] (feedback) {Corrections\\and Explanations};
-\draw[->, thick, color=BalighDarkGreen] (input) -- (pipeline);
-\draw[->, thick, color=BalighDarkGreen] (pipeline) -- (models);
-\draw[->, thick, color=BalighDarkGreen] (models) -- (feedback);
-\draw[->, thick, color=BalighDarkGreen] (feedback) -- (input);
-\end{tikzpicture}
-\caption{High-level architecture of the Baligh system.}
-\end{figure}
+\PlaceholderText{Add block diagram figure here showing high-level system architecture and components.}
 
-\section{Module 1: Grammatical Error Detection}
+\section{Module 1: [First Module Name]}
 \subsection{Functional Description}
 \PlaceholderText{Explain what this module does.}
 \subsection{Modular Decomposition}
 \PlaceholderText{Break the module into submodules.}
 \subsection{Design Constraints}
-\PlaceholderText{Explain constraints such as latency, Arabic ambiguity, model size, and data availability.}
+\PlaceholderText{Explain constraints such as latency, domain complexity, model size, and data availability.}
 \subsection{Other Description of Module 1}
 \PlaceholderText{Add any other relevant technical details.}
 
-\section{Module 2: Correction and Explanation Generation}
+\section{Module 2: [Second Module Name]}
 \subsection{Functional Description}
-\PlaceholderText{Explain correction generation and explanation generation.}
+\PlaceholderText{Explain what this module does.}
 \subsection{Modular Decomposition}
 \PlaceholderText{Break the module into submodules.}
 \subsection{Design Constraints}
-\PlaceholderText{Explain constraints such as explanation quality, grammatical accuracy, and user readability.}
+\PlaceholderText{Explain constraints such as output quality, accuracy, and user readability.}
 \subsection{Other Description of Module 2}
 \PlaceholderText{Add any other relevant technical details.}
 
@@ -639,258 +606,41 @@ This chapter describes how the system was tested and verified.
 \pagenumbering{arabic}
 
 \chapter{Introduction}
+\section{Motivation and Justification}
+
 \section{Project Overview}
-Baligh is an Arabic writing assistant designed to support Modern Standard Arabic writing through explainable correction and real-time assistance. This chapter introduces the motivation behind the project, defines the problem it addresses, summarizes the main outcomes delivered by the project, and outlines the organization of the remainder of the report.
 
 \section{Individual Role Overview}
-My individual contribution was centered on the research and implementation of the Grammatical Error Detection (GED) module. I was responsible for studying previous work in Arabic GED and GEC, extracting the most practical design patterns from the literature, and translating them into an explainable multi-detector architecture. This work covered the rule-based detector, lexicon matcher, machine-learning sequence labeler, and the fusion layer that reconciles detector outputs into one final error set.
-
-In addition to the core GED work, I contributed to the product side of Baligh by shaping part of the UI/UX direction, implementing frontend pieces in the web client, and supporting backend integration so that GED results could flow into the editor experience through stable API contracts. These supporting contributions are presented in this report as delivery-enabling work around the main technical contribution.
 
 \section{Document Organization}
-This booklet presents my role, the preparation that informed my work, the GED-focused contribution chapter, the supporting frontend and integration work, and finally the main validation results, lessons learned, and future improvements.
 
 \chapter{Personal Role and Responsibilities}
 \section{Team Responsibilities}
-My responsibilities during the project combined research, engineering, and delivery support. On the research side, I reviewed Arabic GED, GEC, and writing-assistance literature to understand available datasets, common modeling strategies, and the trade-off between interpretability and coverage. On the implementation side, I owned the main GED architecture and its supporting documentation, notebooks, tests, and evaluation flow. I also participated in making the final system usable by contributing to frontend behavior, UI presentation decisions, and backend integration tasks related to editor-facing analysis results.
 
 \section{Assigned Tasks}
-My assigned tasks can be summarized as follows:
-\begin{itemize}
-    \item Conduct an extensive literature review on Arabic grammatical error detection and correction, with emphasis on explainable systems and sequence-labeling approaches.
-    \item Design and implement the GED architecture used in Baligh, including rule-based checks, lexicon-backed matching, a machine-learned detector, and a fusion layer.
-    \item Build technical documentation and experimentation notebooks that made the subsystem easier to analyze, evaluate, and extend.
-    \item Contribute to the UI/UX direction of the user-facing product, especially the presentation of correction-oriented interactions.
-    \item Develop selected frontend pieces in the React web client and support backend integration so GED outputs could be consumed consistently by the editor workflow.
-\end{itemize}
 
 \section{Timeline and Deliverables}
-\begin{table}[H]
-\caption{Major Milestones in My Individual Contribution}
-\centering
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.19\textwidth}YY}
-\toprule
-\textbf{Phase} & \textbf{Main Focus} & \textbf{Deliverables} \\
-\midrule
-Research phase & Survey Arabic GED/GEC literature, datasets, and system-design patterns & Research notes, literature synthesis, architecture direction \\
-Rule-based GED phase & Build interpretable detectors on top of preprocessing output & YAML/Python rules, registry, tests, notebooks \\
-Lexicon and ML phase & Extend coverage through curated patterns and sequence labeling & Lexicon matcher, ML detector, training/runtime artifacts, evaluation scripts \\
-Frontend and design phase & Help shape how Baligh appears and behaves in the browser & UI direction, design-system-aligned pages, editor-facing components \\
-Integration and validation phase & Connect detectors to the editor workflow and verify quality & API contract support, integration checks, aggregate evaluation report \\
-\bottomrule
-\end{tabularx}
-\end{table}
 
 \chapter{Knowledge Acquisition and Technical Preparation}
 \section{Investigated Papers}
-The literature review focused on Arabic grammatical error detection, grammatical error correction, and practical Arabic writing-assistance systems. The work of Alhafni et al. clarified the value of treating Arabic GED as a sequence-labeling task and highlighted the benefit of passing detection information into later correction stages \cite{alhafni2023advancements}. Earlier rule-oriented systems such as SAHSOH@QALB-2015 showed that hand-crafted rules still matter in Arabic when interpretability is important \cite{zaghouani2015sahsoh}. Ontology-driven work on Arabic syntax correction reinforced the value of structured grammatical reasoning and explanation-friendly system design \cite{moukrim2021ontology}. I also studied preprocessing and morphology-analysis references because robust segmentation, disambiguation, and feature extraction are essential prerequisites for meaningful grammatical analysis.
-
-The research phase was not only descriptive; it directly influenced implementation choices. Rather than selecting a single detector family, I adopted a layered design in which interpretable rules and lexicon signals handle precise, explanation-friendly cases while the machine-learning component improves coverage on broader contexts. This hybrid direction was consistent with the patterns seen in the literature and more suitable for an educational writing assistant than a fully opaque end-to-end model.
 
 \section{Self-Learning Materials}
-To implement the project effectively, I relied on a mix of coursework, research papers, library documentation, experimentation notebooks, and framework references. The main self-learning inputs were:
-
-\begin{itemize}
-    \item \textbf{College Machine Learning course by Dr.~Yahia Zakaria}: strengthened the theoretical background behind the statistical modeling side of the project.
-    \item \textbf{College Natural Language course by Dr.~Sandra Wahid}: reinforced the language-processing concepts most relevant to Arabic NLP work.
-    \item \textbf{Arabic NLP pipeline study}: focused on the preprocessing and morphology-analysis workflow used in the project, especially segmentation, disambiguation, and morphological feature access.
-    \item \textbf{GED modeling study}: covered sequence-labeling concepts, token-level feature engineering, and artifact-based model packaging.
-    \item \textbf{Software and integration study}: included FastAPI for service integration, React and Vite for the web client, and Python testing workflows for unit and integration validation.
-\end{itemize}
 
 \section{Relevance to the Project}
-This technical preparation shaped the implemented architecture in several direct ways. First, the literature justified keeping symbolic detectors in the loop because Baligh aims to explain as well as detect errors. Second, the sequence-labeling literature supported the use of a learned detector for broader grammatical coverage. Third, Arabic preprocessing references made it clear that morphology-aware input is necessary before higher-level error reasoning can become reliable. Finally, my study of evaluation practice led to a reporting pipeline that measures each GED subsystem individually and then after fusion, allowing the final design to be argued using evidence rather than intuition alone.
 
 \chapter{Individual Contributions}
-\section{Contribution 1: Research Foundation and GED Implementation}
-The main technical contribution presented in this booklet is the design and implementation of the Baligh GED subsystem. The objective was to build a detector that is practical for Arabic text, strong enough to cover several error categories, and explainable enough to serve an educational writing tool. Instead of relying on a single model family, I implemented a layered detector architecture that combines symbolic and statistical signals before consolidating them through a fusion stage.
+\section{Contribution 1: [First Contribution Name]}
 
-\subsection{Problem Framing from the Literature}
-The literature showed three recurring realities about Arabic GED and GEC. First, Arabic is highly morphology-sensitive, so error handling becomes unreliable when preprocessing is shallow or inconsistent. Second, symbolic systems remain useful because many important grammatical and orthographic phenomena still benefit from explicit linguistic checks. Third, learned sequence-labeling approaches improve coverage and fit naturally into multi-class GED pipelines \cite{alhafni2023advancements, moukrim2021ontology, zaghouani2015sahsoh}. This motivated a hybrid implementation in which different detector families contribute complementary strengths rather than competing as isolated alternatives.
-
-\subsection{GED Architecture}
-The implemented GED service receives preprocessed tokens and morphological features, runs several detectors on the same normalized payload, and then resolves conflicts between their outputs. The high-level system context of Baligh is shown in Figure~\ref{fig:baligh-arch}, while the detector-focused GED architecture appears in Figure~\ref{fig:ged-detectors}. These figures were generated as part of the project documentation and deliverables rather than drawn specifically for this booklet.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\textwidth]{assets/hl-arch.png}
-\caption{High-level Baligh architecture showing preprocessing, core modules, and user-facing flow.}
-\label{fig:baligh-arch}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{assets/ged-detectors.png}
-\caption{GED detector architecture with rule-based, lexicon-based, and machine-learning detectors followed by fusion and priority logic.}
-\label{fig:ged-detectors}
-\end{figure}
-
-\subsection{Rule-Based Subsystem}
-The rule-based detector was the most interpretable lane in the GED stack. Its main design points were:
-
-\begin{itemize}
-    \item \textbf{Hybrid rule hosting}: checks are routed through a registry that supports both declarative YAML rules and registry-based procedural Python rules.
-    \item \textbf{Why both formats}: YAML handled compact pattern-driven checks, while Python covered cases that needed richer procedural logic.
-    \item \textbf{Authoring workflow}: an agent was fed rule-source material from LanguageTool and other online grammar references to draft rules in our internal format.
-    \item \textbf{Quality control}: generated rules were reviewed manually, aligned to our tag schema and preprocessing assumptions, then tested one by one before acceptance.
-    \item \textbf{Practical value}: this subsystem was especially useful for high-confidence, explanation-friendly findings that could be stated explicitly and verified deterministically.
-\end{itemize}
-
-\subsection{Lexicon Subsystem}
-The lexicon subsystem extended detection beyond purely procedural rules by combining curated token and split/merge patterns with trie-backed lookup and conservative spelling suspicion. Its role was to act as a middle layer between rigid symbolic rules and broader machine-learned predictions.
-
-\textbf{Main lexicon design points}
-\begin{itemize}
-    \item \textbf{General word lexicon}: used to decide whether a normalized token is a plausible in-vocabulary Arabic word.
-    \item \textbf{Named-entity lexicon}: used to protect people, places, organizations, and other entity mentions that may not appear in the general word list.
-    \item \textbf{Why both}: the word lexicon supports ordinary spelling lookup, while the entity lexicon reduces false positives on proper nouns and multi-token names.
-\end{itemize}
-
-\begin{table}[H]
-\centering
-\caption{Lexicon Resources Used by the GED Lexicon Detector}
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.58\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth}}
-\toprule
-\textbf{Resource} & \textbf{Size} \\
-\midrule
-General word lexicon & 9{,}009{,}550 entries \\
-Named-entity phrase lexicon & 60{,}833 phrases \\
-Named-entity token lexicon & 43{,}292 tokens \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-\subsection{Machine-Learning Subsystem}
-The machine-learning subsystem was explored through the \texttt{ged\_ml.ipynb} workflow, where I compared token-memory heuristics, calibrated token memory, linear classifiers, and CRF sequence models before selecting the final detector family. However, the final deployed model was not trained from the notebook directly. It was trained through the dedicated ML training module and exported as the artifact bundle used at runtime. The final formulation treats GED as token-level sequence labeling over Baligh categories, and the final morphology-aware CRF artifact was trained on more than QALB14 alone: its training bundle uses both \texttt{QALB14} and \texttt{QALB15}. According to the artifact manifest, the kept training data covered 19{,}706 sentences and 1{,}063{,}125 tokens across those two corpora.
-
-\textbf{Feature engineering}
-\begin{itemize}
-    \item \textbf{Surface features}: normalized token form, token shape, token length, Arabic/digit/punctuation flags, prefixes and suffixes up to length four, sentence-boundary markers, neighboring normalized tokens, sentence-length and position buckets.
-    \item \textbf{Orthographic cues}: diacritic presence, repeated-character indicators, definite-article cues, and character n-grams.
-    \item \textbf{Morphology features}: POS, UD POS, lexeme, stem, root, pattern, gender, number, person, aspect, voice, mood, state, case, proclitic and enclitic fields.
-    \item \textbf{Confidence and context features}: backoff-source indicators, discretized morphology log-probability buckets, and neighboring POS features.
-\end{itemize}
-
-\textbf{Selected model path}
-\begin{table}[H]
-\centering
-\caption{ML Detector Selection Summary from \texttt{ged\_ml.ipynb}}
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.26\textwidth} >{\raggedright\arraybackslash}p{0.22\textwidth} >{\raggedright\arraybackslash}p{0.12\textwidth} >{\raggedright\arraybackslash}p{0.1\textwidth} >{\raggedright\arraybackslash}p{0.1\textwidth} >{\raggedright\arraybackslash}p{0.1\textwidth}}
-\toprule
-\textbf{Role} & \textbf{Model} & \textbf{Threshold} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
-\midrule
-Earlier deployment candidate & Surface-only CRF (\texttt{crf\_surface\_v1}) & 0.35 & 0.9080 & 0.8070 & 0.8545 \\
-Final deployed module & CRF + morphology (\texttt{crf\_surface\_v1\_morph\_v1}) & 0.40 & 0.9158 & 0.8332 & 0.8725 \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-The final runtime detector is therefore the morphology-enhanced CRF, loaded from a model bundle with an inference manifest so that the training-time feature contract stays aligned with deployment. Although the surface-only CRF was an earlier lightweight candidate, the final selected module was \texttt{crf\_surface\_v1\_morph\_v1} because it delivered the strongest development performance and better category-sensitive signal through the added morphological features.
-
-\subsection{Fusion Layer}
-One of the most important parts of my work was the fusion layer, because a multi-detector system is only useful if overlapping outputs can be reconciled consistently. The implemented algorithm first sorts spans, then performs a single left-to-right sweep over the accepted list, applying rules for exact-span duplicates, containment, partial overlap, and tier mismatches. It also normalizes explanation eligibility so that statistical predictions do not claim rule-like explanations that they do not actually possess. Figure~\ref{fig:fusion-flow} summarizes this logic using the generated visualization from the GED documentation.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.52\textwidth]{assets/ged-fusion-flow.png}
-\caption{Fusion-layer flow used to resolve overlap conflicts and normalize final GED spans.}
-\label{fig:fusion-flow}
-\end{figure}
-
-\begin{table}[H]
-\caption{Implemented GED Subsystems and Their Roles}
-\centering
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.2\textwidth}YYY}
-\toprule
-\textbf{Subsystem} & \textbf{Purpose} & \textbf{Main Strength} & \textbf{My Implementation Role} \\
-\midrule
-Rule-based detector & Apply linguistic checks over preprocessed text & Precision and explainability & Implemented detector entry point, rule organization, tests, and supporting notebooks \\
-Lexicon matcher & Detect curated lexical and spelling-oriented issues & Useful bridge between rules and broad statistical prediction & Implemented pattern matching, trie-backed resources, and plausibility gating \\
-Sequence labeler & Predict token-level GED labels from features & Broad contextual coverage & Implemented runtime detector, artifact alignment, and evaluation support \\
-Fusion layer & Merge subsystem outputs into one final result set & Stable multi-detector behavior & Designed and implemented overlap resolution and explanation-eligibility logic \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-\subsection{Evaluation Summary}
-The implemented evaluation pipeline measures each subsystem independently and then after fusion across several corpora, including QALB14, QALB15 L1, QALB15 L2, and ZAEBUC. Aggregate binary results from the generated report show that the symbolic lanes are precise but narrower in coverage, while the learned and fused systems provide much stronger end-to-end performance. The aggregate binary F1 scores were approximately 0.277 for the rule-based detector, 0.230 for the lexicon matcher, 0.808 for the sequence labeler, and 0.819 for the fused system.
-
-These numbers should also be interpreted with care because the error categories are not evenly distributed across the evaluation datasets. In practice, the datasets highlight models that perform well on the more frequent tags, which naturally favors the sequence labeler. However, the rule-based and lexicon-based lanes still catch error types that the sequence labeler may miss, especially categories that are less common in the training and evaluation sets. For that reason, their value is not fully reflected by aggregate binary scores alone, and the fused gain is important because it shows that these symbolic detectors still contribute useful coverage beyond the dominant dataset patterns.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.9\textwidth]{assets/ged-aggregate-f1.png}
-\caption{Aggregate binary GED F1 score by subsystem from the generated evaluation figures.}
-\label{fig:ged-aggregate-f1}
-\end{figure}
-
-\begin{table}[H]
-\caption{Aggregate Binary GED Performance}
-\centering
-\begin{tabularx}{0.88\textwidth}{lYYY}
-\toprule
-\textbf{System} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
-\midrule
-Rule-Based & 0.685 & 0.174 & 0.277 \\
-Lexicon Matcher & 0.892 & 0.132 & 0.230 \\
-Sequence Labeler & 0.913 & 0.725 & 0.808 \\
-Fused & 0.905 & 0.747 & 0.819 \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-\subsection{GED Output in the GUI}
-Because Baligh is ultimately a user-facing writing assistant, the detector output had to be understandable in the editor rather than only measurable in an evaluation script. Figure~\ref{fig:ged-gui-slots} therefore shows two real GUI captures: one emphasizing highlighted detections inside the editor text, and one showing the issue card and explanation-oriented presentation attached to a detected span.
-
-\begin{figure}[H]
-\centering
-\begin{tabular}{cc}
-\includegraphics[width=0.45\textwidth]{assets/ged_output-2.png} &
-\includegraphics[width=0.45\textwidth]{assets/ged_output-1.png}
-\end{tabular}
-\caption{GED feedback inside the Baligh editor: highlighted detections in the writing view and an issue card showing explanation-oriented feedback for a detected error.}
-\label{fig:ged-gui-slots}
-\end{figure}
-
-\section{Contribution 2: Productization Through Frontend, UI Direction, and Integration Support}
-While GED was my primary technical ownership area, I also contributed to making the subsystem usable inside the product. This work was not presented as a separate research contribution; rather, it helped turn backend analysis into a coherent editor workflow.
-
-\subsection{UI/UX Direction}
-My UI/UX contribution focused on clarity rather than visual novelty alone. Since Baligh is intended to support writing improvement, the interface needed to make corrections approachable and readable for Arabic users. This influenced the direction of the editor flow, the presentation of highlighted issues, and the general preference for an Arabic-first, learning-oriented experience over a noisy or overloaded correction dashboard. The goal was to ensure that detector outputs felt like guided feedback instead of raw diagnostic logs.
-
-\subsection{Frontend Implementation}
-The web client provided a concrete path for exposing Baligh's capabilities to users. My contribution here included participation in frontend development around the landing experience, editor-facing interaction, and reusable design-system-aligned components. The repo reflects this through the React/Vite client structure, themed assets, UI components, and test coverage for page behavior and controller logic. Figure~\ref{fig:frontend-screens} illustrates this product layer through the public landing view and the editor workspace where analysis results are consumed. Although this was not the flagship contribution of my booklet, it was important because it created the presentation layer that transformed GED results into something inspectable and actionable.
-
-\begin{figure}[H]
-\centering
-\begin{tabular}{c}
-\includegraphics[width=0.82\textwidth]{assets/baligh-landing.png} \\[8pt]
-\includegraphics[width=0.82\textwidth]{assets/baligh-editor.png}
-\end{tabular}
-\caption{Frontend-facing product surfaces: the Baligh landing page and the editor workspace used to present analysis results to the user.}
-\label{fig:frontend-screens}
-\end{figure}
-
-\subsection{Integration and Backend Support}
-I also supported the backend and integration work needed to expose analysis results to the editor through stable service contracts. This helped ensure that findings, corrections, and suggestions were normalized into frontend-ready structures and fit the final editor workflow.
+\section{Contribution 2: [Second Contribution Name]}
 
 \section{Testing and Validation}
-My contribution was validated through three main layers: unit tests for GED components such as rules, lexicon logic, and fusion; experimentation notebooks for inspecting preprocessing and detector behavior on real Arabic examples; and formal multi-corpus evaluation of the rule-based, lexicon, sequence-labeling, and fused systems. The surrounding product work was also checked through frontend tests, end-to-end flows, and backend contract-level validation.
 
 \chapter{Challenges, Lessons Learned, and Future Work}
 \section{Faced Challenges}
-The main challenges were acquiring suitable Arabic GED data, since high-quality labeled resources are limited, and building the rule base itself. Writing rules required both finding reliable grammar sources and translating them into forms that could be implemented, reviewed, and tested consistently.
 
 \section{Lessons Learned}
-\begin{itemize}
-    \item Research becomes valuable when it directly shapes implementation and evaluation decisions.
-    \item Experimental NLP work becomes easier to maintain when it is supported by tests, artifacts, and clear interfaces.
-    \item Product value depends not only on detection quality, but also on presenting model output clearly to users.
-    \item The benefit of good communication and documentation.
-\end{itemize}
 
 \section{Future Enhancements}
-Several improvements could extend this work in future iterations. The rule base can be broadened to cover more grammatical constructions and edge cases, especially for syntax and morphology. The machine-learning detector can benefit from richer training data, additional feature refinement, and stronger handling of underrepresented error categories. The interaction between GED and later correction stages can also become tighter so that detection evidence more directly shapes candidate generation and ranking.
 }
 
 % -----------------------------------------------------------------------------
@@ -902,242 +652,9 @@ Several improvements could extend this work in future iterations. The rule base 
 \begin{thebibliography}{99}
 \small
 
-\bibitem{alhafni2023advancements}
-B. Alhafni, N. Inoue, and N. Habash,
-``Advancements in Arabic Grammatical Error Correction: The Promise of Large Language Models and a Two-Stage System,''
-in \textit{Proceedings of ArabicNLP}, 2023.
-
-\bibitem{moukrim2021ontology}
-M. Moukrim, A. Namir, and M. Boulaknadel,
-``An Innovative Approach for Autocorrecting Arabic Syntactic Errors Based on Ontology,''
-\textit{International Journal of Advanced Computer Science and Applications}, 2021.
-
-\bibitem{zaghouani2015sahsoh}
-W. Zaghouani, N. Habash, O. Obeid, H. Bouamor, and S. Khalifa,
-``SAHSOH@QALB-2015 Shared Task: A Hybrid Arabic Spelling and Grammar Correction System,''
-in \textit{Proceedings of the Second Workshop on Arabic Natural Language Processing}, 2015.
-
-\bibitem{belkebir2021areta}
-R. Belkebir and N. Habash,
-``Automatic Error Type Annotation for Arabic,''
-in \textit{Proceedings of the 6th Arabic Natural Language Processing Workshop}, 2021.
-
 \end{thebibliography}
 }
 
-\newcommand{\AppendicesSection}{%
-\appendix
-
-\chapter{GED Rules Reference}
-This appendix summarizes the rule inventory that supports the implemented GED subsystem. The rule-based catalog is documented in \texttt{baligh/docs/ged/rules.md}, while the split and merge lexicon patterns are maintained in \texttt{src/services/ged/detectors/lexicon/resources/patterns.yaml}. The goal of this appendix is to keep the booklet aligned with the actual implementation rather than presenting a rewritten or disconnected list.
-
-\section{Rule-Based GED Catalog}
-\small
-
-\subsection{Orthography Rules}
-\begin{longtable}{T{0.28\textwidth}L{0.62\textwidth}}
-\toprule
-\textbf{Rule ID} & \textbf{Description} \\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Rule ID} & \textbf{Description} \\
-\midrule
-\endhead
-OT\_HAMZA\_PREP & \AR{حروف الجر والربط وبعض الأدوات التي أصلها بهمزة قطع تكتب بالهمزة لا بالألف المجردة، مثل: إلى، أو، إذا، أن، إن.} \\
-OT\_ALIF\_MAQSURA\_ALA & \AR{الصواب «على» لا «علي».} \\
-OT\_ALIF\_MAQSURA\_HATTA & \AR{الصواب «حتى» لا «حتي».} \\
-OT\_TANWIN\_NASB\_ON\_ALIF & \AR{تنوين النصب يكتب على الحرف الذي قبل الألف لا على الألف نفسها.} \\
-OT\_IDGHAM\_AN\_MA & \AR{الأفصح إدغام «عن ما» في «عمّا» عندما تليها جملة فعلية.} \\
-OT\_IDGHAM\_MIN\_MA & \AR{الأفصح إدغام «من ما» في «ممّا» عندما تليها جملة فعلية.} \\
-OT\_TA\_MARBUTA\_NOUN & \AR{وجوب كتابة التاء المربوطة «ة» في أواخر الأسماء المؤنثة بدل الهاء «ه».} \\
-OT\_TA\_MARBUTA\_ADJ & \AR{وجوب كتابة التاء المربوطة «ة» في أواخر الصفات المؤنثة بدل الهاء «ه».} \\
-OT\_TA\_MARBUTA\_NOUN\_PROP & \AR{وجوب كتابة التاء المربوطة «ة» في أواخر الأعلام المؤنثة بدل الهاء «ه»، مثل: مكة، فاطمة.} \\
-OT\_INNA\_AFTER\_QAWL & \AR{همزة «إن» تُكسر وجوباً بعد القول.} \\
-OT\_IDHA\_HAMZA & \AR{«إذا» تُكتب بهمزة قطع تحت الألف.} \\
-OT\_ARWAH\_HAMZA & \AR{كلمة «أرواح» جمع تكسير تُكتب بهمزة قطع على الألف.} \\
-OT\_AQAL\_HAMZA & \AR{أفعل التفضيل «أقل» يُكتب بهمزة قطع على الألف.} \\
-\bottomrule
-\end{longtable}
-
-\subsection{Punctuation Rules}
-\begin{longtable}{T{0.28\textwidth}L{0.62\textwidth}}
-\toprule
-\textbf{Rule ID} & \textbf{Description} \\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Rule ID} & \textbf{Description} \\
-\midrule
-\endhead
-PC\_SPACE\_BEFORE\_PUNC & \AR{وجوب اتصال علامات الترقيم العربية مباشرة بالكلمة التي تسبقها دون فاصل أو مسافة.} \\
-PC\_LATIN\_COMMA\_ARABIC & \AR{في السياق العربي تستعمل الفاصلة العربية «،» لا الفاصلة اللاتينية.} \\
-PC\_LATIN\_QUESTION\_ARABIC & \AR{في السياق العربي تستعمل علامة الاستفهام العربية «؟» لا العلامة اللاتينية.} \\
-PC\_LATIN\_SEMICOLON\_ARABIC & \AR{في السياق العربي تستعمل الفاصلة المنقوطة العربية «؛» لا العلامة اللاتينية المناظرة.} \\
-\bottomrule
-\end{longtable}
-
-\subsection{Syntax Rules}
-\begin{longtable}{T{0.30\textwidth}L{0.60\textwidth}}
-\toprule
-\textbf{Rule ID} & \textbf{Description} \\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Rule ID} & \textbf{Description} \\
-\midrule
-\endhead
-SY\_DEM\_HADHANI\_FEM & \AR{الصواب «هاتان» مع الاسم المثنى المؤنث لا «هذان».} \\
-SY\_DEM\_HATANI\_MASC & \AR{الصواب «هذان» مع الاسم المثنى المذكر لا «هاتان».} \\
-SY\_DEM\_HADHAYNI\_FEM & \AR{الصواب «هاتين» مع الاسم المثنى المؤنث لا «هذين».} \\
-SY\_DEM\_HATAYNI\_MASC & \AR{الصواب «هذين» مع الاسم المثنى المذكر لا «هاتين».} \\
-SY\_DEM\_HADHANI\_CASE\_OBLIQUE\_NOUN & \AR{إذا جاء بعد «هذان» اسم مثنى مذكر غير مرفوع فهناك خلل في المطابقة الإعرابية.} \\
-SY\_DEM\_HADHAYNI\_CASE\_NOM\_NOUN & \AR{إذا جاء بعد «هذين» اسم مثنى مذكر مرفوع فهناك خلل في المطابقة الإعرابية.} \\
-SY\_DEM\_PREP\_HADHAYNI\_CASE\_NOM\_NOUN & \AR{بعد حرف الجر يكون الاسم بعد «هذين» مجرورًا لا مرفوعًا.} \\
-SY\_DEM\_HATANI\_CASE\_OBLIQUE\_NOUN & \AR{إذا جاء بعد «هاتان» اسم مثنى مؤنث غير مرفوع فهناك خلل في المطابقة الإعرابية.} \\
-SY\_DEM\_HATAYNI\_CASE\_NOM\_NOUN & \AR{إذا جاء بعد «هاتين» اسم مثنى مؤنث مرفوع فهناك خلل في المطابقة الإعرابية.} \\
-SY\_DEM\_PREP\_HATAYNI\_CASE\_NOM\_NOUN & \AR{بعد حرف الجر يكون الاسم بعد «هاتين» مجرورًا لا مرفوعًا.} \\
-SY\_LAM\_JUSSIVE & \AR{الفعل المضارع بعد «لم» يجب أن يكون مجزومًا.} \\
-SY\_LAMMA\_JUSSIVE & \AR{الفعل المضارع بعد «لما» يجب أن يكون مجزومًا.} \\
-SY\_LA\_NAHIYA\_JUSSIVE & \AR{الفعل المضارع بعد «لا» الناهية يجب أن يكون مجزومًا.} \\
-SY\_LA\_NAFIYA\_NOT\_JUSSIVE & \AR{«لا» النافية لا تجزم الفعل المضارع.} \\
-SY\_INNA\_SISTERS\_DUAL\_ACCUSATIVE & \AR{أخوات إن تنصب الاسم، والمثنى بعدها يكون منصوبًا بالياء لا مرفوعًا.} \\
-SY\_VERB\_SUBJECT\_VSO & \AR{وجوب إفراد الفعل وتجريده من علامات التثنية والجمع إذا تقدم على الفاعل الظاهر في الجملة الفعلية.} \\
-SY\_NOUN\_ADJ\_DEFINITENESS & \AR{وجوب مطابقة النعت للمنعوت في التعريف والتنكير.} \\
-SY\_DEMONSTRATIVE\_NOUN\_GENDER & \AR{وجوب مطابقة اسم الإشارة للاسم الذي بعده في التذكير والتأنيث، مثل: هذا البطل، هذه السلامة.} \\
-SY\_RELATIVE\_PRONOUN\_GENDER & \AR{وجوب مطابقة الاسم الموصول للاسم السابق له في التذكير والتأنيث، مثل: القول الذي، الوشاية التي.} \\
-SY\_PREP\_DUAL\_CASE & \AR{وجوب جر الاسم المثنى بعد حرف الجر، مثل: في الكتابين لا في الكتابان.} \\
-SY\_PREP\_SOUND\_MASC\_PLURAL\_CASE & \AR{وجوب جر جمع المذكر السالم بعد حرف الجر، مثل: مع المسافرين لا مع المسافرون.} \\
-SY\_MAMNOO3\_SARF\_TANWEEN\_NASB & \AR{الممنوع من الصرف لا يُنوَّن.} \\
-SY\_KAMA\_ANNA & \AR{الصواب «كما أن» بدون الواو الزائدة.} \\
-SY\_LA\_SIYYAMA\_WA & \AR{الصواب «لا سيما» دون واو بعدها.} \\
-SY\_AS\_KA & \AR{استخدام الكاف للصفة استخدام أجنبي، والأصح النصب على الحالية.} \\
-SY\_LA\_PAST\_TENSE & \AR{عند نفي الفعل الماضي يُنفى بـ «ما» أو «لم» مع المضارع، ولا يصح استخدام «لا» إلا إذا تكررت أو كانت للدعاء.} \\
-SY\_MUBTADA\_NAKIRA\_PREP & \AR{المبتدأ النكرة يؤخر وجوباً إذا كان الخبر شبه جملة من جار ومجرور.} \\
-SY\_QAAMA\_BI & \AR{تعبير «القيام بـ» ركيك يستحسن تجنبه واستعمال الفعل مباشرة.} \\
-SY\_HAWLA\_FI & \AR{يفضل استعمال حرف الجر «في» بدلاً من «حول» في هذا السياق.} \\
-SY\_RAGHBA\_LI & \AR{يُقال: «رغبة في» وليس «رغبة لـ».} \\
-SY\_AATIL\_AN & \AR{الأفصح أن يقال: «عاطل من العمل» أو «متعطل».} \\
-SY\_TA2MEEN\_DHIDDA & \AR{الأفصح «تأمين من» أو «مناعة من» بدلاً من «ضد».} \\
-\bottomrule
-\end{longtable}
-
-\subsection{Semantics Rules}
-\begin{longtable}{T{0.28\textwidth}L{0.62\textwidth}}
-\toprule
-\textbf{Rule ID} & \textbf{Description} \\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Rule ID} & \textbf{Description} \\
-\midrule
-\endhead
-SE\_DECADES\_IYAT & \AR{يفضل في العقود الكتابة بصيغة «ـينيات» لا «ـينات»، مثل: الثلاثينيات.} \\
-SE\_MOAKHARAN & \AR{يفضل تجنب «مؤخرا» بهذا المعنى، والأفصح: حديثًا أو قريبًا.} \\
-SE\_MUTAAKID & \AR{يفضل استعمال «متحقق» أو «متيقن» بدل «متأكد».} \\
-SE\_DHATA & \AR{يفضل «ذواتا» بدل «ذاتا» في هذا الاستعمال.} \\
-SE\_KHATIR & \AR{يفضل في هذا الاستعمال: شديد الخطر أو محفوف بالخطر بدل «خطير».} \\
-SE\_KHAMMARA & \AR{«الخمارة» بائعة الخمر، ويستحسن للمكان: «مخمرة» أو «حانة».} \\
-SE\_INDHAHALA & \AR{الفعل الأفصح: «ذهل» لا «انذهل».} \\
-SE\_BIAKMALIHI & \AR{يفضل «كله» أو «جميعه» أو «برمته» بدل «بأكمله».} \\
-SE\_TAHAMMAMA & \AR{يفضل استعمال «استحم» بدل «تحمم».} \\
-SE\_TASHKILU & \AR{يستحسن الاستغناء عن «تشكل» في هذا الاستعمال أو استبدالها بـ«هي».} \\
-SE\_TASAMAMA & \AR{الفعل المضعف هنا يدغم، والأفصح: «تصامّ» لا «تصامم».} \\
-SE\_TATMIN & \AR{الأفصح: «طمأنة» لا «تطمين».} \\
-SE\_TA3KISU & \AR{يفضل في هذا السياق «تظهر» أو «تفضح» بدل «تعكس».} \\
-SE\_JANOOBI & \AR{في الظرفية المكانية يفضل «جنوبَ» بدل «جنوبي».} \\
-SE\_KHESISAN & \AR{يفضل «خِصِّيصَى» أو «خاصًا» بدل «خصيصا».} \\
-SE\_KHALOOQ & \AR{يفضل في الوصف هنا: «حسن الخلق» بدل «خلوق».} \\
-SE\_RAGHMA & \AR{يفضل «على الرغم» أو «بالرغم» أو «على» أو «مع» بدل «رغم».} \\
-SE\_RAFAH & \AR{المستعمل هنا «رفات» لا «رفاة».} \\
-SE\_SHAWYAN & \AR{الأفصح في مصدر «شوى»: «شَيًّا» لا «شويا».} \\
-SE\_ARAYA & \AR{يفضل في هذا المعنى «عريانـون» لا «عرايا».} \\
-SE\_LIWAHDIHI & \AR{الأفصح: «وحده» بدل «لوحده».} \\
-SE\_MAHALAT & \AR{جمع «محل» في هذا الاستعمال هو «محالّ» لا «محلات».} \\
-SE\_NAFOUKH & \AR{الأفصح: «يافوخ» بدل «نافوخ».} \\
-SE\_NASHET & \AR{في الوصف يفضل «نشيط» أو «ناشط» بدل «نشط».} \\
-SE\_WALLATI & \AR{يستحسن حذف الواو من «والتي» في هذا الربط.} \\
-SE\_WALLADHI & \AR{يستحسن حذف الواو من «والذي» في هذا الربط.} \\
-SE\_ITTILA3 & \AR{الأفصح: «اطّلاع» بدل «إطلاع».} \\
-SE\_IDHTARADA & \AR{الأفصح: «اطرّد» بدل «اضطرد».} \\
-SE\_MUJBAA & \AR{الأفصح: «مجبية» بدل «مجباة».} \\
-SE\_MOUSOUD & \AR{الأفصح: «موصَد» بدل «موصود».} \\
-SE\_MUASHIRAT & \AR{يستحسن في هذا المعنى: إشارات أو علامات أو شواهد أو دلائل بدل «مؤشرات».} \\
-SE\_MISHWAR & \AR{يستحسن تجنب «مشوار» بهذا المعنى، والأفصح: طريق أو مسار أو نزهة.} \\
-SE\_MACHINE & \AR{الأفصح: «مكنة» بدل «ماكينة».} \\
-SE\_IMKANIYAT & \AR{يفضل «إمكانات» بدل «إمكانيات».} \\
-SE\_TAWAJUD & \AR{يفضل في هذا الاستعمال «وجد» بدل «تواجد».} \\
-SE\_MUSBAQAN & \AR{يفضل «مقدمًا» أو «سلفًا» أو «قبلًا» بدل «مسبقا».} \\
-SE\_WABITTALI & \AR{«وبالتالي» تعبير ركيك في هذا السياق، ويستحسن استبداله ببدائل أفصح.} \\
-SE\_BIMATHABATI & \AR{يفضل «بمنزلة» أو «تقوم مقام» بدل «بمثابة».} \\
-SE\_ISTIBYAN & \AR{يفضل «استبانة» بدل «استبيان».} \\
-SE\_AKHISSAI & \AR{يفضل «اختصاصي» بدل «أخصائي».} \\
-SE\_TOQOS & \AR{يفضل «شعائر» بدل «طقوس» في هذا الاستعمال.} \\
-SE\_BIHASABI & \AR{يستحسن تجنب «بحسب» في هذا الاستعمال واستبدالها ببدائل أفصح.} \\
-SE\_LISALIHIKA & \AR{يفضل «لمصلحتك» بدل «لصالحك».} \\
-SE\_LISALIHI & \AR{يفضل «لمصلحة» بدل «لصالح».} \\
-SE\_I3TABAR & \AR{يفضل في هذا الاستعمال «عدّ» بدل «اعتبر».} \\
-SE\_BURHA & \AR{يفضل «هنيهة» بدل «برهة» في هذا السياق.} \\
-SE\_AAWINA & \AR{يفضل «أوان» بدل «آونة».} \\
-SE\_BAWASIL & \AR{في هذا الاستعمال يفضل «بسلاء» أو «باسلون» بدل «بواسل».} \\
-SE\_MUSTAHTIR & \AR{يفضل «مستهين» أو «مستخفّ» بدل «مستهتر» في هذا الاستعمال.} \\
-SE\_SUWAH & \AR{يفضل «سياح» بدل «سواح».} \\
-SE\_KAKULL & \AR{«ككل» ترجمة ركيكة، ويستحسن «كليًا».} \\
-\bottomrule
-\end{longtable}
-\normalsize
-
-\section{Lexicon Split and Merge Patterns}
-The lexicon matcher supplements the rule-based system with exact curated patterns. In this booklet I explicitly list the split and merge entries because they form an important bridge between pure spelling normalization and grammar-aware error detection.
-
-\subsection{Split Patterns}
-\small
-\begin{longtable}{T{0.24\textwidth}L{0.26\textwidth}L{0.18\textwidth}L{0.22\textwidth}}
-\toprule
-\textbf{Pattern ID} & \textbf{Wrong Surface Form} & \textbf{Correct Form} & \textbf{Purpose} \\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Pattern ID} & \textbf{Wrong Surface Form} & \textbf{Correct Form} & \textbf{Purpose} \\
-\midrule
-\endhead
-LEX\_SPLIT\_LAKIN & \AR{لا كن} & \AR{لكن} & Common split correction \\
-LEX\_SPLIT\_HAYTHU\_MA & \AR{حيث ما} & \AR{حيثما} & Conditional/relative split correction \\
-LEX\_SPLIT\_KAY\_LA & \AR{كي لا} & \AR{كيلا} & Common split correction \\
-LEX\_SPLIT\_BAADAMA & \AR{بعد ما} & \AR{بعدما} & Common split correction \\
-LEX\_SPLIT\_LIMAN & \AR{ل من} & \AR{لمن} & Clitic attachment correction \\
-LEX\_SPLIT\_FI\_MA & \AR{في ما} & \AR{فيما} & Common split correction \\
-LEX\_SPLIT\_LIMADHA & \AR{ل ماذا} & \AR{لماذا} & Interrogative clitic correction \\
-LEX\_SPLIT\_INDA\_MA & \AR{عند ما} & \AR{عندما} & Common split correction \\
-LEX\_SPLIT\_KULLAMA & \AR{كل ما} & \AR{كلما} & Conditional/time expression correction \\
-LEX\_SPLIT\_RUBBA\_MA & \AR{رب ما} & \AR{ربما} & Common split correction \\
-\bottomrule
-\end{longtable}
-
-\subsection{Merge Patterns}
-\begin{longtable}{T{0.24\textwidth}L{0.22\textwidth}L{0.28\textwidth}L{0.16\textwidth}}
-\toprule
-\textbf{Pattern ID} & \textbf{Wrong Token} & \textbf{Correct Tokens} & \textbf{Purpose} \\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Pattern ID} & \textbf{Wrong Token} & \textbf{Correct Tokens} & \textbf{Purpose} \\
-\midrule
-\endhead
-LEX\_MERGE\_IN\_SHA\_ALLAH & \AR{انشاءالله} & \AR{إن شاء الله} & Common merge correction \\
-LEX\_MERGE\_MASHA\_ALLAH & \AR{ماشاءالله} & \AR{ما شاء الله} & Common merge correction \\
-LEX\_MERGE\_ALHAMD\_LILLAH & \AR{الحمدلله} & \AR{الحمد لله} & Common merge correction \\
-LEX\_MERGE\_SUBHAN\_ALLAH & \AR{سبحانالله} & \AR{سبحان الله} & Common merge correction \\
-LEX\_MERGE\_LA\_SIYYAMA & \AR{لاسيما} & \AR{لا سيما} & Common merge correction \\
-LEX\_MERGE\_JAZAK\_ALLAH & \AR{جزاكالله} & \AR{جزاك الله} & Common merge correction \\
-LEX\_MERGE\_TAWAKKAL\_ALLAH & \AR{توكلتعلىالله} & \AR{توكلت على الله} & Common merge correction \\
-LEX\_MERGE\_ASTAGHFIR\_ALLAH & \AR{استغفرالله} & \AR{أستغفر الله} & Common merge correction \\
-LEX\_MERGE\_ALLAHU\_AKBAR & \AR{اللهاكبر} & \AR{الله أكبر} & Common merge correction \\
-LEX\_MERGE\_BISMILLAH & \AR{بسماللهالرحمنالرحيم} & \AR{بسم الله الرحمن الرحيم} & Common merge correction \\
-\bottomrule
-\end{longtable}
-\normalsize
-}
 
 % -----------------------------------------------------------------------------
 % 17. DOCUMENT START
@@ -1154,6 +671,5 @@ LEX\_MERGE\_BISMILLAH & \AR{بسماللهالرحمنالرحيم} & \AR{بسم
 \fi
 
 \ReferencesSection
-\AppendicesSection
 
 \end{document}
