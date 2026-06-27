@@ -1031,17 +1031,102 @@ Top-5 Accuracy & 11.76\% & 32.79\% & 54.00\% & 77.50\% & 94.44\% & 100.00\% \\
 As the user types, the character prefixes restrict the possible lexical search space, causing the top-\texttt{5} prediction accuracy to rise from \texttt{11.76\%} for a single character to \texttt{100.00\%} once \texttt{6} characters have been entered.
 
 \chapter{Conclusions and Future Work}
+This chapter summarizes the overall journey of developing the Baligh project. It details the various challenges encountered during the research, design, and implementation phases, along with the strategies used to overcome them. Furthermore, it outlines the valuable experiences and technical skills gained by the team members. Finally, the chapter presents the overarching conclusions drawn from the project, highlighting its main features and limitations, and provides strategic directions for future work to expand and improve upon the current system.
+
 \section{Faced Challenges}
-\PlaceholderText{Discuss technical, management, research, data, and integration challenges.}
+Throughout the development of Baligh, the team encountered several research, technical, and integration challenges. To ensure a modular architecture and facilitate future updates, these challenges are categorized by the respective system modules.
+
+\subsection{Research Challenges}
+\begin{itemize}
+    \item \textbf{Next-Word Suggestion (NWS) Module:} One of the primary difficulties encountered during the research phase was the poorness of literature on Next-Word Suggestion for the Arabic language. The available research was found to be limited in quantity and often lacking in quality. To compensate for this gap and achieve reliable results, it was necessary to look beyond Arabic and review papers focusing on other morphologically rich languages that share similar structural complexities.
+\end{itemize}
+
+\subsection{Technical and Integration Challenges}
+\begin{itemize}
+    \item \textbf{Next-Word Suggestion (NWS) Module:} Developing a real-time predictive text module posed significant challenges, primarily revolving around the trade-off between latency and accuracy, data scarcity, and poorly existing literature.
+    \begin{itemize}
+        \item \textbf{Model Latency vs. Accuracy:} Balancing the fast response time required for typing with the context-awareness of neural models was difficult. This was done by implementing a hybrid approach that blends a fast Word N-Gram model with an LSTM model.
+        \item \textbf{Misleading Literature on N-Gram Performance:} Most papers claiming that simple N-Gram models are highly fit for NWS tasks often exaggerate their performance and use unrealistic numbers, which caused us to question our own results for a time. Furthermore, these studies assume the availability of massive corpora containing hundreds of millions to over a billion tokens to achieve good accuracy. Due to computing power limitations, training on such massive datasets was not feasible for our project.
+        \item \textbf{Data Scarcity for Interactive Evaluation:} While there are standard corpora for Arabic, finding datasets that closely mimic user keystrokes for evaluating Word Auto-Completion was challenging. We had to synthesize evaluation strategies using MRR and KSR metrics.
+    \end{itemize}
+
+    \item \textbf{Grammatical Error Detection (GED) Module}
+    \begin{itemize}
+        \item \textbf{High False Positives in Statistical Models:} Initial sequence labeling models often over-flagged correct Arabic structures. This was addressed by introducing a fusion orchestrator that prioritizes rule-based and lexicon-based detections over statistical models.
+        \item \textbf{Morphological Ambiguity:} Arabic's rich morphology often caused the system to misidentify word boundaries or grammatical roles. Integrating Farasa and CAMeL Tools for accurate morphological analysis prior to detection was crucial to resolving this.
+    \end{itemize}
+
+    \item \textbf{Grammatical Error Correction (GEC) Module}
+    \begin{itemize}
+        \item \textbf{Enormous Search Space:} Generating correction candidates for out-of-vocabulary words yielded too many possibilities. We overcame this by using dictionary lookups paired with phonetic and edit-distance ranking to surface only the most relevant suggestions.
+        \item \textbf{Complex Rule Maintenance:} Building an ontology-based correction module required extensive manual encoding of Arabic grammatical rules. Keeping this rule set manageable and efficient required careful software design.
+    \end{itemize}
+
+    \item \textbf{Integration and Web Application}
+    \begin{itemize}
+        \item \textbf{Pipeline Latency:} Running GED, GEC, and NWS sequentially for every user keystroke caused noticeable delays. We resolved this by optimizing the MongoDB client, separating analysis onto background threads, and making NWS requests independent from grammar checks.
+        \item \textbf{Rich Text Editor Alignment:} Ensuring that the highlight spans from the backend exactly matched the user's text on the frontend---especially after whitespace modifications or partial edits---required precise index mapping and synchronization.
+    \end{itemize}
+\end{itemize}
 
 \section{Gained Experience}
-\PlaceholderText{Discuss technical and non-technical learning outcomes.}
+Working on Baligh provided the team with extensive hands-on experience in both technical and non-technical domains. The collaborative nature of the project allowed team members to specialize while maintaining a unified system.
+
+\subsection{Technical Skills}
+\begin{itemize}
+    \item \textbf{Natural Language Processing (NLP):} The team gained profound insights into the linguistic differences of Arabic NLP. This included developing robust pipelines for morphological analysis, tokenization, and handling orthographic ambiguities. We also gained practical experience in extracting meaningful features for sequence labeling algorithms like CRFs and applying N-Gram structures effectively for predictive tasks.
+    \item \textbf{Machine Learning (ML) \& Data Science:} Extensive experience was gained in the entire ML lifecycle, from curating and preprocessing messy Arabic text corpora to training, evaluating, and fine-tuning models. We learned to balance accuracy and latency by evaluating different architectures, such as blending LSTMs with N-Grams, and measuring performance using metrics like MRR and KSR.
+    \item \textbf{Frontend UI Design and Backend Integration:} Although heavily streamlined during development, constructing the interactive interface strengthened our skills in custom, handcrafted UI design. Setting up the core backend also provided practical experience in handling API integrations and orchestrating requests efficiently.
+\end{itemize}
+
+\subsection{Soft Skills and Teamwork}
+\begin{itemize}
+    \item \textbf{Modular Collaboration:} Dividing the project into NWS, GED, GEC, and Integration taught the team how to define clear API contracts and interfaces, allowing parallel development without blocking one another.
+    \item \textbf{Version Control and CI/CD:} Utilizing Git, GitHub Actions, and rigorous code review processes ensured code quality and seamless integration of independently developed modules.
+    \item \textbf{Problem Solving and Research:} The project required translating academic research into practical engineering solutions, bridging the gap between theoretical Arabic linguistics and applied software engineering.
+\end{itemize}
 
 \section{Conclusions}
-\PlaceholderText{Summarize what the project achieved and why it matters.}
+The Baligh project successfully demonstrates that a comprehensive, real-time Arabic writing assistant is achievable by combining traditional linguistic rules with statistical and machine learning approaches. The final system integrates Grammatical Error Detection, Grammatical Error Correction, and Next-Word Suggestion to provide a better user experience.
+
+\textbf{Key Features achieved by the project include:}
+\begin{itemize}
+    \item A hybrid detection and correction pipeline that accurately addresses a wide range of Arabic grammatical and orthographic errors.
+    \item A fast, context-aware next-word prediction and auto-completion engine that reduces typing effort.
+    \item Educational, explainable feedback that helps users understand their mistakes rather than just blindly accepting corrections.
+    \item A highly responsive web interface customized for the Arabic language.
+\end{itemize}
+
+\textbf{Current Limitations of the system include:}
+\begin{itemize}
+    \item The reliance on word-level and character-level models in the NWS module, which can occasionally miss deep semantic context.
+    \item The ontology and rule-based corrections, while explainable, are currently limited in coverage and may not handle rare or complex grammatical structures.
+    \item The system is primarily optimized for Modern Standard Arabic (MSA) and may struggle with dialectal Arabic.
+\end{itemize}
 
 \section{Future Work}
-\PlaceholderText{Mention possible future improvements and extensions.}
+To build upon the foundation established by Baligh, subsequent development can focus on scaling the system and incorporating more advanced technologies.
+
+\subsection{Next-Word Suggestion (NWS) Enhancements}
+\begin{itemize}
+    \item \textbf{In-Sentence Completions:} Expanding the suggestion capabilities to support completions anywhere within the sentence context, rather than strictly predicting the next word at the end of a sentence.
+    \item \textbf{Extensive Model Benchmarking:} Experimenting with and benchmarking a wider variety of models to determine the highest achievable results and accuracies for Arabic text.
+    \item \textbf{Domain-Specific Training and User Personalization:} Training models on higher volume datasets and providing distinct models customized for specific text domains (e.g., legal, medical, or casual text). The system could then dynamically switch to a model based on the specific domain of the user currently using the application.
+\end{itemize}
+
+\subsection{Grammatical Error Detection and Correction Enhancements}
+\begin{itemize}
+    \item \textbf{End-to-End Seq2Seq Models:} Integrating an advanced sequence-to-sequence model alongside the text-editing approach to handle complex, multi-word structural corrections.
+    \item \textbf{Expanded Ontology:} Broadening the rule-based ontology to cover deeper semantic errors and stylistic improvements, beyond basic syntax and orthography.
+    \item \textbf{Contextual Spelling Correction:} Utilizing contextual embeddings (like AraBERT) to detect real-word spelling errors where the word is correctly spelled but incorrect in context.
+\end{itemize}
+
+\subsection{System and Platform Extensions}
+\begin{itemize}
+    \item \textbf{Dialectal Support:} Expanding the datasets and models to support common Arabic dialects alongside MSA.
+    \item \textbf{Browser Extension \& Plugins:} Developing browser extensions and plugins for popular word processors (e.g., Microsoft Word, Google Docs) to make Baligh accessible across different platforms.
+    \item \textbf{Offline Mode:} Packaging the core lightweight models (like N-Grams and MARISA Tries) for offline usage on mobile devices or desktop applications.
+\end{itemize}
 }
 
 % -----------------------------------------------------------------------------
