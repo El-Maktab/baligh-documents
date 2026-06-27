@@ -1642,7 +1642,58 @@ W. Zaghouani,
 \appendix
 
 \chapter{Development Platforms and Tools}
-\PlaceholderText{List programming languages, frameworks, libraries, operating systems, hardware, datasets, and development tools.}
+This appendix details the comprehensive technology stack, hardware, and datasets utilized throughout the development, testing, and deployment phases of the Baligh system.
+
+\section*{Programming Languages}
+\begin{itemize}
+    \item \textbf{Python (\(\geq\)3.11):} The primary language for the core NLP backend, machine learning inference, and API orchestration.
+    \item \textbf{TypeScript \& JavaScript:} Used for developing the web frontend application and the browser extension.
+    \item \textbf{HTML5 \& CSS3:} Core web technologies structuring and styling the user interfaces.
+\end{itemize}
+
+\section*{Backend Frameworks and Libraries}
+\begin{itemize}
+    \item \textbf{FastAPI \& Uvicorn:} High-performance ASGI framework and web server used for serving the RESTful API endpoints.
+    \item \textbf{PyTorch (\(\geq\)2.4):} The deep learning framework powering the neural network models.
+    \item \textbf{HuggingFace Transformers \& Accelerate:} Utilized for loading, fine-tuning, and running transformer-based language models efficiently.
+    \item \textbf{Scikit-Learn \& sklearn-crfsuite:} Employed for traditional machine learning approaches and Conditional Random Field (CRF) sequence tagging.
+    \item \textbf{CAMeL Tools \& FarasaPy:} Specialized Arabic Natural Language Processing libraries used extensively for text preprocessing, tokenization, and morphological analysis.
+    \item \textbf{Pydantic:} Used for strict data validation and serialization schemas across the API.
+    \item \textbf{Motor:} The asynchronous Python driver utilized for non-blocking communication with MongoDB.
+    \item \textbf{SPARQLWrapper:} A Python wrapper around SPARQL services used to interface with the Ontology of Arabic Syntax (OAS).
+    \item \textbf{Marisa-Trie:} A static and memory-efficient Trie data structure library used for fast lexical lookups.
+\end{itemize}
+
+\section*{Frontend Frameworks and Libraries}
+\begin{itemize}
+    \item \textbf{React 19 \& React Router DOM:} The core UI library and routing solution for building the interactive single-page application.
+    \item \textbf{Vite:} A fast, modern build tool and development server for the frontend workspace.
+    \item \textbf{TailwindCSS v4:} A utility-first CSS framework enabling rapid, responsive styling.
+    \item \textbf{React Aria Components \& Framer Motion:} Used to construct accessible, highly interactive, and smoothly animated UI components.
+    \item \textbf{Lucide React:} Providing scalable vector iconography throughout the application interfaces.
+\end{itemize}
+
+\section*{Databases and Storage}
+\begin{itemize}
+    \item \textbf{MongoDB:} A NoSQL document database used for scalable data persistence (e.g., storing user profiles, document histories).
+    \item \textbf{SQLite:} A lightweight, file-based relational database employed locally to house the Arramooz lexical dictionary and ontology relational data for rapid local queries.
+\end{itemize}
+
+\section*{Datasets}
+\begin{itemize}
+    \item \textbf{Qatar Arabic Language Bank (QALB):} The QALB-2014 and QALB-2015 test datasets served as the primary benchmark corpora. These datasets contain native and non-native Arabic comments extracted from Aljazeera articles and are characterized by a high frequency of authentic spelling and punctuation errors.
+    \item \textbf{Zayed Arabic English Bilingual Undergraduate Corpus (ZAEBUC):} An annotated corpus containing essays written by university students, utilized to evaluate models on authentic learner errors.
+    \item \textbf{Arabic Wikipedia:} Data extracted from Arabic Wikipedia was used for large-scale language modeling, vocabulary extraction, and providing general-domain context for the predictive models.
+\end{itemize}
+
+\section*{Development and CI/CD Tools}
+\begin{itemize}
+    \item \textbf{Version Control \& Automation:} Git, GitHub, and GitHub Actions formed the backbone of the continuous integration and delivery pipelines.
+    \item \textbf{Package Management:} \texttt{uv} was utilized for extremely fast Python dependency management and virtual environments; \texttt{pnpm} managed Node.js packages in the frontend monorepo.
+    \item \textbf{Backend QA:} \textbf{Ruff} (linting and formatting), \textbf{MyPy} (static type checking), and \textbf{Pytest} (unit testing framework).
+    \item \textbf{Frontend QA:} \textbf{ESLint} \& \textbf{Prettier} (linting and formatting), \textbf{Vitest} (unit testing), and \textbf{Playwright} (end-to-end browser testing).
+    \item \textbf{Task Automation:} GNU \textbf{Make} (via \texttt{Makefile}) and \textbf{pre-commit} hooks were used to orchestrate development workflows and enforce code quality standards before commits.
+\end{itemize}
 
 \chapter{Use Cases}
 The Baligh system serves a diverse set of users by addressing their specific Arabic writing needs:
