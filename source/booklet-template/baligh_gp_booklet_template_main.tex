@@ -1,0 +1,740 @@
+% !TEX TS-program = xelatex
+% -----------------------------------------------------------------------------
+% Baligh Graduation Project Booklet Template
+% One-file LaTeX template for both PROJECT and INDIVIDUAL reports.
+%
+% Compile with XeLaTeX.
+%
+% To switch between the two document types:
+%   - Project booklet:    \individualfalse
+%   - Individual booklet: \individualtrue
+%
+% Image files are optional. If the files do not exist, the template shows
+% clean placeholder boxes and still compiles.
+% -----------------------------------------------------------------------------
+
+\documentclass[12pt,a4paper,oneside]{report}
+
+% -----------------------------------------------------------------------------
+% 1. DOCUMENT MODE
+% -----------------------------------------------------------------------------
+\newif\ifindividual
+\individualfalse        % Project booklet mode
+% \individualtrue       % Individual booklet mode
+
+% -----------------------------------------------------------------------------
+% 2. PROJECT METADATA
+% -----------------------------------------------------------------------------
+\newcommand{\UniversityName}{Cairo University}
+\newcommand{\FacultyName}{Faculty of Engineering}
+\newcommand{\DepartmentName}{Department of Computer Engineering}
+\newcommand{\DegreeName}{Bachelor of Science in Computer Engineering}
+
+\newcommand{\ProjectName}{Baligh}
+\newcommand{\ProjectSubtitle}{Arabic Writing Assistant}
+\newcommand{\ProjectFullTitle}{\ProjectName: \ProjectSubtitle}
+\newcommand{\ProjectYear}{2025}
+\newcommand{\SubmissionDate}{July, 2025} % Change as needed
+
+% Verify the official English spelling of the supervisor name before final submission.
+\newcommand{\SupervisorName}{Dr. Ayman AboElhassan}
+\newcommand{\SupervisorEmail}{ayman.abo.elmaaty@eng.cu.edu.eg}
+\newcommand{\SupervisorPhone}{01060836189}
+
+% Individual mode defaults. Change these when preparing each student's report.
+\newcommand{\IndividualStudentName}{Amir Anwar Bekhit Awd Kedis}
+\newcommand{\IndividualStudentEmail}{amir.awd03@eng-st.cu.edu.eg}
+\newcommand{\IndividualStudentPhone}{01221461992}
+
+% Asset filenames are resolved relative to this template directory.
+\newcommand{\UniversityLogoFile}{assets/cu-logo.png}
+\newcommand{\FacultyLogoFile}{assets/faculty-logo.jpeg}
+\newcommand{\ProjectLogoFile}{assets/baligh-logo.pdf}
+
+% -----------------------------------------------------------------------------
+% 3. PACKAGES
+% -----------------------------------------------------------------------------
+\usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm,headheight=25pt]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage[table]{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{tocloft}
+\usepackage{setspace}
+\usepackage{ragged2e}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{etoolbox}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\usepackage{cite}
+\usepackage{hyperref}
+
+% -----------------------------------------------------------------------------
+% 4. LANGUAGE AND FONTS
+% -----------------------------------------------------------------------------
+\setmainlanguage{english}
+\setotherlanguage{arabic}
+
+% Use an installed sans-serif so local builds remain deterministic.
+\setmainfont{Liberation Sans}
+\newfontfamily\arabicfont[Script=Arabic,Scale=1.08]{Noto Naskh Arabic}
+
+\onehalfspacing
+\justifying
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% -----------------------------------------------------------------------------
+% 5. COLOR PALETTE - LIGHT MODE WITH BALIGH ACCENTS
+% -----------------------------------------------------------------------------
+\definecolor{BalighGreen}{HTML}{2EAD67}
+\definecolor{BalighDarkGreen}{HTML}{167A45}
+\definecolor{BalighGold}{HTML}{B99A4A}
+\definecolor{BalighInk}{HTML}{1C1F23}
+\definecolor{BalighMuted}{HTML}{6B7280}
+\definecolor{BalighLine}{HTML}{D7DCE0}
+\definecolor{BalighSoft}{HTML}{F3F8F5}
+\definecolor{CodeBack}{HTML}{F6F8FA}
+\definecolor{CodeFrame}{HTML}{D0D7DE}
+
+% -----------------------------------------------------------------------------
+% 6. HYPERLINKS
+% -----------------------------------------------------------------------------
+\hypersetup{
+    colorlinks=true,
+    linkcolor=BalighDarkGreen,
+    citecolor=BalighDarkGreen,
+    urlcolor=BalighDarkGreen,
+    pdftitle={\ProjectFullTitle\ Graduation Project Report},
+    pdfauthor={Baligh Team}
+}
+
+% -----------------------------------------------------------------------------
+% 7. HEADINGS, CAPTIONS, LISTS, TABLES
+% -----------------------------------------------------------------------------
+\titleformat{\chapter}
+  {\normalfont\bfseries\fontsize{24}{29}\selectfont\color{BalighInk}}
+  {Chapter \thechapter:}
+  {0.5em}
+  {}
+
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{18}{22}\selectfont\color{BalighDarkGreen}}
+  {\thesection.}
+  {0.6em}
+  {}
+
+\titleformat{\subsection}
+  {\normalfont\bfseries\fontsize{14}{18}\selectfont\color{BalighInk}}
+  {\thesubsection.}
+  {0.6em}
+  {}
+
+\titleformat{\subsubsection}
+  {\normalfont\bfseries\fontsize{12}{15}\selectfont\color{BalighMuted}}
+  {\thesubsubsection.}
+  {0.6em}
+  {}
+
+\titlespacing*{\chapter}{0pt}{0pt}{18pt}
+\titlespacing*{\section}{0pt}{16pt}{8pt}
+\titlespacing*{\subsection}{0pt}{12pt}{6pt}
+
+\captionsetup{
+    font=small,
+    labelfont=bf,
+    textfont=it,
+    labelsep=colon
+}
+\captionsetup[table]{position=top,skip=6pt}
+\captionsetup[figure]{position=bottom,skip=6pt}
+
+\setlist[itemize]{topsep=4pt,itemsep=3pt,leftmargin=1.2cm}
+\setlist[enumerate]{topsep=4pt,itemsep=3pt,leftmargin=1.2cm}
+
+\renewcommand{\arraystretch}{1.25}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+
+% -----------------------------------------------------------------------------
+% 8. HEADER AND FOOTER
+% -----------------------------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.7pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{BalighLine}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrule}{\hbox to\headwidth{\color{BalighLine}\leaders\hrule height \footrulewidth\hfill}}
+\fancyhead[L]{\small\textcolor{BalighMuted}{Graduation Project Report}}
+\fancyhead[R]{\small\textbf{\ProjectName}\, |\, \textcolor{BalighGreen}{\ProjectYear}}
+\fancyfoot[R]{\small\thepage\, | Page}
+
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0.7pt}
+  \renewcommand{\footrulewidth}{0.4pt}
+  \renewcommand{\headrule}{\hbox to\headwidth{\color{BalighLine}\leaders\hrule height \headrulewidth\hfill}}
+  \renewcommand{\footrule}{\hbox to\headwidth{\color{BalighLine}\leaders\hrule height \footrulewidth\hfill}}
+  \fancyhead[L]{\small\textcolor{BalighMuted}{Graduation Project Report}}
+  \fancyhead[R]{\small\textbf{\ProjectName}\, |\, \textcolor{BalighGreen}{\ProjectYear}}
+  \fancyfoot[R]{\small\thepage\, | Page}
+}
+
+% -----------------------------------------------------------------------------
+% 9. CODE LISTING STYLE
+% -----------------------------------------------------------------------------
+\lstdefinestyle{balighcode}{
+    backgroundcolor=\color{CodeBack},
+    frame=single,
+    rulecolor=\color{CodeFrame},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\bfseries\color{BalighDarkGreen},
+    commentstyle=\itshape\color{BalighMuted},
+    stringstyle=\color{BalighGold},
+    numbers=left,
+    numberstyle=\tiny\color{BalighMuted},
+    breaklines=true,
+    tabsize=4,
+    showstringspaces=false,
+    captionpos=b
+}
+\lstset{style=balighcode}
+
+% -----------------------------------------------------------------------------
+% 10. REUSABLE BLOCKS
+% -----------------------------------------------------------------------------
+\newcommand{\ImageOrPlaceholder}[2][4cm]{%
+  \IfFileExists{#2}{%
+    \includegraphics[width=#1]{#2}%
+  }{%
+    \begin{tikzpicture}
+      \node[draw=BalighLine, fill=BalighSoft, rounded corners=4pt,
+            minimum width=#1, minimum height=2.7cm, align=center,
+            text=BalighMuted] {Image placeholder\\\texttt{#2}};
+    \end{tikzpicture}%
+  }%
+}
+
+\newcommand{\ImageOrPlaceholderByHeight}[2][2cm]{%
+  \IfFileExists{#2}{%
+    \includegraphics[height=#1,keepaspectratio]{#2}%
+  }{%
+    \begin{tikzpicture}
+      \node[draw=BalighLine, fill=BalighSoft, rounded corners=4pt,
+            minimum width=2.7cm, minimum height=#1, align=center,
+            text=BalighMuted] {Image placeholder\\\texttt{#2}};
+    \end{tikzpicture}%
+  }%
+}
+
+\newtcolorbox{notebox}{
+    colback=BalighSoft,
+    colframe=BalighGreen,
+    boxrule=0.8pt,
+    arc=2mm,
+    left=8pt,right=8pt,top=6pt,bottom=6pt
+}
+
+\newcommand{\PlaceholderText}[1]{\textcolor{BalighMuted}{\emph{#1}}}
+\newcommand{\ArabicPlaceholderText}[1]{\textcolor{BalighMuted}{#1}}
+
+\newcommand{\BalighTableHeader}{\rowcolor{BalighDarkGreen}\color{white}}
+
+% -----------------------------------------------------------------------------
+% 11. TEAM DATA
+% -----------------------------------------------------------------------------
+\newcommand{\TeamMembersForCover}{%
+\renewcommand{\arraystretch}{1.1}%
+\setlength{\tabcolsep}{8pt}%
+\begin{tabular}{cc}
+\textbf{Ahmed Hamed Gaber Hamed} & \textbf{Akram Hany Karam Salam} \\
+\textbf{Amir Anwar Bekhit Awd Kedis} & \textbf{Somia Saad Ismail El-Shemy}
+\end{tabular}%
+}
+
+\newcommand{\TeamContactsTable}{%
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.32\textwidth}Y>{\raggedright\arraybackslash}p{0.18\textwidth}}
+\rowcolor{BalighDarkGreen}
+\textcolor{white}{\textbf{Name}} & \textcolor{white}{\textbf{Email}} & \textcolor{white}{\textbf{Phone Number}} \\
+Ahmed Hamed Gaber Hamed & \href{mailto:ahmed.hamed03@eng-st.cu.edu.eg}{ahmed.hamed03@eng-st.cu.edu.eg} & 01226968657 \\
+Akram Hany Karam Salam & \href{mailto:akram.sallam03@eng-st.cu.edu.eg}{akram.sallam03@eng-st.cu.edu.eg} & 01148746563 \\
+Amir Anwar Bekhit Awd Kedis & \href{mailto:amir.awd03@eng-st.cu.edu.eg}{amir.awd03@eng-st.cu.edu.eg} & 01221461992 \\
+Somia Saad Ismail El-Shemy & \href{mailto:somia.elshemy02@eng-st.cu.edu.eg}{somia.elshemy02@eng-st.cu.edu.eg} & 01080732462 \\
+\end{tabularx}%
+}
+
+\newcommand{\SupervisorContactsTable}{%
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.32\textwidth}Y>{\raggedright\arraybackslash}p{0.18\textwidth}}
+\rowcolor{BalighDarkGreen}
+\textcolor{white}{\textbf{Name}} & \textcolor{white}{\textbf{Email}} & \textcolor{white}{\textbf{Phone Number}} \\
+\SupervisorName & \href{mailto:\SupervisorEmail}{\SupervisorEmail} & \SupervisorPhone \\
+\end{tabularx}%
+}
+
+% -----------------------------------------------------------------------------
+% 12. COVER PAGE
+% -----------------------------------------------------------------------------
+\newcommand{\MakeCoverPage}{%
+\begin{titlepage}
+\thispagestyle{empty}
+\enlargethispage{0.6cm}
+
+\begin{minipage}[t]{0.57\textwidth}
+    \vspace{0pt}
+    {\fontsize{13}{16}\selectfont\textbf{\UniversityName}}\\[2pt]
+    {\fontsize{13}{16}\selectfont\textbf{\FacultyName}}\\[2pt]
+    {\fontsize{13}{16}\selectfont\textbf{\DepartmentName}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.37\textwidth}
+    \vspace{0pt}
+    \raggedleft
+    \begin{tabular}{@{}c@{\hspace{0.35cm}}c@{}}
+        \ImageOrPlaceholderByHeight[1.85cm]{\UniversityLogoFile} &
+        \ImageOrPlaceholderByHeight[1.85cm]{\FacultyLogoFile}
+    \end{tabular}
+\end{minipage}
+
+\vspace{0.55cm}
+\begin{center}
+    \ImageOrPlaceholderByHeight[2.05cm]{\ProjectLogoFile}
+
+    \vspace{0.3cm}
+    {\fontsize{24}{28}\selectfont\bfseries\ProjectName\par}
+    \vspace{0.08cm}
+    {\large\textcolor{BalighDarkGreen}{\ProjectSubtitle}\par}
+
+    \vspace{0.38cm}
+    {\normalsize A Graduation Project Report Submitted\par}
+    \vspace{0.08cm}
+    {\small to\par}
+    \vspace{0.08cm}
+    {\normalsize \FacultyName, \UniversityName\par}
+    \vspace{0.08cm}
+    {\small in Partial Fulfillment of the requirements of the degree\par}
+    \vspace{0.08cm}
+    {\small of\par}
+    \vspace{0.08cm}
+    {\normalsize \DegreeName.\par}
+
+    \vspace{0.4cm}
+    {\large\bfseries Presented by\par}
+    \vspace{0.16cm}
+    \ifindividual
+        {\normalsize\bfseries \IndividualStudentName\par}
+    \else
+        {\small\TeamMembersForCover\par}
+    \fi
+
+    \vspace{0.4cm}
+    {\large\bfseries Supervised by\par}
+    \vspace{0.14cm}
+    {\normalsize\bfseries \SupervisorName\par}
+
+    \vfill
+    {\normalsize \SubmissionDate\par}
+    \vspace{0.14cm}
+    \begin{minipage}{0.93\textwidth}
+    \centering\small
+    All rights reserved. This report may not be reproduced in whole or in part, by photocopying or other means, without the permission of the authors/department.
+    \end{minipage}
+\end{center}
+\end{titlepage}
+}
+
+% -----------------------------------------------------------------------------
+% 13. FRONT MATTER PAGES
+% -----------------------------------------------------------------------------
+\newcommand{\AbstractPage}{%
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\PlaceholderText{Write a clear and brief abstract. It should cover: the addressed problem, objectives, followed approach, project outputs, development/testing tools, testing summary, and sponsors if any.}
+
+Baligh is an AI-powered Arabic Writing Assistant designed to improve Modern Standard Arabic writing through real-time grammatical error detection, correction, spelling correction, next-word prediction, and explanatory feedback. This section should be replaced by the final project abstract.
+\clearpage
+}
+
+\newcommand{\ArabicAbstractPage}{%
+\chapter*{\hfill\foreignlanguage{arabic}{الملخص}}
+\addcontentsline{toc}{chapter}{\foreignlanguage{arabic}{الملخص}}
+\begin{Arabic}
+\begin{flushright}
+\ArabicPlaceholderText{يُكتب هنا نفس محتوى الـ \textenglish{Abstract} ولكن باللغة العربية.}
+\end{flushright}
+
+\begin{flushright}
+بليغ هو مساعد كتابة عربي مدعوم بالذكاء الاصطناعي يهدف إلى تحسين الكتابة باللغة العربية الفصحى من خلال اكتشاف الأخطاء وتصحيحها واقتراح الكلمات التالية وتقديم تفسيرات تساعد المستخدم على فهم سبب الخطأ وطريقة التصحيح. تُستبدل هذه الفقرة بالملخص العربي النهائي للمشروع.
+\end{flushright}
+\end{Arabic}
+\clearpage
+}
+
+\newcommand{\AcknowledgmentPage}{%
+\chapter*{Acknowledgment}
+\addcontentsline{toc}{chapter}{Acknowledgment}
+\PlaceholderText{Write your acknowledgment and dedication here.}
+\clearpage
+}
+
+\newcommand{\AbbreviationsPage}{%
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\PlaceholderText{Put abbreviations in alphabetical order.}
+
+\begin{longtable}{p{0.22\textwidth}p{0.68\textwidth}}
+\toprule
+\textbf{Abbreviation} & \textbf{Meaning} \\
+\midrule
+AI & Artificial Intelligence \\
+GEC & Grammatical Error Correction \\
+GED & Grammatical Error Detection \\
+MSA & Modern Standard Arabic \\
+NLP & Natural Language Processing \\
+NWP & Next-Word Prediction \\
+\bottomrule
+\end{longtable}
+\clearpage
+}
+
+\newcommand{\SymbolsPage}{%
+\chapter*{List of Symbols}
+\addcontentsline{toc}{chapter}{List of Symbols}
+\PlaceholderText{Put symbols in alphabetical order. Greek symbols should come first, followed by English symbols.}
+
+\begin{longtable}{p{0.22\textwidth}p{0.68\textwidth}}
+\toprule
+\textbf{Symbol} & \textbf{Meaning} \\
+\midrule
+$\alpha$ & Learning rate or weighting coefficient \\
+$P$ & Probability \\
+$T$ & Time or sequence length \\
+\bottomrule
+\end{longtable}
+\clearpage
+}
+
+\newcommand{\ContactsPage}{%
+\chapter*{Contacts}
+\addcontentsline{toc}{chapter}{Contacts}
+\section*{Team Members}
+\TeamContactsTable
+
+\vspace{1cm}
+\section*{Supervisor}
+\SupervisorContactsTable
+\clearpage
+}
+
+\newcommand{\MakeFrontMatter}{%
+\pagenumbering{roman}
+\AbstractPage
+\ArabicAbstractPage
+\AcknowledgmentPage
+\tableofcontents
+\clearpage
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+\clearpage
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+\clearpage
+\AbbreviationsPage
+\SymbolsPage
+\ContactsPage
+}
+
+% -----------------------------------------------------------------------------
+% 14. PROJECT BOOKLET BODY
+% -----------------------------------------------------------------------------
+\newcommand{\ProjectBookletBody}{%
+\pagenumbering{arabic}
+
+\chapter{Introduction}
+This chapter introduces the project, justifies the need for it, states the project outcomes, and explains the organization of the report.
+
+\section{Motivation and Justification}
+\PlaceholderText{Explain why the project is needed, what problem it addresses, why the problem is significant, and who benefits from the project.}
+
+Arabic writing tools often provide corrections without explaining the grammatical reasoning behind them. Baligh focuses not only on correction, but also on understandable explanations that help users improve their writing over time.
+
+\section{Project Objectives and Problem Definition}
+\PlaceholderText{State the project objectives clearly and end with a formal problem definition.}
+
+\section{Project Outcomes}
+\PlaceholderText{State the final project outcomes: models, datasets, applications, APIs, experiments, reports, or other deliverables.}
+
+\section{Document Organization}
+\PlaceholderText{Briefly describe the following chapters.}
+
+\chapter{Market Visibility Study}
+This chapter surveys the market related to the project and discusses similar tools or platforms. It should explain their limitations and justify the need for Baligh.
+
+\section{Targeted Customers}
+\PlaceholderText{Mention the intended customers/users and how they benefit from the project.}
+
+\section{Market Survey}
+\PlaceholderText{List competing or related products. Discuss each one in a subsection and explain its pros and cons.}
+
+\subsection{Competitive Product 1}
+\PlaceholderText{Describe the product, strengths, weaknesses, and relevance to Baligh.}
+
+\subsection{Competitive Product 2}
+\PlaceholderText{Describe the product, strengths, weaknesses, and relevance to Baligh.}
+
+\section{Business Case and Financial Analysis}
+\PlaceholderText{Describe the possible business case, expected users, pricing assumptions, CapEx, OpEx, revenue, cash flow, and break-even point.}
+
+\begin{table}[H]
+\caption{Sample Five-Year Financial Projection}
+\centering
+\begin{tabularx}{\textwidth}{lYYYY}
+\toprule
+\textbf{Year} & \textbf{Expected Users} & \textbf{Revenue} & \textbf{Expenses} & \textbf{Profit Before Tax} \\
+\midrule
+1 & -- & -- & -- & -- \\
+2 & -- & -- & -- & -- \\
+3 & -- & -- & -- & -- \\
+4 & -- & -- & -- & -- \\
+5 & -- & -- & -- & -- \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\chapter{Literature Survey}
+This chapter should include necessary engineering and non-engineering background, followed by a concise literature review of recent work related to the project.
+
+\section{Background on Arabic NLP}
+\PlaceholderText{Explain the most important concepts needed to understand the project, such as morphology, spelling correction, grammatical error correction, and language modeling.}
+
+\section{Background on Writing Assistance Systems}
+\PlaceholderText{Explain writing assistants, correction pipelines, feedback generation, and user-facing explanations.}
+
+\section{Comparative Study of Previous Work}
+\PlaceholderText{Classify and compare previous work. Focus on relevance, strengths, limitations, datasets, methods, and results.}
+
+\begin{table}[H]
+\caption{Comparison of Related Arabic Writing Assistance Approaches}
+\centering
+\begin{tabularx}{\textwidth}{p{0.2\textwidth}YYY}
+\toprule
+\textbf{Work/System} & \textbf{Main Approach} & \textbf{Strengths} & \textbf{Limitations} \\
+\midrule
+System 1 & Rule-based & Explainable & Limited coverage \\
+System 2 & Neural & Strong accuracy & Less interpretable \\
+System 3 & Hybrid & Balanced & Requires integration effort \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Implemented Approach}
+\PlaceholderText{State the approach chosen from the reviewed approaches and justify why it was selected. Mention any modifications added by the team.}
+
+\chapter{System Design and Architecture}
+This chapter is the main body of the report. It should answer: what has been done, and how has it been done? The discussion should flow from the overall architecture to modules and submodules.
+
+\section{Overview and Assumptions}
+\PlaceholderText{Introduce the system design and list the assumptions used during design and implementation.}
+
+\section{System Architecture}
+\PlaceholderText{Describe the overall architecture and how modules communicate.}
+
+\subsection{Block Diagram}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=1.6cm, every node/.style={draw, rounded corners, align=center, fill=BalighSoft, minimum width=3.1cm, minimum height=1cm}]
+\node (input) {User Text\\Input};
+\node[right=of input] (pipeline) {Baligh\\Processing Pipeline};
+\node[right=of pipeline] (models) {Language Models\\and Rules};
+\node[below=of pipeline] (feedback) {Corrections\\and Explanations};
+\draw[->, thick, color=BalighDarkGreen] (input) -- (pipeline);
+\draw[->, thick, color=BalighDarkGreen] (pipeline) -- (models);
+\draw[->, thick, color=BalighDarkGreen] (models) -- (feedback);
+\draw[->, thick, color=BalighDarkGreen] (feedback) -- (input);
+\end{tikzpicture}
+\caption{High-level architecture of the Baligh system.}
+\end{figure}
+
+\section{Module 1: Grammatical Error Detection}
+\subsection{Functional Description}
+\PlaceholderText{Explain what this module does.}
+\subsection{Modular Decomposition}
+\PlaceholderText{Break the module into submodules.}
+\subsection{Design Constraints}
+\PlaceholderText{Explain constraints such as latency, Arabic ambiguity, model size, and data availability.}
+\subsection{Other Description of Module 1}
+\PlaceholderText{Add any other relevant technical details.}
+
+\section{Module 2: Correction and Explanation Generation}
+\subsection{Functional Description}
+\PlaceholderText{Explain correction generation and explanation generation.}
+\subsection{Modular Decomposition}
+\PlaceholderText{Break the module into submodules.}
+\subsection{Design Constraints}
+\PlaceholderText{Explain constraints such as explanation quality, grammatical accuracy, and user readability.}
+\subsection{Other Description of Module 2}
+\PlaceholderText{Add any other relevant technical details.}
+
+\chapter{System Testing and Verification}
+This chapter describes how the system was tested and verified.
+
+\section{Testing Setup}
+\PlaceholderText{Describe hardware, software, datasets, versions, and test environment.}
+
+\section{Testing Plan and Strategy}
+\PlaceholderText{Describe unit tests, integration tests, user testing, model evaluation, and manual review.}
+
+\subsection{Module Testing}
+\PlaceholderText{Explain how each module was tested independently.}
+
+\subsection{Integration Testing}
+\PlaceholderText{Explain how the full pipeline was tested after integration.}
+
+\section{Test Schedule}
+\PlaceholderText{Add the timeline/schedule of testing activities.}
+
+\section{Comparative Results to Previous Work}
+\PlaceholderText{Compare your results with baselines or previous work where applicable.}
+
+\chapter{Conclusions and Future Work}
+\section{Faced Challenges}
+\PlaceholderText{Discuss technical, management, research, data, and integration challenges.}
+
+\section{Gained Experience}
+\PlaceholderText{Discuss technical and non-technical learning outcomes.}
+
+\section{Conclusions}
+\PlaceholderText{Summarize what the project achieved and why it matters.}
+
+\section{Future Work}
+\PlaceholderText{Mention possible future improvements and extensions.}
+}
+
+% -----------------------------------------------------------------------------
+% 15. INDIVIDUAL BOOKLET BODY
+% -----------------------------------------------------------------------------
+\newcommand{\IndividualBookletBody}{%
+\pagenumbering{arabic}
+
+\chapter{Introduction}
+\section{Project Overview}
+\PlaceholderText{Briefly introduce Baligh and the overall graduation project.}
+
+\section{Individual Role Overview}
+\PlaceholderText{Summarize the student's role and responsibilities in the team.}
+
+\section{Document Organization}
+\PlaceholderText{Briefly describe the organization of the individual report.}
+
+\chapter{Personal Role and Responsibilities}
+\section{Team Responsibilities}
+\PlaceholderText{Describe coordination, research, implementation, testing, documentation, communication, or leadership responsibilities.}
+
+\section{Assigned Tasks}
+\PlaceholderText{List the tasks assigned to this student and how they contributed to the project objectives.}
+
+\section{Timeline and Deliverables}
+\PlaceholderText{Summarize major milestones and deliverables.}
+
+\chapter{Knowledge Acquisition and Technical Preparation}
+\section{Investigated Papers}
+\PlaceholderText{Summarize the papers/materials studied and how they influenced the student's work.}
+
+\section{Self-Learning Materials}
+\PlaceholderText{List courses, tutorials, documentation, and tools studied during the project.}
+
+\section{Relevance to the Project}
+\PlaceholderText{Explain how the acquired knowledge supported the implemented contribution.}
+
+\chapter{Individual Contributions}
+\section{Contribution 1}
+\PlaceholderText{Describe the first major contribution, implementation details, design decisions, and results.}
+
+\section{Contribution 2}
+\PlaceholderText{Describe the second major contribution. Add figures, tables, and code snippets where useful.}
+
+\begin{tcolorbox}[title={Sample code snippet placeholder},colback=CodeBack,colframe=CodeFrame,boxrule=0.6pt]
+\ttfamily\small
+def explain\_correction(sentence: str) -> str:\\
+\hspace*{1.5em}"""Return a human-readable explanation for a correction."""\\
+\hspace*{1.5em}return "Replace this placeholder with actual project code."
+\end{tcolorbox}
+
+\section{Testing and Validation}
+\PlaceholderText{Explain how the individual contribution was tested and validated.}
+
+\chapter{Challenges, Lessons Learned, and Future Work}
+\section{Faced Challenges}
+\PlaceholderText{Discuss technical and personal challenges.}
+
+\section{Lessons Learned}
+\PlaceholderText{Discuss the most important skills and insights gained.}
+
+\section{Future Enhancements}
+\PlaceholderText{Mention how this contribution could be improved in future work.}
+}
+
+% -----------------------------------------------------------------------------
+% 16. REFERENCES AND APPENDICES
+% -----------------------------------------------------------------------------
+\newcommand{\ReferencesSection}{%
+\clearpage
+\renewcommand{\bibname}{References}
+\begin{thebibliography}{99}
+\small
+
+\bibitem{sample1}
+Author Name, ``Paper or Book Title,'' \textit{Conference or Journal Name}, Year.
+
+\bibitem{sample2}
+Author Name, ``Another Reference Title,'' Publisher or Venue, Year.
+
+\end{thebibliography}
+}
+
+\newcommand{\AppendicesSection}{%
+\appendix
+
+\chapter{Development Platforms and Tools}
+\PlaceholderText{List programming languages, frameworks, libraries, operating systems, hardware, datasets, and development tools.}
+
+\chapter{Use Cases}
+\PlaceholderText{Describe system use cases, actors, preconditions, main flows, alternative flows, and expected results.}
+
+\chapter{User Guide}
+\PlaceholderText{This appendix should be included. Explain how to install, run, and use the final system. Add screenshots or step-by-step instructions when available.}
+
+\chapter{Code Documentation}
+\PlaceholderText{Document important modules, classes, APIs, configuration files, and code structure.}
+
+\chapter{Feasibility Study}
+\PlaceholderText{This appendix should be included. Add market, technical, operational, and financial feasibility details.}
+}
+
+% -----------------------------------------------------------------------------
+% 17. DOCUMENT START
+% -----------------------------------------------------------------------------
+\begin{document}
+
+\MakeCoverPage
+\MakeFrontMatter
+
+\ifindividual
+    \IndividualBookletBody
+\else
+    \ProjectBookletBody
+\fi
+
+\ReferencesSection
+\AppendicesSection
+
+\end{document}
