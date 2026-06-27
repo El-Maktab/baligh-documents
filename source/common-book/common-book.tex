@@ -73,7 +73,7 @@
 \usepackage{listings}
 \usepackage[most]{tcolorbox}
 \usepackage{tikz}
-\usetikzlibrary{positioning}
+\usetikzlibrary{positioning, fit, calc, shadows}
 \usepackage{etoolbox}
 \usepackage{fontspec}
 \usepackage{polyglossia}
@@ -827,28 +827,35 @@ The same reasoning applies to prediction. Since Baligh is interactive, efficient
 In summary, Baligh follows the literature by combining morphology-aware preprocessing, structured error handling, explainable correction support, and efficient prediction into one real-time writing workflow.
 
 \chapter{System Design and Architecture}
-This chapter is the main body of the report. It should answer: what has been done, and how has it been done? The discussion should flow from the overall architecture to modules and submodules.
+This chapter forms the core of the report, detailing the technical foundation of Baligh. It outlines the design principles and structural components that enable the system to perform high-accuracy Grammatical Error Correction (GEC) and Next-Word Suggestion (NWS) with real-time responsiveness. Beginning with the high-level system architecture and then diving deep into the specific inner workings of each module and submodule.
 
 \section{Overview and Assumptions}
-\PlaceholderText{Introduce the system design and list the assumptions used during design and implementation.}
+Baligh is designed as a comprehensive Modern Standard Arabic (MSA) writing assistant that aims to provide real-time Grammatical Error Correction (GEC) and Next-Word Suggestion (NWS). The primary goal is to achieve high linguistic accuracy combined with low latency to ensure a seamless typing experience. To achieve this, the system is architected to differentiate between slow-path operations (such as deep grammatical checking) and fast-path operations (such as real-time predictive text).
+
+During the design and implementation of the system, several key assumptions and technical constraints were established:
+\begin{itemize}
+    \item \textbf{Joint Morphological Processing:} Diacritization and morphological analysis are mutually dependent in Arabic. The system assumes that morphological disambiguation implicitly provides the correct diacritization based on context, meaning they are resolved in a single joint pass rather than sequentially.
+    \item \textbf{Real-Time Word Boundary Handling:} Since user input is instantaneous and often contains incomplete words at the cursor, the system assumes that only tokens terminated by specific delimiters (whitespace or punctuation) are fully formed. Incomplete fragments bypass the full morphological pipeline and are directly routed to the word auto-completion engine.
+    \item \textbf{Modularity for Explainability:} The system assumes that users need understandable feedback. Thus, error detection and correction are loosely coupled, allowing the Explanation/Fusion layer to compile clear reasoning from multiple detection subsystems (rule-based, pattern-based, and ML).
+\end{itemize}
 
 \section{System Architecture}
-\PlaceholderText{Describe the overall architecture and how modules communicate.}
+The system architecture of Baligh is highly modular, orchestrating data through a carefully constructed pipeline that balances deep linguistic analysis with immediate user responsiveness. The architecture is broadly separated into three main layers: the Client Layer, the Preprocessing Pipeline, and the Core Features Layer.
+
+Data enters the system through the \textbf{Client Layer}, which consists of the user interface (web text editor) and the REST API backend. The raw text is immediately sent to the \textbf{Preprocessing Pipeline}. This pipeline performs foundational text cleaning, normalization, tokenization via Farasa, and contextual morphological analysis and disambiguation using CAMeL tools. 
+
+Once the text is preprocessed, it is dispatched into the \textbf{Core Features Layer}, which splits into two parallel tracks:
+\begin{enumerate}
+    \item \textbf{The Slow Path (GEC \& GED):} Preprocessed text is fed into the Grammatical Error Detection (GED) Engine, which utilizes a fusion of rule-based checkers, pattern matchers, and machine-learning sequence labelers to identify errors. These findings are passed to the Grammatical Error Correction (GEC) Module, which proposes corrections via an ontology-guided grammar lookup, dictionary spelling checks, and a text-editing machine learning model. Each module generates human-readable explanations. A final fusion and ranking layer consolidates the corrections and explanations, ensuring that the user receives the most relevant and understandable feedback.
+    \item \textbf{The Fast Path (NWS):} For predictive typing, the Next-Word Suggestion (NWS) module operates with minimal latency. It relies on a smart caching layer (for idioms and user patterns) and a context-aware trie-based lookup for word auto-completion (WAC) or next-word prediction (NWP).
+\end{enumerate}
 
 \subsection{Block Diagram}
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[node distance=1.6cm, every node/.style={draw, rounded corners, align=center, fill=BalighSoft, minimum width=3.1cm, minimum height=1cm}]
-\node (input) {User Text\\Input};
-\node[right=of input] (pipeline) {Baligh\\Processing Pipeline};
-\node[right=of pipeline] (models) {Language Models\\and Rules};
-\node[below=of pipeline] (feedback) {Corrections\\and Explanations};
-\draw[->, thick, color=BalighDarkGreen] (input) -- (pipeline);
-\draw[->, thick, color=BalighDarkGreen] (pipeline) -- (models);
-\draw[->, thick, color=BalighDarkGreen] (models) -- (feedback);
-\draw[->, thick, color=BalighDarkGreen] (feedback) -- (input);
-\end{tikzpicture}
-\caption{High-level architecture of the Baligh system.}
+\includegraphics[width=\textwidth]{assets/High-Level-Arch.png}
+\caption{High-level modular architecture of the Baligh system.}
+\label{fig:high_level_architecture}
 \end{figure}
 
 \section{Module 1: Grammatical Error Detection}
