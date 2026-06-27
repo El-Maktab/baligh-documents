@@ -263,7 +263,10 @@
 }
 
 \newcommand{\TeamContactsTable}{%
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.32\textwidth}Y>{\raggedright\arraybackslash}p{0.18\textwidth}}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.29\textwidth}Y>{\raggedright\arraybackslash}p{0.16\textwidth}@{}}
 \rowcolor{BalighDarkGreen}
 \textcolor{white}{\textbf{Name}} & \textcolor{white}{\textbf{Email}} & \textcolor{white}{\textbf{Phone Number}} \\
 Ahmed Hamed Gaber Hamed & \href{mailto:ahmed.hamed03@eng-st.cu.edu.eg}{ahmed.hamed03@eng-st.cu.edu.eg} & 01226968657 \\
@@ -271,14 +274,19 @@ Akram Hany Karam Salam & \href{mailto:akram.sallam03@eng-st.cu.edu.eg}{akram.sal
 Amir Anwar Bekhit Awd Kedis & \href{mailto:amir.awd03@eng-st.cu.edu.eg}{amir.awd03@eng-st.cu.edu.eg} & 01221461992 \\
 Somia Saad Ismail El-Shemy & \href{mailto:somia.elshemy02@eng-st.cu.edu.eg}{somia.elshemy02@eng-st.cu.edu.eg} & 01080732462 \\
 \end{tabularx}%
+\endgroup
 }
 
 \newcommand{\SupervisorContactsTable}{%
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.32\textwidth}Y>{\raggedright\arraybackslash}p{0.18\textwidth}}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.31\textwidth}Y>{\raggedright\arraybackslash}p{0.16\textwidth}@{}}
 \rowcolor{BalighDarkGreen}
 \textcolor{white}{\textbf{Name}} & \textcolor{white}{\textbf{Email}} & \textcolor{white}{\textbf{Phone Number}} \\
 \SupervisorName & \href{mailto:\SupervisorEmail}{\SupervisorEmail} & \SupervisorPhone \\
 \end{tabularx}%
+\endgroup
 }
 
 % -----------------------------------------------------------------------------
@@ -384,7 +392,13 @@ The project outputs include the preprocessing pipeline, grammatical error detect
 \newcommand{\AcknowledgmentPage}{%
 \chapter*{Acknowledgment}
 \addcontentsline{toc}{chapter}{Acknowledgment}
-\PlaceholderText{Write your acknowledgment and dedication here.}
+Baligh was not built through technical effort alone, but through the support, patience, and trust of many people around us. We would first like to thank our supervisor, \SupervisorName, for his steady guidance throughout this project. His questions, feedback, and encouragement pushed us to think more carefully, work more seriously, and keep improving the project whenever we felt uncertain or stuck.
+
+We are also deeply grateful to the Faculty of Engineering at Cairo University and the Department of Computer Engineering. The years we spent there shaped the way we think, learn, and solve problems, and this project reflects much of what we gained from that journey. Baligh became possible because of the academic foundation and sense of responsibility that this environment gave us.
+
+We would also like to thank one another as a team. This project demanded time, patience, repeated trial and error, and many long discussions before ideas became clear and features became real. What made that process meaningful was not only the final result, but the way we supported each other through the difficult parts, shared the pressure, and kept moving forward together.
+
+Finally, we thank our families and loved ones with all sincerity. Their patience during busy and stressful periods, their constant encouragement, and their belief in us gave us the strength to continue. Any achievement in this work carries a part of their support within it, and for that we are truly grateful.
 \clearpage
 }
 
@@ -462,21 +476,35 @@ $T$ & Time or sequence length \\
 \pagenumbering{arabic}
 
 \chapter{Introduction}
-This chapter introduces the project, justifies the need for it, states the project outcomes, and explains the organization of the report.
+Baligh is an Arabic writing assistant designed to support Modern Standard Arabic writing through explainable correction and real-time assistance. This chapter introduces the motivation behind the project, defines the problem it addresses, summarizes the main outcomes delivered by the project, and outlines the organization of the remainder of the report.
 
 \section{Motivation and Justification}
-\PlaceholderText{Explain why the project is needed, what problem it addresses, why the problem is significant, and who benefits from the project.}
+Arabic digital writing still lacks broadly available tools that combine grammatical support, writing speed, and educational value in a single user experience. While many writing assistants for other languages provide immediate correction, prediction, and revision support, Arabic users often rely on tools that address only isolated spelling mistakes, provide limited grammatical help, or return suggestions without clarifying the linguistic reason behind them. This gap is especially important in Modern Standard Arabic, where accurate writing is influenced by rich morphology, orthographic ambiguity, and context-sensitive grammatical structure.
 
-Arabic writing tools often provide corrections without explaining the grammatical reasoning behind them. Baligh focuses not only on correction, but also on understandable explanations that help users improve their writing over time.
+These characteristics make Arabic NLP more demanding to model and more difficult to serve well in real time. A useful writing assistant must do more than detect surface-level errors; it must process text carefully, understand partially typed input, and return feedback quickly enough to support natural writing. It must also present corrections in a way that is understandable to users rather than functioning as a black box.
+
+Baligh is motivated by this need for an integrated Arabic writing assistant that combines grammatical error detection, grammatical error correction, next-word assistance, and explanatory feedback in one workflow. The project is intended to benefit students, educators, and Arabic content writers who need writing support that improves both text quality and user understanding at the same time.
 
 \section{Project Objectives and Problem Definition}
-\PlaceholderText{State the project objectives clearly and end with a formal problem definition.}
+The primary objective of Baligh is to build an explainable writing assistant for Modern Standard Arabic that can help users write more accurately and efficiently. To achieve this objective, the project integrates a preprocessing pipeline for normalization, segmentation, and morphological analysis with a grammatical error detection subsystem, grammatical error correction components, a next-word suggestion module, and a user-facing application interface. The system is designed to highlight issues, generate ranked suggestions, provide next-word and auto-completion support, and present explanations that make the feedback more useful for learning.
+
+In addition to functional assistance, the project aims to demonstrate that Arabic writing support can be delivered through a modular architecture that balances linguistic processing, machine learning, usability, and responsiveness. This makes Baligh not only a correction tool, but also a platform for combining multiple Arabic NLP capabilities into a practical workflow.
+
+Formally, the problem addressed by this project is the lack of an integrated and explainable system for Modern Standard Arabic writing that can detect and correct grammatical issues, assist users during text entry, and deliver reliable feedback in a form suitable for real-time interactive use.
 
 \section{Project Outcomes}
-\PlaceholderText{State the final project outcomes: models, datasets, applications, APIs, experiments, reports, or other deliverables.}
+The project produced a working set of interconnected software components that together form the Baligh writing assistant. The implemented outcomes include a preprocessing pipeline responsible for text normalization, word-boundary handling, segmentation, and morphological analysis, as well as a grammatical error detection subsystem that combines rule-based, lexicon-based, and machine-learning detectors through a fusion layer.
+
+The project also delivered grammatical error correction components that use ontology-based reasoning, dictionary-based lookup, and text-editing approaches to generate and rank correction candidates. In parallel, Baligh includes a next-word suggestion subsystem that supports both next-word prediction and word auto-completion for interactive writing scenarios.
+
+At the application level, the project provides a backend API and a web-based client that expose these capabilities to the user through an integrated writing workflow. Testing and evaluation were supported through automated checks and experiments on established Arabic resources, including QALB14, QALB15, and ZAEBUC, in addition to the accompanying project documents and technical materials.
 
 \section{Document Organization}
-\PlaceholderText{Briefly describe the following chapters.}
+The remainder of this report is organized as follows. Chapter 2 presents the Market Visibility Study, which examines the intended users of the system, reviews related products, and discusses the practical need for Baligh.
+
+Chapter 3 provides the Literature Survey, covering the Arabic NLP background and the research context most relevant to the project. Chapter 4 describes the System Design and Architecture, including the main modules, their responsibilities, and the overall data flow.
+
+Chapter 5 discusses System Testing and Verification, explaining how the implemented components were checked and evaluated. Finally, Chapter 6 presents the Conclusions and Future Work, summarizing the project contributions and outlining possible directions for extending Baligh in later stages.
 
 \chapter{Market Visibility Study}
 This chapter surveys the market related to the project and discusses similar tools or platforms. It should explain their limitations and justify the need for Baligh.
