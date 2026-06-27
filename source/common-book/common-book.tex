@@ -872,25 +872,153 @@ This chapter is the main body of the report. It should answer: what has been don
 \PlaceholderText{Add any other relevant technical details.}
 
 \chapter{System Testing and Verification}
-This chapter describes how the system was tested and verified.
+To ensure that Baligh operates correctly, achieves high linguistic accuracy, and maintains responsive real-time performance, a multi-layered testing and verification strategy was implemented. The validation framework includes automatic unit testing of isolated backend algorithms, end-to-end automated browser testing of frontend interactive elements, and evaluation of core Natural Language Processing (NLP) models on gold-standard Arabic corpora. This chapter details the testing environment setup, the modular and integrated testing methodologies, the continuous integration schedule, and the quantitative evaluation results of the grammatical error detection and next-word prediction modules.
 
 \section{Testing Setup}
-\PlaceholderText{Describe hardware, software, datasets, versions, and test environment.}
+Testing and evaluation were conducted in a standardized environment to ensure the reproducibility of all results. The hardware and software specifications of the testing environment are defined as follows:
+\begin{itemize}
+    \item \textbf{Operating System:} Linux (Ubuntu 22.04 LTS / Debian-based distributions).
+    \item \textbf{Python Environment:} Python 3.11.x, managed using the \texttt{uv} package installer and virtual environment manager to guarantee deterministic dependency resolution.
+    \item \textbf{Node.js Environment:} Node.js v24.x, utilizing the \texttt{pnpm} package manager (version 10.33.4) for frontend dependency caching and management.
+    \item \textbf{Linguistic Libraries and Resources:}
+    \begin{itemize}
+        \item \texttt{camel-tools} (version 1.5.7+) loaded with the Modern Standard Arabic morphology database (\texttt{morphology-db-msa-r13}) and the Maximum Likelihood Estimation disambiguator (\texttt{disambig-mle-calima-msa-r13}).
+        \item \texttt{farasapy} (version 0.1.1) for initial text segmentations.
+    \end{itemize}
+    \item \textbf{Testing Libraries:} \texttt{pytest} (version 8.3.5) for Python backend testing; standard Node testing libraries for frontend unit tests; and \texttt{playwright} for automated end-to-end browser execution.
+    \item \textbf{Evaluation Corpora:} 
+    \begin{itemize}
+        \item \textbf{Qatar Arabic Language Bank (QALB):} The QALB-2014 and QALB-2015 test datasets, which contain native and non-native Arabic comments extracted from Aljazeera articles, characterized by a high frequency of spelling and punctuation errors.
+        \item \textbf{ZAEBUC:} A bilingual Arabic-English student writing corpus used to evaluate detection and correction robustness in educational settings.
+        \item \textbf{NWP Corpus:} An Arabic text corpus combining Arabic Wikipedia articles and the MAD corpus (totaling 900,000 test-split words) for next-word prediction models.
+    \end{itemize}
+\end{itemize}
 
 \section{Testing Plan and Strategy}
-\PlaceholderText{Describe unit tests, integration tests, user testing, model evaluation, and manual review.}
+The verification strategy relies on testing components in isolation (module testing) before testing their interactions in a fully assembled pipeline (integration testing).
 
 \subsection{Module Testing}
-\PlaceholderText{Explain how each module was tested independently.}
+Each subsystem in Baligh is validated independently using automated unit tests to guarantee functional correctness under diverse inputs.
+\begin{itemize}
+    \item \textbf{Preprocessing Service:} Unit tests in the \texttt{tests/services/preprocessing/} directory verify normalizer rules (such as Alif and Ya normalization), sentence boundary detection, word segmenters, and morphological analyzers. For example, \texttt{test\_analyzer.py} validates that out-of-vocabulary (OOV) tokens (e.g., typos like ``\foreignlanguage{arabic}{الطلابب}'' containing an extra letter) are correctly flagged with an \texttt{is\_oov = True} attribute to prevent cascading errors in downstream grammar checks.
+    \item \textbf{Grammatical Error Detection (GED):}
+    \begin{itemize}
+        \item \textit{Rule-Based Subsystem:} Unit tests verify syntactic, semantic, punctuation, and orthographical rules. Files like \texttt{test\_syntax.py} and \texttt{test\_punctuation.py} check specific grammar patterns, such as subject-verb agreement or missing spaces before punctuation.
+        \item \textit{Lexicon Subsystem:} Verified in \texttt{test\_detector.py} and \texttt{test\_trie\_runtime.py} to ensure that dictionary words and entity phrases are loaded correctly into MARISA trie data structures for rapid OOV detection.
+        \item \textit{Machine Learning Subsystem:} Verified in \texttt{test\_features.py} and \texttt{test\_detector.py} to ensure sequence labeling features are extracted and parsed correctly by the CRF model.
+        \item \textit{Fusion Layer:} Tested in \texttt{test\_fusion.py} to ensure overlap resolution works according to defined tier priorities (e.g., Tier 1 rules override Tier 3 statistical detections; overlapping spans of the same category are merged; duplicate sources are consolidated).
+    \end{itemize}
+    \item \textbf{Grammatical Error Correction (GEC):} Evaluated in \texttt{tests/services/gec/}. Tests cover ontology-guided candidate generation, alternative ranking engines, spell checking dictionary lookups, and morphological generation.
+    \item \textbf{Next-Word Prediction (NWP):} Verified in \texttt{tests/services/nws/} to ensure cache managers, request/response schemas, and character-level N-gram completions run correctly. Additionally, during the prototyping phase, interactive Jupyter Notebooks were used to visually evaluate candidate suggestions and beam search outputs of the LSTM and Hybrid models. A dedicated orchestrator test suite (\texttt{test\_orchestrator.py}) was maintained locally to validate prediction flows. This orchestrator test file was excluded from the final repository submission to avoid requiring large CUDA library dependencies and GPU environments for compilation.
+    \item \textbf{Frontend Application:} Frontend unit tests ensure utility functions, schema parsers, and editor states function correctly under standard input conditions.
+\end{itemize}
 
 \subsection{Integration Testing}
-\PlaceholderText{Explain how the full pipeline was tested after integration.}
+Integration testing validates that data flows correctly across the entire application stack.
+\begin{itemize}
+    \item \textbf{GED Orchestrator Integration:} Tested in \texttt{test\_ged\_orchestrator.py}. This ensures that a raw Arabic sentence is properly normalized, segmented, analyzed morphologically, routed through all three detectors, and fused into a final list of resolved error spans.
+    \item \textbf{Client-Server API Integration:} Verified by testing backend endpoints to ensure HTTP requests correctly accept Arabic payloads, apply the processing pipeline, and return JSON responses conforming to the API schemas.
+    \item \textbf{End-to-End Browser Automation:} Using Playwright (\texttt{pnpm test:e2e}), automated Chromium browser instances simulate actual typing sessions. The E2E suite verifies that when a user types text in the editor, error spans are visually highlighted, suggestion dropdowns populate with correction candidates, and explanatory text bubbles appear beneath active cursors.
+\end{itemize}
 
 \section{Test Schedule}
-\PlaceholderText{Add the timeline/schedule of testing activities.}
+Testing is integrated into the daily development workflow through three distinct stages:
+\begin{enumerate}
+    \item \textbf{Local Pre-Commit Verification:} Code formatting (\texttt{ruff format}), linting checks (\texttt{ruff check}), and static type checking (\texttt{mypy}) are run on local changes prior to committing.
+    \item \textbf{Local Pre-Push Validation:} Developers run the complete check suite locally using a unified command (\texttt{make all}), which triggers formatting, linting, type-checking, and the full backend \texttt{pytest} test suite.
+    \item \textbf{Continuous Integration (CI):} Managed via GitHub Actions on every pull request and push to the \texttt{main} branch. The CI workflow splits verification into two parallel jobs:
+    \begin{itemize}
+        \item \texttt{quality}: Sets up a Python 3.11 environment, installs astral \texttt{uv}, restores cached NLP datasets (Farasa and CAMeL Tools), overrides PyTorch with a CPU-only version to reduce runner overhead, downloads morphology databases, and executes formatting checks, linting, type checking, and unit tests.
+        \item \texttt{frontend}: Sets up Node.js 24 and pnpm, checks formatting and linting, runs frontend unit tests, installs Playwright dependencies, and executes end-to-end browser tests.
+    \end{itemize}
+\end{enumerate}
 
 \section{Comparative Results to Previous Work}
-\PlaceholderText{Compare your results with baselines or previous work where applicable.}
+The performance of Baligh's primary modules was quantitatively evaluated on established benchmarks.
+
+\subsection{Grammatical Error Detection (GED) Performance}
+The GED system was evaluated on QALB-2014, QALB-2015 (separate native L1 and non-native L2 sets), and ZAEBUC test sets. Performance is measured using Precision (P), Recall (R), F1-Score, and False Positives per 1000 tokens (FP/1000). The results are summarized in Table \ref{tab:ged_results}.
+
+\begin{table}[H]
+\caption{Grammatical Error Detection Subsystem Performance}
+\label{tab:ged_results}
+\centering
+\small
+\begin{tabularx}{\textwidth}{l*{5}{Y}}
+\toprule
+\textbf{Dataset} & \textbf{System / Detector} & \textbf{Precision (P)} & \textbf{Recall (R)} & \textbf{F1-Score} & \textbf{FP/1000} \\
+\midrule
+\textbf{QALB-2014} 
+  & Rule-Based Detector     & 69.22\% & 18.76\% & 29.52\% & 18.88 \\
+  & Lexicon Matcher         & 89.64\% & 13.83\% & 23.96\% & 3.62  \\
+  & Sequence Labeler (ML)   & 92.91\% & 77.49\% & 84.50\% & 13.39 \\
+  & \textbf{Fused Orchestrator} & \textbf{92.03\%} & \textbf{79.75\%} & \textbf{85.45\%} & \textbf{15.63} \\
+\midrule
+\textbf{QALB-2015 L1} 
+  & Rule-Based Detector     & 71.61\% & 20.34\% & 31.68\% & 17.38 \\
+  & Lexicon Matcher         & 88.21\% & 14.97\% & 25.59\% & 4.31  \\
+  & Sequence Labeler (ML)   & 92.47\% & 81.84\% & 86.83\% & 14.37 \\
+  & \textbf{Fused Orchestrator} & \textbf{91.52\%} & \textbf{84.30\%} & \textbf{87.76\%} & \textbf{16.84} \\
+\midrule
+\textbf{QALB-2015 L2} 
+  & Rule-Based Detector     & 55.79\% & 7.59\% & 13.36\% & 13.57 \\
+  & Lexicon Matcher         & 88.87\% & 9.48\%  & 17.13\% & 2.68  \\
+  & Sequence Labeler (ML)   & 82.67\% & 40.66\% & 54.51\% & 19.24 \\
+  & \textbf{Fused Orchestrator} & \textbf{82.49\%} & \textbf{42.74\%} & \textbf{56.31\%} & \textbf{20.47} \\
+\midrule
+\textbf{ZAEBUC} 
+  & Rule-Based Detector     & 62.58\% & 19.93\% & 30.23\% & 33.41 \\
+  & Lexicon Matcher         & 96.97\% & 8.92\%  & 16.34\% & 0.78  \\
+  & Sequence Labeler (ML)   & 87.63\% & 77.98\% & 82.52\% & 30.87 \\
+  & \textbf{Fused Orchestrator} & \textbf{87.58\%} & \textbf{79.09\%} & \textbf{83.12\%} & \textbf{31.46} \\
+\midrule
+\textbf{Aggregate} 
+  & Rule-Based Detector     & 68.48\% & 17.39\% & 27.73\% & 17.95 \\
+  & Lexicon Matcher         & 89.17\% & 13.22\% & 23.02\% & 3.60  \\
+  & Sequence Labeler (ML)   & 91.29\% & 72.48\% & 80.81\% & 15.51 \\
+  & \textbf{Fused Orchestrator} & \textbf{90.50\%} & \textbf{74.73\%} & \textbf{81.86\%} & \textbf{17.59} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The empirical results show that while the rule-based and lexicon detectors exhibit high precision (especially the lexicon matcher on ZAEBUC at 96.97%), they suffer from low recall. The machine-learning sequence labeler provides the highest recall, and the fused orchestrator successfully integrates all subsystems to achieve the best overall F1-score across all test sets, raising the aggregate F1-score to 81.86%.
+
+\subsection{Next-Word Prediction (NWP) Performance}
+The Next-Word Prediction (NWP) models were evaluated on the test split of the LSTM Corpus. We compare the standalone LSTM model against a hybrid predictor that blends LSTM and Word N-Gram models (with confidence weight $\alpha = 0.75$). The evaluation metrics include Top-1, Top-3, and Top-5 prediction accuracy, as shown in Table \ref{tab:nwp_results}.
+
+\begin{table}[H]
+\caption{Next-Word Prediction (NWP) Accuracy Comparison}
+\label{tab:nwp_results}
+\centering
+\begin{tabularx}{\textwidth}{lYYY}
+\toprule
+\textbf{Model} & \textbf{Top-1 Accuracy} & \textbf{Top-3 Accuracy} & \textbf{Top-5 Accuracy} \\
+\midrule
+Standalone LSTM   & 10.88\% & 17.56\% & 21.52\% \\
+Hybrid Predictor  & \textbf{11.40\%} & \textbf{18.20\%} & \textbf{23.00\%} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The hybrid predictor outperforms the standalone LSTM model by leveraging high-frequency local word patterns from the N-Gram model alongside the long-range semantic representation of the LSTM.
+
+\subsection{Word Auto-Completion (WAC) Performance}
+The context-aware Character N-Gram model for Word Auto-Completion was evaluated under typing scenarios. It achieves a Top-1 accuracy of \texttt{30.00\%}, Top-3 accuracy of \texttt{40.80\%}, and Top-5 accuracy of \texttt{46.40\%}, with a Mean Reciprocal Rank (MRR) of \texttt{0.3699} and a Keystroke Savings Rate (KSR) of \texttt{7.40\%}. The performance improves significantly as the length of the typed prefix increases, as detailed in Table \ref{tab:wac_prefix_results}.
+
+\begin{table}[H]
+\caption{WAC Top-5 Accuracy by Typed Prefix Length}
+\label{tab:wac_prefix_results}
+\centering
+\begin{tabularx}{\textwidth}{l*{6}{Y}}
+\toprule
+\textbf{Prefix Length (chars)} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6+} \\
+\midrule
+Top-5 Accuracy & 11.76\% & 32.79\% & 54.00\% & 77.50\% & 94.44\% & 100.00\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+As the user types, the character prefixes restrict the possible lexical search space, causing the top-5 prediction accuracy to rise from \texttt{11.76\%} for a single character to \texttt{100.00\%} once six characters have been entered.
 
 \chapter{Conclusions and Future Work}
 \section{Faced Challenges}
