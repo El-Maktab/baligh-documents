@@ -652,7 +652,7 @@ Each subsystem in Baligh is validated independently using automated unit tests t
         \item \textit{Fusion Layer:} Tested in \texttt{test\_fusion.py} to ensure overlap resolution works according to defined tier priorities (e.g., Tier 1 rules override Tier 3 statistical detections; overlapping spans of the same category are merged; duplicate sources are consolidated).
     \end{itemize}
     \item \textbf{Grammatical Error Correction (GEC):} Evaluated in \texttt{tests/services/gec/}. Tests cover ontology-guided candidate generation, alternative ranking engines, spell checking dictionary lookups, and morphological generation.
-    \item \textbf{Next-Word Prediction (NWP):} Verified in \texttt{tests/services/nws/} to ensure cache managers, request/response schemas, and character-level N-gram completions run correctly.
+    \item \textbf{Next-Word Prediction (NWP):} Verified in \texttt{tests/services/nws/} to ensure cache managers, request/response schemas, and character-level N-gram completions run correctly. Additionally, during the prototyping phase, interactive Jupyter Notebooks were used to visually evaluate candidate suggestions and beam search outputs of the LSTM and Hybrid models. A dedicated orchestrator test suite (\texttt{test\_orchestrator.py}) was maintained locally to validate prediction flows. This orchestrator test file was excluded from the final repository submission to avoid requiring large CUDA library dependencies and GPU environments for compilation.
     \item \textbf{Frontend Application:} Frontend unit tests ensure utility functions, schema parsers, and editor states function correctly under standard input conditions.
 \end{itemize}
 
