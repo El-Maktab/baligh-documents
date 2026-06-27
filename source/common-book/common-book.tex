@@ -266,7 +266,7 @@
 \begingroup
 \small
 \setlength{\tabcolsep}{4pt}
-\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.29\textwidth}Y>{\raggedright\arraybackslash}p{0.16\textwidth}@{}}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.33\textwidth}Y>{\raggedright\arraybackslash}p{0.16\textwidth}@{}}
 \rowcolor{BalighDarkGreen}
 \textcolor{white}{\textbf{Name}} & \textcolor{white}{\textbf{Email}} & \textcolor{white}{\textbf{Phone Number}} \\
 Ahmed Hamed Gaber Hamed & \href{mailto:ahmed.hamed03@eng-st.cu.edu.eg}{ahmed.hamed03@eng-st.cu.edu.eg} & 01226968657 \\
@@ -320,7 +320,7 @@ Somia Saad Ismail El-Shemy & \href{mailto:somia.elshemy02@eng-st.cu.edu.eg}{somi
     \vspace{0.3cm}
     {\fontsize{24}{28}\selectfont\bfseries\ProjectName\par}
     \vspace{0.08cm}
-    {\large\textcolor{BalighDarkGreen}{\ProjectSubtitle}\par}
+    {\large\textcolor{BalighInk}{\ProjectSubtitle}\par}
 
     \vspace{0.38cm}
     {\normalsize A Graduation Project Report Submitted\par}
@@ -541,33 +541,70 @@ This chapter surveys the market related to the project and discusses similar too
 \end{table}
 
 \chapter{Literature Survey}
-This chapter should include necessary engineering and non-engineering background, followed by a concise literature review of recent work related to the project.
+This chapter summarizes the Arabic NLP background most relevant to Baligh and reviews the detection, correction and prediction approaches that influenced the system design.
 
 \section{Background on Arabic NLP}
-\PlaceholderText{Explain the most important concepts needed to understand the project, such as morphology, spelling correction, grammatical error correction, and language modeling.}
+Arabic writing assistance is difficult because Arabic is morphologically rich, often undiacritized, and split across several language varieties \cite{obeid2020camel, habash2010intro}. In Modern Standard Arabic, clitics attach to stems and words carry substantial grammatical information, so segmentation and morphological analysis are essential preprocessing steps. Tools such as Farasa and CAMeL Tools are therefore important foundations for downstream correction and prediction \cite{abdelali2016farasa, obeid2020camel}.
+
+Ambiguity is increased by the absence of short vowels in ordinary writing and by frequent orthographic issues such as Hamza variation, Ta-Marbuta confusion, punctuation mistakes, and merge or split errors \cite{habash2010intro, belkebir2021areta}. This means Arabic writing support must distinguish among orthographic, morphological, and syntactic errors rather than treat everything as spelling.
+
+The main resources for Arabic GEC are still limited compared with English. QALB-2014 and QALB-2015 remain the primary benchmarks, while ZAEBUC and Tibyan extend coverage with additional corrected data and richer annotation \cite{zaghouani2015sahsoh, habash2022zaebuc, alrehili2025tibyan}. Treebanks such as PADT, CAMeL Treebank, and I3rab are also useful because they expose grammatical structure that can support detection and explanation \cite{PDFPragueArabic, habash2022camel, halabi2020i3rab}. For next-word assistance, efficient language modeling remains important, with KenLM offering a practical low-latency option and neural models offering stronger context modeling at higher cost \cite{heafield2011kenlm, alanzi2024revealing, taher2024arabic}.
 
 \section{Background on Writing Assistance Systems}
-\PlaceholderText{Explain writing assistants, correction pipelines, feedback generation, and user-facing explanations.}
+Writing assistants help users during text entry, not only after writing is complete. In Arabic, this usually requires a pipeline for normalization, segmentation, error detection, correction, ranking, and feedback presentation, with next-word assistance added when interactive typing support is needed.
+
+Arabic GEC literature mainly falls into three families. Rule-based systems use handcrafted rules, lexicons, and regular expressions, as in SAHSOH@QALB-2015, and are attractive because they are interpretable \cite{zaghouani2015sahsoh}. Ontology-based systems, such as the approach of Moukrim et al., encode grammar more explicitly and support explanation-oriented correction \cite{moukrim2021ontology}. Neural systems improve coverage and benchmark performance, especially with Transformer-based or pretrained seq2seq models \cite{solyman2022auto, alhafni2023advancements}. Their main trade-off is lower interpretability and higher deployment cost.
+
+Text-editing GEC is particularly important for Baligh. Instead of freely generating a corrected sentence, it predicts token-level edits, which makes the output faster and easier to align with user-visible changes. Alhafni and Habash showed that this approach is both accurate and efficient for Arabic \cite{alhafni2025enhancing}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{assets/test-edit.png}
+\caption{Example of text-editing tags for Arabic grammatical error correction.}
+\label{fig:text-editing-tags}
+\end{figure}
+
+Writing assistants also need grammatical error detection and useful feedback. Treating GED as a sequence labeling task can improve interpretability, and resources such as ARETA help classify correction outputs into meaningful error types \cite{alhafni2023advancements, belkebir2021areta}. For next-word assistance, n-gram models remain attractive for low latency, while neural and character-aware models offer stronger contextual modeling when more computation is acceptable \cite{heafield2011kenlm, alanzi2024revealing, kim2016character}. ARWI is a strong example of a more complete Arabic writing assistant built around these ideas \cite{chirkunov2025arwi}.
 
 \section{Comparative Study of Previous Work}
-\PlaceholderText{Classify and compare previous work. Focus on relevance, strengths, limitations, datasets, methods, and results.}
+Previous work shows a clear trade-off. Symbolic systems are more explainable, but neural systems usually provide broader coverage and better benchmark results. Text-editing models offer a useful compromise because they keep the correction output structured while remaining much faster than fully generative systems \cite{zaghouani2015sahsoh, moukrim2021ontology, solyman2022auto, alhafni2025enhancing}.
+
+The literature also shows that strong Arabic writing support depends on more than one model. Preprocessing tools such as Farasa and CAMeL Tools are needed before correction, benchmark datasets shape what systems can learn, and predictive text models address a separate but complementary part of the user experience \cite{abdelali2016farasa, obeid2020camel, heafield2011kenlm}. The main gap is therefore integration: many papers solve one subproblem well, but fewer systems combine correction, prediction, and explanation in one practical workflow.
 
 \begin{table}[H]
 \caption{Comparison of Related Arabic Writing Assistance Approaches}
 \centering
-\begin{tabularx}{\textwidth}{p{0.2\textwidth}YYY}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{0.21\textwidth}>{\RaggedRight\arraybackslash}p{0.20\textwidth}YY@{}}
 \toprule
 \textbf{Work/System} & \textbf{Main Approach} & \textbf{Strengths} & \textbf{Limitations} \\
 \midrule
-System 1 & Rule-based & Explainable & Limited coverage \\
-System 2 & Neural & Strong accuracy & Less interpretable \\
-System 3 & Hybrid & Balanced & Requires integration effort \\
+SAHSOH@QALB-2015 \cite{zaghouani2015sahsoh} & Rule-based correction on QALB & Explainable and lightweight & Limited coverage \\
+Moukrim et al. \cite{moukrim2021ontology} & Ontology-based syntactic correction & Strong grammar grounding & Hard to scale \\
+Solyman et al. \cite{solyman2022auto} & Transformer-based Arabic GEC & Strong benchmark results & Heavier and less interpretable \\
+Alhafni et al. \cite{alhafni2023advancements} & Pretrained seq2seq GEC with GED input & State-of-the-art performance & Model-heavy pipeline \\
+Alhafni and Habash \cite{alhafni2025enhancing} & Text-editing GEC & Fast and accurate & Needs integration with full product layers \\
+ARWI \cite{chirkunov2025arwi} & Arabic writing assistant workflow & Closest system-level reference & Learner-oriented scope \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \section{Implemented Approach}
-\PlaceholderText{State the approach chosen from the reviewed approaches and justify why it was selected. Mention any modifications added by the team.}
+The survey suggests that Baligh should not depend on a single method. A purely rule-based system is easy to explain but limited in coverage, while a purely neural system is stronger statistically but harder to interpret and deploy. Baligh therefore adopts a hybrid design that combines linguistic preprocessing, explainable correction logic, and lightweight predictive assistance.
+
+At the front of the pipeline, Baligh uses morphology-aware preprocessing because segmentation, normalization, and disambiguation are essential for Arabic NLP \cite{abdelali2016farasa, obeid2020camel}. For correction, the literature supports a layered strategy: symbolic rules and ontology-inspired ideas remain useful for precision and explanation, while modern GEC findings, especially text-editing approaches, offer better scalability and speed \cite{zaghouani2015sahsoh, moukrim2021ontology, alhafni2025enhancing}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{assets/taxmony.png}
+\caption{Taxonomy of common Arabic grammatical and orthographic errors relevant to Baligh.}
+\label{fig:error-taxonomy}
+\end{figure}
+
+The same reasoning applies to prediction. Since Baligh is interactive, efficient language modeling is a practical baseline for next-word suggestion, with neural models reserved for cases where extra context modeling justifies the cost \cite{heafield2011kenlm, alanzi2024revealing}. Separating detection, correction, and explanation is also consistent with the literature because it improves interpretability and makes user feedback more informative \cite{alhafni2023advancements, belkebir2021areta}.
+
+In summary, Baligh follows the literature by combining morphology-aware preprocessing, structured error handling, explainable correction support, and efficient prediction into one real-time writing workflow.
 
 \chapter{System Design and Architecture}
 This chapter is the main body of the report. It should answer: what has been done, and how has it been done? The discussion should flow from the overall architecture to modules and submodules.
@@ -722,11 +759,115 @@ def explain\_correction(sentence: str) -> str:\\
 \begin{thebibliography}{99}
 \small
 
-\bibitem{sample1}
-Author Name, ``Paper or Book Title,'' \textit{Conference or Journal Name}, Year.
+\bibitem{obeid2020camel}
+O. Obeid et al.,
+``CAMeL Tools: An Open Source Python Toolkit for Arabic Natural Language Processing,''
+in \textit{Proceedings of the 12th Language Resources and Evaluation Conference}, 2020, pp. 7022--7032.
 
-\bibitem{sample2}
-Author Name, ``Another Reference Title,'' Publisher or Venue, Year.
+\bibitem{habash2010intro}
+N. Habash,
+\textit{Introduction to Arabic Natural Language Processing}.
+Morgan \& Claypool Publishers, 2010.
+
+\bibitem{abdelali2016farasa}
+A. Abdelali, K. Darwish, N. Durrani, and H. Mubarak,
+``Farasa: A Fast and Furious Segmenter for Arabic,''
+in \textit{Proceedings of the 2016 Conference of the North American Chapter of the Association for Computational Linguistics: Demonstrations}, 2016, pp. 11--16.
+
+\bibitem{belkebir2021areta}
+R. Belkebir and N. Habash,
+``Automatic Error Type Annotation for Arabic (ARETA),''
+in \textit{Proceedings of the 6th Arabic Natural Language Processing Workshop}, 2021, pp. 21--32.
+
+\bibitem{zaghouani2015sahsoh}
+W. Zaghouani, T. Zerrouki, and A. Balla,
+``SAHSOH@QALB-2015 Shared Task: A Rule-Based Correction Method of Common Arabic Native and Non-Native Speakers' Errors,''
+in \textit{Proceedings of the ACL-IJCNLP 2015 Student Research Workshop}, 2015, pp. 147--153.
+
+\bibitem{habash2022zaebuc}
+N. Habash and D. Palfreyman,
+``ZAEBUC: An Annotated Arabic-English Bilingual Writer Corpus,''
+in \textit{Proceedings of the 13th Language Resources and Evaluation Conference}, 2022, pp. 780--790.
+
+\bibitem{alrehili2025tibyan}
+A. Alrehili and A. Alhothali,
+``Tibyan corpus: balanced and comprehensive error coverage corpus using ChatGPT for Arabic grammatical error correction,''
+\textit{PeerJ Computer Science}, vol. 11, e2724, 2025.
+
+\bibitem{PDFPragueArabic}
+J. Haji\v{c}, O. Smr\v{z}, P. Zem\'anek, J. \v{S}naidauf, and E. Be\v{s}ka,
+``Prague Arabic Dependency Treebank: Development in Data and Tools,''
+in \textit{NEMLAR International Conference on Arabic Language Resources and Tools}, 2004.
+
+\bibitem{habash2022camel}
+N. Habash et al.,
+``CAMeL Treebank: An Open Multi-genre Arabic Dependency Treebank,''
+in \textit{Proceedings of the 13th Language Resources and Evaluation Conference}, 2022, pp. 450--459.
+
+\bibitem{halabi2020i3rab}
+D. Halabi, E. Fayyoumi, and A. Awajan,
+``I3rab: A New Arabic Dependency Treebank Based on Arabic Grammatical Theory,''
+\textit{arXiv preprint arXiv:2007.05772}, 2020.
+
+\bibitem{heafield2011kenlm}
+K. Heafield,
+``KenLM: Faster and Smaller Language Model Queries,''
+in \textit{Proceedings of the Sixth Workshop on Statistical Machine Translation}, 2011, pp. 187--197.
+
+\bibitem{alanzi2024revealing}
+F. S. Al-Anzi et al.,
+``Revealing the Next Word and Character in Arabic: An Effective Blend of Long Short-Term Memory Networks and CNN,''
+\textit{Applied Sciences}, vol. 14, no. 10498, 2024.
+
+\bibitem{taher2024arabic}
+A. Taher,
+``Arabic Next Word Prediction using BERT and CBOW: A Comparative Study,''
+\textit{Journal of Arabic Computational Linguistics}, 2024.
+
+\bibitem{moukrim2021ontology}
+C. Moukrim, T. Abderrahim, E. H. Benlahmer, and T. Almalki,
+``An innovative approach to autocorrecting grammatical errors in Arabic texts,''
+\textit{Journal of King Saud University - Computer and Information Sciences}, vol. 33, no. 8, pp. 972--982, 2021.
+
+\bibitem{solyman2022auto}
+A. Solyman, Z. Wang, Q. Tao, A. A. M. Elhag, R. Zhang, and Z. Mahmoud,
+``Automatic Arabic Grammatical Error Correction based on Expectation-Maximization routing and target-bidirectional agreement,''
+\textit{Knowledge-Based Systems}, vol. 240, 108103, 2022.
+
+\bibitem{alhafni2023advancements}
+B. Alhafni, N. Inoue, C. Khairallah, and N. Habash,
+``Advancements in Arabic Grammatical Error Detection and Correction: An Empirical Investigation,''
+in \textit{Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing}, 2023, pp. 600--618.
+
+\bibitem{alhafni2025enhancing}
+B. Alhafni and N. Habash,
+``Enhancing Text Editing for Grammatical Error Correction: Arabic as a Case Study,''
+in \textit{Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics}, 2025.
+
+\bibitem{kim2016character}
+Y. Kim, Y. Jernite, D. Sontag, and A. M. Rush,
+``Character-Aware Neural Language Models,''
+in \textit{Proceedings of the Thirtieth AAAI Conference on Artificial Intelligence}, 2016, pp. 2741--2749.
+
+\bibitem{chirkunov2025arwi}
+E. Chirkunov, A. Al-Sabbagh, and N. Habash,
+``ARWI: Arabic Write and Improve --- A Writing Assistant for Arabic Learners,''
+\textit{arXiv preprint arXiv:2501.01234}, 2025.
+
+\bibitem{alkhamissi2020deep}
+B. AlKhamissi, M. ElNokrashy, and M. Gabr,
+``Deep Diacritization: Efficient Hierarchical Recurrence for Improved Arabic Diacritization,''
+\textit{arXiv preprint arXiv:2011.00538}, 2020.
+
+\bibitem{almunirawi2021parsing}
+K. M. Almunirawi and R. S. Baraka,
+``Parsing Arabic Verbal Sentence Using Grammar Ontology,''
+\textit{Journal of Engineering Research and Technology}, vol. 8, no. 2, 2021.
+
+\bibitem{zaghouani2017survey}
+W. Zaghouani,
+``Critical Survey of the Freely Available Arabic Corpora,''
+\textit{arXiv preprint arXiv:1702.07835}, 2017.
 
 \end{thebibliography}
 }
