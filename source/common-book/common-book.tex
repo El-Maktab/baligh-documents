@@ -369,9 +369,9 @@ Somia Saad Ismail El-Shemy & \href{mailto:somia.elshemy02@eng-st.cu.edu.eg}{somi
 \newcommand{\AbstractPage}{%
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-Arabic digital writing still suffers from a shortage of integrated tools that can correct Modern Standard Arabic text accurately, respond in real time, and explain their feedback in a way that helps users learn. Existing tools often focus on surface spelling fixes or black-box suggestions without exposing the grammatical reasoning behind the correction. Baligh addresses this problem by providing an Arabic writing assistant that combines grammatical error detection, grammatical error correction, spelling-aware editing, next-word suggestion, and explanatory feedback in a single user-facing system. The project aims to support students, educators, and Arabic content writers by improving writing quality while also making the correction process more understandable and educational.
+Arabic digital writing still suffers from a shortage of integrated tools that can correct Modern Standard Arabic text accurately, respond in real time, and explain their feedback in a way that helps users learn. Existing tools often focus on surface spelling fixes or black-box suggestions without exposing the grammatical reasoning behind the correction. Baligh addresses this problem by providing an Arabic writing assistant that combines grammatical error detection, grammatical error correction, spelling-aware editing, automatic vowelization (Tashkeel), next-word suggestion, and explanatory feedback in a single user-facing system. The project aims to support students, educators, and Arabic content writers by improving writing quality while also making the correction process more understandable and educational.
 
-The implemented system follows a modular pipeline. A preprocessing layer performs normalization, word-boundary handling, segmentation, and morphological analysis and disambiguation. On top of that, Baligh integrates a grammatical error detection engine that fuses rule-based, lexicon-based, and machine-learning detectors, then passes its findings to correction components built around ontology-guided reasoning, dictionary lookup, and text-editing models. In parallel, a next-word suggestion module supports both next-word prediction and word auto-completion. The final system highlights issues, proposes corrections, returns ranked suggestions, and presents grammar-oriented explanations to the user in an interactive workflow.
+The implemented system follows a modular pipeline. A preprocessing layer performs normalization, word-boundary handling, segmentation, and morphological analysis and disambiguation. On top of that, Baligh integrates a grammatical error detection engine that fuses rule-based, lexicon-based, and machine-learning detectors, then passes its findings to correction components built around ontology-guided reasoning, dictionary lookup, text-editing models, and automatic vowelization support. In parallel, a next-word suggestion module supports both next-word prediction and word auto-completion. The final system highlights issues, proposes corrections, returns ranked suggestions, generates Tashkeel when needed, and presents grammar-oriented explanations to the user in an interactive workflow.
 
 The project outputs include the preprocessing pipeline, grammatical error detection and correction services, the next-word suggestion subsystem, and a working user application. Testing and validation relied on automated unit and integration tests together with evaluation on established Arabic linguistic resources, including QALB14, QALB15, and ZAEBUC. Overall, Baligh demonstrates that a modular and explainable Arabic writing assistant can combine linguistic processing and machine learning into a practical platform for improving Arabic writing quality.
 \clearpage
@@ -467,10 +467,10 @@ Arabic digital writing still lacks broadly available tools that combine grammati
 
 These characteristics make Arabic NLP more demanding to model and more difficult to serve well in real time. A useful writing assistant must do more than detect surface-level errors; it must process text carefully, understand partially typed input, and return feedback quickly enough to support natural writing. It must also present corrections in a way that is understandable to users rather than functioning as a black box.
 
-Baligh is motivated by this need for an integrated Arabic writing assistant that combines grammatical error detection, grammatical error correction, next-word assistance, and explanatory feedback in one workflow. The project is intended to benefit students, educators, and Arabic content writers who need writing support that improves both text quality and user understanding at the same time.
+Baligh is motivated by this need for an integrated Arabic writing assistant that combines grammatical error detection, grammatical error correction, automatic vowelization (Tashkeel), next-word assistance, and explanatory feedback in one workflow. The project is intended to benefit students, educators, and Arabic content writers who need writing support that improves both text quality and user understanding at the same time.
 
 \section{Project Objectives and Problem Definition}
-The primary objective of Baligh is to build an explainable writing assistant for Modern Standard Arabic that can help users write more accurately and efficiently. To achieve this objective, the project integrates a preprocessing pipeline for normalization, segmentation, and morphological analysis with a grammatical error detection subsystem, grammatical error correction components, a next-word suggestion module, and a user-facing application interface. The system is designed to highlight issues, generate ranked suggestions, provide next-word and auto-completion support, and present explanations that make the feedback more useful for learning.
+The primary objective of Baligh is to build an explainable writing assistant for Modern Standard Arabic that can help users write more accurately and efficiently. To achieve this objective, the project integrates a preprocessing pipeline for normalization, segmentation, and morphological analysis with a grammatical error detection subsystem, grammatical error correction components, an automatic vowelization (Tashkeel) capability, a next-word suggestion module, and a user-facing application interface. The system is designed to highlight issues, generate ranked suggestions, provide next-word and auto-completion support, generate vowelized output when needed, and present explanations that make the feedback more useful for learning.
 
 In addition to functional assistance, the project aims to demonstrate that Arabic writing support can be delivered through a modular architecture that balances linguistic processing, machine learning, usability, and responsiveness. This makes Baligh not only a correction tool, but also a platform for combining multiple Arabic NLP capabilities into a practical workflow.
 
@@ -479,7 +479,7 @@ Formally, the problem addressed by this project is the lack of an integrated and
 \section{Project Outcomes}
 The project produced a working set of interconnected software components that together form the Baligh writing assistant. The implemented outcomes include a preprocessing pipeline responsible for text normalization, word-boundary handling, segmentation, and morphological analysis, as well as a grammatical error detection subsystem that combines rule-based, lexicon-based, and machine-learning detectors through a fusion layer.
 
-The project also delivered grammatical error correction components that use ontology-based reasoning, dictionary-based lookup, and text-editing approaches to generate and rank correction candidates. In parallel, Baligh includes a next-word suggestion subsystem that supports both next-word prediction and word auto-completion for interactive writing scenarios.
+The project also delivered grammatical error correction components that use ontology-based reasoning, dictionary-based lookup, and text-editing approaches to generate and rank correction candidates, together with automatic vowelization support for Arabic text. In parallel, Baligh includes a next-word suggestion subsystem that supports both next-word prediction and word auto-completion for interactive writing scenarios.
 
 At the application level, the project provides a backend API and a web-based client that expose these capabilities to the user through an integrated writing workflow. Testing and evaluation were supported through automated checks and experiments on established Arabic resources, including QALB14, QALB15, and ZAEBUC, in addition to the accompanying project documents and technical materials.
 
@@ -1500,10 +1500,20 @@ W. Zaghouani,
 \PlaceholderText{List programming languages, frameworks, libraries, operating systems, hardware, datasets, and development tools.}
 
 \chapter{Use Cases}
-\PlaceholderText{Describe system use cases, actors, preconditions, main flows, alternative flows, and expected results.}
+The Baligh system serves a diverse set of users by addressing their specific Arabic writing needs:
+\begin{itemize}
+    \item \textbf{Arabic Language Learners:} To understand their grammatical mistakes through explainable corrections and improve their writing skills.
+    \item \textbf{Content Creators \& Journalists:} To quickly draft, proofread, and ensure their articles are free from linguistic errors before publication.
+    \item \textbf{Teachers \& Educators:} To assist in grading essays or preparing grammatically sound educational materials.
+    \item \textbf{Lawyers \& Professionals:} To draft formal documents, contracts, and emails with high linguistic accuracy and professionalism.
+    \item \textbf{Companies \& Institutions:} To maintain standardized, error-free Arabic communication across their platforms and internal tools.
+    \item \textbf{Translators:} To ensure that content translated into Arabic is grammatically sound, flows naturally, and uses appropriate vocabulary.
+\end{itemize}
 
 \chapter{User Guide}
-\PlaceholderText{This appendix should be included. Explain how to install, run, and use the final system. Add screenshots or step-by-step instructions when available.}
+For a demonstration of how to use the Baligh system, please refer to our video demo: \url{https://www.youtube.com/watch?v=1NjsZ_7A3k8}
+
+Additional details, including step-by-step instructions on how to install and run the project, can be found in the project's README repository: \url{https://github.com/El-Maktab/baligh}
 
 \chapter{Code Documentation}
 \PlaceholderText{Document important modules, classes, APIs, configuration files, and code structure.}
