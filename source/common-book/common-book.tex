@@ -877,20 +877,20 @@ To ensure that Baligh operates correctly, achieves high linguistic accuracy, and
 \section{Testing Setup}
 Testing and evaluation were conducted in a standardized environment to ensure the reproducibility of all results. The hardware and software specifications of the testing environment are defined as follows:
 \begin{itemize}
-    \item \textbf{Operating System:} Linux (Ubuntu 22.04 LTS / Debian-based distributions).
-    \item \textbf{Python Environment:} Python 3.11.x, managed using the \texttt{uv} package installer and virtual environment manager to guarantee deterministic dependency resolution.
-    \item \textbf{Node.js Environment:} Node.js v24.x, utilizing the \texttt{pnpm} package manager (version 10.33.4) for frontend dependency caching and management.
+    \item \textbf{Operating System:} Linux (Ubuntu \texttt{22.04} LTS / Debian-based distributions).
+    \item \textbf{Python Environment:} Python \texttt{3.11.x}, managed using the \texttt{uv} package installer and virtual environment manager to guarantee deterministic dependency resolution.
+    \item \textbf{Node.js Environment:} Node.js v\texttt{24.x}, utilizing the \texttt{pnpm} package manager (version \texttt{10.33.4}) for frontend dependency caching and management.
     \item \textbf{Linguistic Libraries and Resources:}
     \begin{itemize}
-        \item \texttt{camel-tools} (version 1.5.7+) loaded with the Modern Standard Arabic morphology database (\texttt{morphology-db-msa-r13}) and the Maximum Likelihood Estimation disambiguator (\texttt{disambig-mle-calima-msa-r13}).
-        \item \texttt{farasapy} (version 0.1.1) for initial text segmentations.
+        \item \texttt{camel-tools} (version \texttt{1.5.7+}) loaded with the Modern Standard Arabic morphology database (\texttt{morphology-db-msa-r13}) and the Maximum Likelihood Estimation disambiguator (\texttt{disambig-mle-calima-msa-r13}).
+        \item \texttt{farasapy} (version \texttt{0.1.1}) for initial text segmentations.
     \end{itemize}
-    \item \textbf{Testing Libraries:} \texttt{pytest} (version 8.3.5) for Python backend testing; standard Node testing libraries for frontend unit tests; and \texttt{playwright} for automated end-to-end browser execution.
+    \item \textbf{Testing Libraries:} \texttt{pytest} (version \texttt{8.3.5}) for Python backend testing; standard Node testing libraries for frontend unit tests; and \texttt{playwright} for automated end-to-end browser execution.
     \item \textbf{Evaluation Corpora:} 
     \begin{itemize}
-        \item \textbf{Qatar Arabic Language Bank (QALB):} The QALB-2014 and QALB-2015 test datasets, which contain native and non-native Arabic comments extracted from Aljazeera articles, characterized by a high frequency of spelling and punctuation errors.
+        \item \textbf{Qatar Arabic Language Bank (QALB):} The QALB-\texttt{2014} and QALB-\texttt{2015} test datasets, which contain native and non-native Arabic comments extracted from Aljazeera articles, characterized by a high frequency of spelling and punctuation errors.
         \item \textbf{ZAEBUC:} A bilingual Arabic-English student writing corpus used to evaluate detection and correction robustness in educational settings.
-        \item \textbf{NWP Corpus:} An Arabic text corpus combining Arabic Wikipedia articles and the MAD corpus (totaling 900,000 test-split words) for next-word prediction models.
+        \item \textbf{NWP Corpus:} An Arabic text corpus combining Arabic Wikipedia articles and the MAD corpus (totaling \texttt{900,000} test-split words) for next-word prediction models.
     \end{itemize}
 \end{itemize}
 
@@ -906,10 +906,19 @@ Each subsystem in Baligh is validated independently using automated unit tests t
         \item \textit{Rule-Based Subsystem:} Unit tests verify syntactic, semantic, punctuation, and orthographical rules. Files like \texttt{test\_syntax.py} and \texttt{test\_punctuation.py} check specific grammar patterns, such as subject-verb agreement or missing spaces before punctuation.
         \item \textit{Lexicon Subsystem:} Verified in \texttt{test\_detector.py} and \texttt{test\_trie\_runtime.py} to ensure that dictionary words and entity phrases are loaded correctly into MARISA trie data structures for rapid OOV detection.
         \item \textit{Machine Learning Subsystem:} Verified in \texttt{test\_features.py} and \texttt{test\_detector.py} to ensure sequence labeling features are extracted and parsed correctly by the CRF model.
-        \item \textit{Fusion Layer:} Tested in \texttt{test\_fusion.py} to ensure overlap resolution works according to defined tier priorities (e.g., Tier 1 rules override Tier 3 statistical detections; overlapping spans of the same category are merged; duplicate sources are consolidated).
+        \item \textit{Fusion Layer:} Tested in \texttt{test\_fusion.py} to ensure overlap resolution works according to defined tier priorities (ex., Tier \texttt{1} rules override Tier \texttt{3} statistical detections; overlapping spans of the same category are merged; duplicate sources are consolidated).
     \end{itemize}
-    \item \textbf{Grammatical Error Correction (GEC):} Evaluated in \texttt{tests/services/gec/}. Tests cover ontology-guided candidate generation, alternative ranking engines, spell checking dictionary lookups, and morphological generation.
-    \item \textbf{Next-Word Prediction (NWP):} Verified in \texttt{tests/services/nws/} to ensure cache managers, request/response schemas, and character-level N-gram completions run correctly. Additionally, during the prototyping phase, interactive Jupyter Notebooks were used to visually evaluate candidate suggestions and beam search outputs of the LSTM and Hybrid models. A dedicated orchestrator test suite (\texttt{test\_orchestrator.py}) was maintained locally to validate prediction flows. This orchestrator test file was excluded from the final repository submission to avoid requiring large CUDA library dependencies and GPU environments for compilation.
+    \item \textbf{Grammatical Error Correction (GEC):} Evaluated in \texttt{tests/services/gec/}.
+    \begin{itemize}
+        \item \textit{Ontology Subsystem:} Tests morphological generation rules and syntactic corrections (such as gender and case endings) by querying semantic reasoning rules.
+        \item \textit{Dictionary Subsystem:} Tests spelling candidate suggestion engines, edit-distance generators, and phonetic ranking matchers.
+    \end{itemize}
+    \item \textbf{Next-Word Prediction (NWP):} Verified in \texttt{tests/services/nws/}.
+    \begin{itemize}
+        \item \textit{Next-Word Prediction (NWP) Subsystem:} Tests candidate word predictions generated from the LSTM model and the Word N-Gram model, validating their hybrid confidence blending.
+        \item \textit{Word Auto-Completion (WAC) Subsystem:} Tests typing completions using the Character N-Gram model to verify MRR and KSR metrics.
+        \item \textit{Prototyping \& Orchestration:} Utilized interactive Jupyter Notebooks to visually evaluate beam search rankings and maintained a local orchestrator test (\texttt{test\_orchestrator.py}), which was excluded from final submission to avoid requiring large CUDA library dependencies.
+    \end{itemize}
     \item \textbf{Frontend Application:} Frontend unit tests ensure utility functions, schema parsers, and editor states function correctly under standard input conditions.
 \end{itemize}
 
@@ -928,16 +937,17 @@ Testing is integrated into the daily development workflow through three distinct
     \item \textbf{Local Pre-Push Validation:} Developers run the complete check suite locally using a unified command (\texttt{make all}), which triggers formatting, linting, type-checking, and the full backend \texttt{pytest} test suite.
     \item \textbf{Continuous Integration (CI):} Managed via GitHub Actions on every pull request and push to the \texttt{main} branch. The CI workflow splits verification into two parallel jobs:
     \begin{itemize}
-        \item \texttt{quality}: Sets up a Python 3.11 environment, installs astral \texttt{uv}, restores cached NLP datasets (Farasa and CAMeL Tools), overrides PyTorch with a CPU-only version to reduce runner overhead, downloads morphology databases, and executes formatting checks, linting, type checking, and unit tests.
-        \item \texttt{frontend}: Sets up Node.js 24 and pnpm, checks formatting and linting, runs frontend unit tests, installs Playwright dependencies, and executes end-to-end browser tests.
+        \item \texttt{quality}: Sets up a Python \texttt{3.11} environment, installs astral \texttt{uv}, restores cached NLP datasets (Farasa and CAMeL Tools), overrides PyTorch with a CPU-only version to reduce runner overhead, downloads morphology databases, and executes formatting checks, linting, type checking, and unit tests.
+        \item \texttt{frontend}: Sets up Node.js \texttt{24} and pnpm, checks formatting and linting, runs frontend unit tests, installs Playwright dependencies, and executes end-to-end browser tests.
     \end{itemize}
 \end{enumerate}
 
+\newpage
 \section{Comparative Results to Previous Work}
 The performance of Baligh's primary modules was quantitatively evaluated on established benchmarks.
 
 \subsection{Grammatical Error Detection (GED) Performance}
-The GED system was evaluated on QALB-2014, QALB-2015 (separate native L1 and non-native L2 sets), and ZAEBUC test sets. Performance is measured using Precision (P), Recall (R), F1-Score, and False Positives per 1000 tokens (FP/1000). The results are summarized in Table \ref{tab:ged_results}.
+The GED system was evaluated on QALB-\texttt{2014}, QALB-\texttt{2015} (separate native L\texttt{1} and non-native L\texttt{2} sets), and ZAEBUC test sets. Performance is measured using Precision (P), Recall (R), F1-Score, and False Positives per \texttt{1000} tokens (FP/\texttt{1000}). The results are summarized in Table \ref{tab:ged_results}.
 
 \begin{table}[H]
 \caption{Grammatical Error Detection Subsystem Performance}
@@ -981,10 +991,10 @@ The GED system was evaluated on QALB-2014, QALB-2015 (separate native L1 and non
 \end{tabularx}
 \end{table}
 
-The empirical results show that while the rule-based and lexicon detectors exhibit high precision (especially the lexicon matcher on ZAEBUC at 96.97%), they suffer from low recall. The machine-learning sequence labeler provides the highest recall, and the fused orchestrator successfully integrates all subsystems to achieve the best overall F1-score across all test sets, raising the aggregate F1-score to 81.86%.
+The empirical results show that while the rule-based and lexicon detectors exhibit high precision (especially the lexicon matcher on ZAEBUC at \texttt{96.97\%}), they suffer from low recall. The machine-learning sequence labeler provides the highest recall, and the fused orchestrator successfully integrates all subsystems to achieve the best overall F1-score across all test sets, raising the aggregate F1-score to \texttt{81.86\%}.
 
 \subsection{Next-Word Prediction (NWP) Performance}
-The Next-Word Prediction (NWP) models were evaluated on the test split of the LSTM Corpus. We compare the standalone LSTM model against a hybrid predictor that blends LSTM and Word N-Gram models (with confidence weight $\alpha = 0.75$). The evaluation metrics include Top-1, Top-3, and Top-5 prediction accuracy, as shown in Table \ref{tab:nwp_results}.
+The Next-Word Prediction (NWP) models were evaluated on the test split of the LSTM Corpus. We compare the standalone LSTM model against a hybrid predictor that blends LSTM and Word N-Gram models (with confidence weight $\alpha = \texttt{0.75}$). The evaluation metrics include Top-\texttt{1}, Top-\texttt{3}, and Top-\texttt{5} prediction accuracy, as shown in Table \ref{tab:nwp_results}.
 
 \begin{table}[H]
 \caption{Next-Word Prediction (NWP) Accuracy Comparison}
@@ -1003,7 +1013,7 @@ Hybrid Predictor  & \textbf{11.40\%} & \textbf{18.20\%} & \textbf{23.00\%} \\
 The hybrid predictor outperforms the standalone LSTM model by leveraging high-frequency local word patterns from the N-Gram model alongside the long-range semantic representation of the LSTM.
 
 \subsection{Word Auto-Completion (WAC) Performance}
-The context-aware Character N-Gram model for Word Auto-Completion was evaluated under typing scenarios. It achieves a Top-1 accuracy of \texttt{30.00\%}, Top-3 accuracy of \texttt{40.80\%}, and Top-5 accuracy of \texttt{46.40\%}, with a Mean Reciprocal Rank (MRR) of \texttt{0.3699} and a Keystroke Savings Rate (KSR) of \texttt{7.40\%}. The performance improves significantly as the length of the typed prefix increases, as detailed in Table \ref{tab:wac_prefix_results}.
+The context-aware Character N-Gram model for Word Auto-Completion was evaluated under typing scenarios. It achieves a Top-\texttt{1} accuracy of \texttt{30.00\%}, Top-\texttt{3} accuracy of \texttt{40.80\%}, and Top-\texttt{5} accuracy of \texttt{46.40\%}, with a Mean Reciprocal Rank (MRR) of \texttt{0.3699} and a Keystroke Savings Rate (KSR) of \texttt{7.40\%}. The performance improves significantly as the length of the typed prefix increases, as detailed in Table \ref{tab:wac_prefix_results}.
 
 \begin{table}[H]
 \caption{WAC Top-5 Accuracy by Typed Prefix Length}
@@ -1018,7 +1028,7 @@ Top-5 Accuracy & 11.76\% & 32.79\% & 54.00\% & 77.50\% & 94.44\% & 100.00\% \\
 \end{tabularx}
 \end{table}
 
-As the user types, the character prefixes restrict the possible lexical search space, causing the top-5 prediction accuracy to rise from \texttt{11.76\%} for a single character to \texttt{100.00\%} once six characters have been entered.
+As the user types, the character prefixes restrict the possible lexical search space, causing the top-\texttt{5} prediction accuracy to rise from \texttt{11.76\%} for a single character to \texttt{100.00\%} once \texttt{6} characters have been entered.
 
 \chapter{Conclusions and Future Work}
 \section{Faced Challenges}
