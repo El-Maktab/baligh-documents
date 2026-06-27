@@ -510,35 +510,255 @@ Chapter 5 discusses System Testing and Verification, explaining how the implemen
 This chapter surveys the market related to the project and discusses similar tools or platforms. It should explain their limitations and justify the need for Baligh.
 
 \section{Targeted Customers}
-\PlaceholderText{Mention the intended customers/users and how they benefit from the project.}
+Baligh is designed to assist individuals and organisations that frequently produce Arabic text and require high grammatical accuracy and proper vowelisation. The system targets both educational and professional sectors, where maintaining linguistic correctness is essential.
+
+The primary target customers include:
+\begin{itemize}
+    \item \textbf{Students and Arabic Language Learners}\\
+    Students at schools and universities often struggle with Arabic grammar (Nahw) and the correct application of I'rab. Baligh provides real-time grammatical corrections and automatic vowelization.
+    \item \textbf{Teachers and Educational Institutions}\\
+    Arabic language teachers can use Baligh as an educational assistant to review assignments, prepare teaching materials, and provide immediate feedback to students.
+    \item \textbf{Researchers and Academic Writers}\\
+    Researchers who prepare scientific papers, theses, or publications in Arabic require grammatically correct and professionally written text.
+    \item \textbf{Content Creators and Journalists}\\
+    Writers, journalists, bloggers, and digital content creators regularly produce large volumes of Arabic text. Baligh accelerates the proofreading process while maintaining linguistic accuracy.
+    \item \textbf{Government and Business Organizations}\\
+    Government agencies and companies frequently produce official reports, legal documents, and correspondence in Arabic. Baligh reduces manual proofreading effort.
+\end{itemize}
+
+Customer Benefits:
+\begin{itemize}
+    \item Real-time grammar correction based on Arabic Nahw and I'rab rules.
+    \item Context-aware automatic vowelization (Tashkeel).
+    \item Intelligent writing suggestions during typing.
+    \item Reduced proofreading time.
+    \item Improved readability and writing quality.
+    \item Educational explanations that help users learn from their mistakes.
+\end{itemize}
 
 \section{Market Survey}
-\PlaceholderText{List competing or related products. Discuss each one in a subsection and explain its pros and cons.}
+Although several Arabic writing assistants currently exist, none provides a comprehensive solution that combines grammatical reasoning, contextual vowelization, and real-time intelligent suggestions. Most existing systems specialize in only one aspect of Arabic language processing.
 
-\subsection{Competitive Product 1}
-\PlaceholderText{Describe the product, strengths, weaknesses, and relevance to Baligh.}
+The following sections discuss the most relevant competing products.
 
-\subsection{Competitive Product 2}
-\PlaceholderText{Describe the product, strengths, weaknesses, and relevance to Baligh.}
+\subsection{Qalam AI}
+Qalam AI is an AI-powered Arabic writing assistant designed to improve spelling and grammar. It also supports automatic Tashkeel generation for Arabic text.
+
+\textbf{Strengths}
+\begin{itemize}
+    \item User-friendly interface.
+    \item AI-assisted grammar and spelling correction.
+\end{itemize}
+
+\textbf{Weaknesses}
+\begin{itemize}
+    \item Does not explain grammatical errors.
+    \item Does not explicitly perform Nahw and I'rab analysis.
+    \item Doesn't perform text completion.
+    \item Doesn't correct diacritic mistakes.
+    \item Not free.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Qalam1.png}
+        \caption{Wrong Correction}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Qalam2.png}
+        \caption{No Diacritiation Correction}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Qalam3.png}
+        \caption{Missed A Grammatical Mistake}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Qalam4.png}
+        \caption{Missed Many Grammatical Mistakes}
+    \end{minipage}
+\end{figure}
+
+\subsection{Sahehly}
+Sahehly is an Arabic proofreading platform that combines spelling correction, grammar checking, punctuation correction, and automatic Tashkeel.
+
+\textbf{Strengths}
+\begin{itemize}
+    \item Full-text diacritization.
+    \item Doesn't detect diacritics mistakes.
+\end{itemize}
+
+\textbf{Weaknesses}
+\begin{itemize}
+    \item Limited real-time interaction while typing.
+    \item No explicit grammatical reasoning or I'rab analysis.
+    \item Premium features require a subscription.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Sahehly1.png}
+        \caption{Wrong Correction}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Sahehly2.png}
+        \caption{No Diacritization Correction}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Sahehly3.png}
+        \caption{Missed The grammatical Error}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Sahehly4.png}
+        \caption{Missed Many Grammatical Errors}
+    \end{minipage}
+\end{figure}
+
+\subsection{AlNahawi}
+Alnahawi is an AI-powered Arabic writing assistant designed to improve Arabic text through grammar correction and spelling correction.
+
+\textbf{Strengths}
+\begin{itemize}
+    \item Provides grammar and spelling correction.
+    \item Simple and user-friendly interface.
+\end{itemize}
+
+\textbf{Weaknesses}
+\begin{itemize}
+    \item Does not provide detailed grammatical explanations based on Nahw and I'rab.
+    \item Doesn't perform text completion.
+    \item Not fully free.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Nahawi1.png}
+        \caption{}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Nahawi2.png}
+        \caption{}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Nahawi3.png}
+        \caption{AlNahawi Interface (3)}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Nahawi4.png}
+        \caption{}
+    \end{minipage}
+\end{figure}
+
+\subsection{Arwi}
+Arwi is an AI-based Arabic writing platform.
+
+\textbf{Strengths}
+\begin{itemize}
+    \item Provides error detection.
+\end{itemize}
+
+\textbf{Weaknesses}
+\begin{itemize}
+    \item Doesn't perform error correction.
+    \item Doesn't perform text completion.
+    \item Doesn't correct diacritic mistakes.
+    \item Does not provide detailed grammatical explanations based on Nahw and I'rab.
+    \item Not free.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{assets/Arwi.png}
+\caption{Marked a correct word as a mistake and no Diacritics correction}
+\end{figure}
 
 \section{Business Case and Financial Analysis}
-\PlaceholderText{Describe the possible business case, expected users, pricing assumptions, CapEx, OpEx, revenue, cash flow, and break-even point.}
+
+\subsection{Business Model}
+Baligh can be offered using a Software-as-a-Service (SaaS) model with multiple subscription plans targeting individual users, educational institutions, and enterprise customers.
+
+Potential revenue streams include:
+\begin{itemize}
+    \item Individual monthly subscriptions.
+    \item Educational institution licenses.
+    \item Enterprise API access.
+\end{itemize}
+
+\subsection{Pricing Assumptions}
+Pricing strategy is shown below.
 
 \begin{table}[H]
-\caption{Sample Five-Year Financial Projection}
+\caption{Pricing Strategy}
 \centering
-\begin{tabularx}{\textwidth}{lYYYY}
+\begin{tabularx}{\textwidth}{lY}
 \toprule
-\textbf{Year} & \textbf{Expected Users} & \textbf{Revenue} & \textbf{Expenses} & \textbf{Profit Before Tax} \\
+\textbf{Plan} & \textbf{Monthly Price} \\
 \midrule
-1 & -- & -- & -- & -- \\
-2 & -- & -- & -- & -- \\
-3 & -- & -- & -- & -- \\
-4 & -- & -- & -- & -- \\
-5 & -- & -- & -- & -- \\
+Free & \$0 \\
+Student & \$5 \\
+Individual & \$10 \\
+Enterprise & Custom quotation \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+\subsection{Capital Expenditure (CapEx)}
+Estimated initial investment: \textbf{\$0}
+
+\subsection{Operational Expenditure (OpEx)}
+Monthly operating expenses include:
+\textbf{\$10} for \textbf{API Hosting}
+
+\subsection{Revenue Projection}
+Assuming:
+\begin{itemize}
+    \item 2,000 active users.
+    \item 15\% subscribe to the Student plan.
+    \item 5\% subscribe to the Individual plan.
+\end{itemize}
+
+Estimated monthly revenue:
+\begin{itemize}
+    \item Student subscriptions: 300 $\times$ \$5 = \$1,500
+    \item Professional subscriptions: 100 $\times$ \$10 = \$1,000
+\end{itemize}
+
+Total monthly revenue:
+\textbf{\$2,500}
+
+Additional enterprise licensing and API subscriptions could significantly increase revenue.
+
+\subsection{Cash Flow}
+With a CapEx of \$0 and an OpEx of only \$10 per month, the project has a very low ongoing operating cost. As a result, the cash flow profile becomes highly favourable and even a small number of paying users would be sufficient to cover monthly expenses.
+
+\subsection{Break-Even Analysis}
+The system is expected to reach break-even almost immediately after launch, and any subscription revenue beyond the monthly operating cost would generate positive cash flow from the start.
 
 \chapter{Literature Survey}
 This chapter summarizes the Arabic NLP background most relevant to Baligh and reviews the detection, correction and prediction approaches that influenced the system design.
