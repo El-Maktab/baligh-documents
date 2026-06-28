@@ -33,8 +33,8 @@
 \newcommand{\ProjectName}{Baligh}
 \newcommand{\ProjectSubtitle}{Arabic Writing Assistant}
 \newcommand{\ProjectFullTitle}{\ProjectName: \ProjectSubtitle}
-\newcommand{\ProjectYear}{2025}
-\newcommand{\SubmissionDate}{July, 2025} % Change as needed
+\newcommand{\ProjectYear}{2026}
+\newcommand{\SubmissionDate}{July, 2026} % Change as needed
 
 % Verify the official English spelling of the supervisor name before final submission.
 \newcommand{\SupervisorName}{Dr. Ayman AboElhassan}
@@ -42,7 +42,7 @@
 \newcommand{\SupervisorPhone}{01060836189}
 
 % Individual mode defaults. Change these when preparing each student's report.
-\newcommand{\IndividualStudentName}{Ahmed Hamed Gaber}
+\newcommand{\IndividualStudentName}{Ahmed Hamed Gaber Hamed}
 \newcommand{\IndividualStudentEmail}{ahmed.hamed03@eng-st.cu.edu.eg}
 \newcommand{\IndividualStudentPhone}{01226968657}
 
@@ -124,7 +124,7 @@
 % 7. HEADINGS, CAPTIONS, LISTS, TABLES
 % -----------------------------------------------------------------------------
 \titleformat{\chapter}
-  {\normalfont\bfseries\fontsize{24}{29}\selectfont\color{BalighInk}}
+  {\normalfont\bfseries\fontsize{24}{29}\selectfont\color{BalighInk}\raggedright}
   {Chapter \thechapter:}
   {0.5em}
   {}
@@ -164,7 +164,9 @@
 \setlist[enumerate]{topsep=4pt,itemsep=3pt,leftmargin=1.2cm}
 
 \renewcommand{\arraystretch}{1.25}
-\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{Y}{>{\RaggedRight\hspace{0pt}\arraybackslash}X}
+\newcolumntype{L}[1]{>{\RaggedRight\hspace{0pt}\arraybackslash}p{#1}}
+\newcolumntype{T}[1]{>{\ttfamily\scriptsize\RaggedRight\hspace{0pt}\arraybackslash}p{#1}}
 
 % -----------------------------------------------------------------------------
 % 8. HEADER AND FOOTER
@@ -224,6 +226,7 @@
     \end{tikzpicture}%
   }%
 }
+\newcommand{\AR}[1]{\foreignlanguage{arabic}{#1}}
 
 \newcommand{\ImageOrPlaceholderByHeight}[2][2cm]{%
   \IfFileExists{#2}{%
@@ -249,6 +252,15 @@
 \newcommand{\ArabicPlaceholderText}[1]{\textcolor{BalighMuted}{#1}}
 
 \newcommand{\BalighTableHeader}{\rowcolor{BalighDarkGreen}\color{white}}
+\newcommand{\GedGuiSlot}[1]{%
+  \begin{tikzpicture}
+    \node[draw=BalighLine, fill=BalighSoft, rounded corners=4pt,
+          minimum width=0.42\textwidth, minimum height=5.2cm, align=center,
+          text=BalighMuted] {\textbf{GUI Screenshot Slot}\\#1\\[4pt]
+          Replace this placeholder with a final editor screenshot\\
+          showing GED output from the Baligh GUI.};
+  \end{tikzpicture}%
+}
 
 % -----------------------------------------------------------------------------
 % 11. TEAM DATA
@@ -312,7 +324,7 @@ Somia Saad Ismail El-Shemy & \href{mailto:somia.elshemy02@eng-st.cu.edu.eg}{somi
     \vspace{0.3cm}
     {\fontsize{24}{28}\selectfont\bfseries\ProjectName\par}
     \vspace{0.08cm}
-    {\large\textcolor{BalighDarkGreen}{\ProjectSubtitle}\par}
+    {\large\textcolor{BalighInk}{\ProjectSubtitle}\par}
 
     \vspace{0.38cm}
     {\normalsize A Graduation Project Report Submitted\par}
@@ -384,25 +396,32 @@ The project outputs include the preprocessing pipeline, grammatical error detect
 \newcommand{\AcknowledgmentPage}{%
 \chapter*{Acknowledgment}
 \addcontentsline{toc}{chapter}{Acknowledgment}
-\PlaceholderText{Write your acknowledgment and dedication here.}
+I would like to express my sincere gratitude to Dr. Ayman AboElhassan for his guidance, support, and constructive feedback throughout this graduation project. His direction helped me shape both the research and engineering sides of the work, especially while translating Arabic NLP literature into practical design decisions.
+
+I am also thankful to my teammates for the collaborative environment we maintained during the project. Building Baligh required continuous coordination between research, backend services, and the user-facing product, and this teamwork made it possible to move from isolated ideas to an integrated system.
+
+Finally, I am deeply grateful to my family and friends for their patience and encouragement throughout the graduation-project journey. Their support made it easier to stay consistent through the long phases of experimentation, debugging, writing, and refinement.
 \clearpage
 }
 
 \newcommand{\AbbreviationsPage}{%
 \chapter*{List of Abbreviations}
 \addcontentsline{toc}{chapter}{List of Abbreviations}
-\PlaceholderText{Put abbreviations in alphabetical order.}
-
 \begin{longtable}{p{0.22\textwidth}p{0.68\textwidth}}
 \toprule
 \textbf{Abbreviation} & \textbf{Meaning} \\
 \midrule
 AI & Artificial Intelligence \\
+API & Application Programming Interface \\
+CRF & Conditional Random Field \\
 GEC & Grammatical Error Correction \\
 GED & Grammatical Error Detection \\
+GUI & Graphical User Interface \\
 MSA & Modern Standard Arabic \\
 NLP & Natural Language Processing \\
 NWP & Next-Word Prediction \\
+POS & Part of Speech \\
+\textenglish{QALB} & Qatar Arabic Language Bank \\
 \bottomrule
 \end{longtable}
 \clearpage
@@ -411,15 +430,14 @@ NWP & Next-Word Prediction \\
 \newcommand{\SymbolsPage}{%
 \chapter*{List of Symbols}
 \addcontentsline{toc}{chapter}{List of Symbols}
-\PlaceholderText{Put symbols in alphabetical order. Greek symbols should come first, followed by English symbols.}
-
 \begin{longtable}{p{0.22\textwidth}p{0.68\textwidth}}
 \toprule
 \textbf{Symbol} & \textbf{Meaning} \\
 \midrule
-$\alpha$ & Learning rate or weighting coefficient \\
-$P$ & Probability \\
-$T$ & Time or sequence length \\
+$P$ & Precision in evaluation metrics \\
+$R$ & Recall in evaluation metrics \\
+$F_1$ & Harmonic mean of precision and recall \\
+$K$ & Number of top-ranked suggestions returned to the user \\
 \bottomrule
 \end{longtable}
 \clearpage
@@ -440,19 +458,12 @@ $T$ & Time or sequence length \\
 \newcommand{\MakeFrontMatter}{%
 \pagenumbering{roman}
 \AbstractPage
-\ArabicAbstractPage
-\AcknowledgmentPage
 \tableofcontents
 \clearpage
 \listoffigures
 \addcontentsline{toc}{chapter}{List of Figures}
 \clearpage
-\listoftables
-\addcontentsline{toc}{chapter}{List of Tables}
-\clearpage
 \AbbreviationsPage
-\SymbolsPage
-\ContactsPage
 }
 
 % -----------------------------------------------------------------------------
@@ -629,60 +640,240 @@ This chapter describes how the system was tested and verified.
 
 \chapter{Introduction}
 \section{Project Overview}
-\PlaceholderText{Briefly introduce Baligh and the overall graduation project.}
+Baligh is an Arabic writing assistant designed to support Modern Standard Arabic writing through explainable correction and real-time assistance. This chapter introduces the motivation behind the project, defines the problem it addresses, summarizes the main outcomes delivered by the project, and outlines the organization of the remainder of the report.
 
 \section{Individual Role Overview}
-\PlaceholderText{Summarize the student's role and responsibilities in the team.}
+My individual contribution was centered on the research and implementation of the Grammatical Error Correction (GEC) module and the design of the core Backend API architecture. I was responsible for bridging the gap between error detection and explainable correction by building two powerful subsystems: the Dictionary Engine and the Ontology Engine. This work involved deeply understanding Semantic Web technologies to model Arabic grammar, integrating the Arramooz lexicon for rapid morphological generation, and engineering the core asynchronous REST API that serves these linguistic analyses to the frontend client.
+
+In addition to the core GEC and API work, I ensured that the various NLP components (including the GED detectors) were seamlessly orchestrated behind scalable, documented API contracts. These supporting contributions are presented in this report as delivery-enabling work around the main technical contributions.
 
 \section{Document Organization}
-\PlaceholderText{Briefly describe the organization of the individual report.}
+This booklet presents my role, the technical preparation that informed my work (focusing on Ontology and Semantic Web methodologies), the GEC-focused contribution chapter detailing the Dictionary and Ontology modules, the Backend API architecture, and finally the main validation results, lessons learned, and future improvements.
 
 \chapter{Personal Role and Responsibilities}
 \section{Team Responsibilities}
-\PlaceholderText{Describe coordination, research, implementation, testing, documentation, communication, or leadership responsibilities.}
+My responsibilities during the project combined linguistic research, knowledge engineering, and backend system architecture. On the research side, I studied "Generation then Comparison" correction methodologies and Semantic Web tools to model Arabic syntax rules formally. On the implementation side, I owned the Dictionary Engine, the Ontology Engine, and the orchestration of the overarching FastAPI backend. I also participated in ensuring the system's scalability by setting up the database layer (MongoDB) and drafting the data validation contracts (Pydantic schemas) used across the application.
 
 \section{Assigned Tasks}
-\PlaceholderText{List the tasks assigned to this student and how they contributed to the project objectives.}
+My assigned tasks can be summarized as follows:
+\begin{itemize}
+    \item Conduct an extensive literature review on Arabic grammatical error correction, specifically focusing on explainable, ontology-driven generation methods.
+    \item Design and implement the GEC Dictionary Engine, integrating the Arramooz lexical database to support Out-Of-Vocabulary (OOV) detection and morphological generation.
+    \item Develop the GEC Ontology Engine, mapping CAMeL morphology features to Web Ontology Language (OWL) properties, and utilizing SPARQL queries to generate syntactically correct word pairs.
+    \item Architect and implement the core asynchronous Backend API using FastAPI, Uvicorn, and Motor, enabling the frontend to reliably request drafts, analysis, suggestions, and corrections.
+    \item Design the API orchestration layer to unify outputs from disparate GED and GEC subsystems into a cohesive, editor-friendly JSON response.
+\end{itemize}
 
 \section{Timeline and Deliverables}
-\PlaceholderText{Summarize major milestones and deliverables.}
+\begin{table}[H]
+\caption{Major Milestones in My Individual Contribution}
+\centering
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.19\textwidth}YY}
+\toprule
+\textbf{Phase} & \textbf{Main Focus} & \textbf{Deliverables} \\
+\midrule
+Research phase & Survey Arabic GEC literature, Semantic Web (OWL/RDF), and Dictionary design patterns & Research notes, literature synthesis, and API architecture direction \\
+Dictionary phase & Build the morphological generator and OOV detector & SQLite Arramooz integration, Dictionary Engine pipelines \\
+Ontology phase & Model Arabic syntax and implement "Generation then Comparison" & OWL ontology mappings, SPARQL query generators, and rule explanations \\
+Backend API phase & Architect the scalable REST interface and data contracts & FastAPI routers, Pydantic schemas, and MongoDB controllers \\
+Integration phase & Connect the GED and GEC engines behind unified endpoints & Orchestrated API responses, latency optimization, and final integration checks \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \chapter{Knowledge Acquisition and Technical Preparation}
 \section{Investigated Papers}
-\PlaceholderText{Summarize the papers/materials studied and how they influenced the student's work.}
+The literature review for my contribution focused heavily on Semantic Web technologies and their application to Arabic natural language processing. I deeply studied the ``Generation then Comparison'' methodology proposed by Moukrim et al., which demonstrated the viability of using the Web Ontology Language (OWL) to model the Ontology of Arabic Syntax (OAS) \cite{moukrim2021ontology}. This paper was foundational for the GEC Ontology Engine, as it outlined how SPARQL queries could enforce morphological and syntactic agreements (such as Case, Gender, and Number) by navigating a structured graph of Arabic grammar axioms. I also researched lexicography integration strategies to understand how a large-scale dictionary like Arramooz could be utilized for Out-Of-Vocabulary (OOV) detection and morphological generation.
 
 \section{Self-Learning Materials}
-\PlaceholderText{List courses, tutorials, documentation, and tools studied during the project.}
+To implement the project effectively, I relied on a mix of coursework, research papers, library documentation, experimentation notebooks, and framework references. The main self-learning inputs were:
 
-\section{Relevance to the Project}
-\PlaceholderText{Explain how the acquired knowledge supported the implemented contribution.}
+\begin{itemize}
+    \item \textbf{College Machine Learning course by Dr.~Yahia Zakaria}: strengthened the theoretical background behind the statistical modeling side of the project.
+    \item \textbf{College Natural Language course by Dr.~Sandra Wahid}: reinforced the language-processing concepts most relevant to Arabic NLP work.
+    \item \textbf{Arabic NLP pipeline study}: focused on the preprocessing and morphology-analysis workflow used in the project, especially segmentation, disambiguation, and morphological feature access.
+    \item \textbf{GEC modeling study}: read papers and studied semantic web and ontology-based approaches to Arabic grammatical error correction.
+    \item \textbf{Software and integration study}: included FastAPI for service integration, and Python testing workflows for unit and integration validation.
+\end{itemize}
 
 \chapter{Individual Contributions}
-\section{Contribution 1}
-\PlaceholderText{Describe the first major contribution, implementation details, design decisions, and results.}
+\section{Contribution 1: The GEC Dictionary and Ontology Engines}
+The main technical contribution presented in this booklet is the design and implementation of the Baligh Grammatical Error Correction (GEC) subsystem. The objective was to build a correction engine that goes beyond simple spelling suggestions to provide grammatically aware, structurally sound, and fully explainable Arabic sentence corrections. To achieve this, I implemented a dual-engine architecture: the Dictionary Engine for morphological generation and Out-Of-Vocabulary handling, and the Ontology Engine for structured grammatical reasoning.
 
-\section{Contribution 2}
-\PlaceholderText{Describe the second major contribution. Add figures, tables, and code snippets where useful.}
+\subsection{Overall System Context}
+The implemented GEC service receives error spans identified by upstream Grammatical Error Detection (GED) modules. It runs generation pipelines on these localized spans to propose corrections that adhere to strict Semantic Web rules. The high-level system context of Baligh is shown in Figure~\ref{fig:hl-arch}, situating the Dictionary and Ontology Engines within the backend API layer.
 
-\begin{tcolorbox}[title={Sample code snippet placeholder},colback=CodeBack,colframe=CodeFrame,boxrule=0.6pt]
-\ttfamily\small
-def explain\_correction(sentence: str) -> str:\\
-\hspace*{1.5em}"""Return a human-readable explanation for a correction."""\\
-\hspace*{1.5em}return "Replace this placeholder with actual project code."
-\end{tcolorbox}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{assets/High-Level-Arch.png}
+\caption{High-level Baligh architecture showing the API Layer, Database Layer, and Core Modules.}
+\label{fig:hl-arch}
+\end{figure}
+
+\subsection{The Dictionary Engine}
+\subsubsection{Functional Description}
+The Dictionary Module is responsible for robust spelling correction, Out-Of-Vocabulary (OOV) detection, and serving as a morphological generation backbone for the ontology. The Arabic language presents unique challenges in lexical validation due to its highly inflectional nature. To address this, the module utilizes the \textbf{Arramooz} dictionary, an open-source comprehensive Arabic lexicon organized in relational database tables. Arramooz encapsulates approximately 6,000 roots and covers stop words, nouns, and verbs. 
+
+The complete dictionary pipeline involves detecting OOV words by stripping clitics (prefixes/suffixes) to isolate the stem, querying the database for close string matches, and retrieving spelling candidates.
+
+\subsubsection{Modular Decomposition}
+The Dictionary Engine consists of the following submodules:
+\begin{itemize}
+    \item \textbf{Spelling Checker:} Analyzes the incoming tokens and performs stem-based clitic analysis. Then it detects Out-Of-Vocabulary (OOV) words and generates a list of spelling candidates using edit distance metrics.
+    \item \textbf{Arramooz Client:} A wrapper designed for efficient, low-latency querying of the SQLite-based Arramooz database.
+    \item \textbf{Morphological Generator:} Acts upon requests from the Ontology Engine. When a specific inflection is required (e.g., converting a singular noun to a plural form in the accusative case), this generator queries Arramooz to construct the morphologically correct word form.
+    \item \textbf{Alternative Ranker:} Ranks spelling candidates using Levenshtein distance (edit distance) combined with corpus-frequency metrics to present the most probable correction first.
+\end{itemize}
+
+\subsubsection{Design Constraints}
+The primary constraint of the Dictionary Module is the reliance on raw string similarity (edit distance) for initial spelling suggestions. Edit distance lacks context-awareness. To counter this, the Dictionary Engine relies on downstream contextual rankers (like the Machine Learning fusion layer) to make the final decision among its proposed alternatives.
+
+\subsubsection{Results}
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Dictionary-Result-1-Error.png}
+        \caption{Spelling Error (Original)}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Dictionary-Result-1-Correction.png}
+        \caption{Dictionary Correction}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Dictionary-Result-2-Error.png}
+        \caption{Typographical Error (Original)}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Dictionary-Result-2-Correction.png}
+        \caption{Dictionary Correction}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Dictionary-Result-3-Error.png}
+        \caption{Lexical Error (Original)}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Dictionary-Result-3-Correction.png}
+        \caption{Dictionary Correction}
+    \end{minipage}
+\end{figure}
+
+
+\subsection{The Ontology Engine}
+\subsubsection{Functional Description}
+An \textbf{Ontology} in computer science is a formal, explicit specification of a shared conceptualization. It defines a set of concepts and categories in a subject area, showing their properties and the relations between them. In the context of Baligh, the Ontology Module encodes Arabic syntax rules into a computational format, inspired by dependency grammar based on predicate logic. 
+
+This approach leverages \textbf{Semantic Web} technologies. The semantic web operates on layers, primarily the Resource Description Framework (RDF), which represents data as subject-predicate-object triples. For Arabic grammar, the \textbf{Ontology of Arabic Syntax (OAS)} is modeled using \textbf{OWL} (Web Ontology Language), an extension of RDF that allows for highly expressive logic and reasoning. In the OAS, concepts represent grammatical categories (e.g., Noun, Verb) while relationships represent syntactic links (e.g., Subject-Verb dependency) and functional properties (e.g., Case, Gender).
+
+The methodology employed is ``Generation then Comparison'':
+\begin{enumerate}
+    \item \textbf{Categorization:} Words are assigned Lexical Features (meaning-heavy aspects like Transitivity) and Functional Features (structural aspects like Number, Gender, Case).
+    \item \textbf{Merger (Generation):} Using \textbf{SPARQL} (the query language for RDF), the system merges words into oriented grammatical pairs. By querying the OAS, the system generates all syntactically correct combinations of the sentence that abide by Arabic grammar axioms.
+    \item \textbf{Comparison:} The original incorrect sentence is compared against the generated valid sentences using string distance metrics, allowing the system to deduce the required correction.
+\end{enumerate}
+
+\subsubsection{Modular Decomposition}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{assets/Extended-Ontology-Based-Architecture.png}
+\caption{Architecture of the GEC Module, showcasing the interaction between the Ontology Engine and the Dictionary Engine.}
+\label{fig:gec_module_architecture}
+\end{figure}
+
+The Ontology Engine orchestrates the generation logic via the following components:
+\begin{itemize}
+    \item \textbf{Feature Mapper:} Translates CAMeL morphological outputs into the specific OWL terminology required by the OAS.
+    \item \textbf{SPARQL Query Generator:} Constructs dynamic semantic queries. For example, it can query the ontology to enforce the axiom that a Verb's Subject must possess a Nominative case.
+    \item \textbf{Candidate Generator:} Combines the theoretical rules from the ontology with the Morphological Generator from the Dictionary to produce the final corrected string phrase.
+    \item \textbf{Explanation Generator:} Utilizes the specific violated ontology axiom to dynamically construct an educational, human-readable grammatical explanation for the user.
+\end{itemize}
+
+\subsubsection{Design Constraints}
+Generating every possible syntactically correct permutation of a full sentence is computationally prohibitive, posing a significant latency risk for a real-time system. To circumvent this, the generation phase is aggressively localized. Instead of processing the entire sentence, the Ontology Engine restricts its generation only to the precise error spans previously identified by the Grammatical Error Detection (GED) module. Furthermore, bridging the terminology gap between the morphological analyzer's tags and the OAS concepts required building a rigid, robust mapping dictionary to prevent query failures.
+
+\subsubsection{Results}
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Ontology-Result-1-Error.png}
+        \caption{Grammatical Error (Original)}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Ontology-Result-1-Correction.png}
+        \caption{Ontology Correction}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Ontology-Result-2-Error.png}
+        \caption{Syntactic Mismatch (Original)}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Ontology-Result-2-Correction.png}
+        \caption{Ontology Correction}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Ontology-Result-3-Error.png}
+        \caption{Case/Gender Error (Original)}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/Ontology-Result-3-Correction.png}
+        \caption{Ontology Correction}
+    \end{minipage}
+\end{figure}
+
+\section{Contribution 2: Core Backend API Architecture}
+While the GEC engines formed my primary research ownership area, I was also responsible for engineering the delivery mechanism that makes these linguistic models accessible: the Baligh Backend API.
+
+\subsection{FastAPI and Uvicorn Orchestration}
+The backend was built using FastAPI, chosen for its native asynchronous capabilities and automatic OpenAPI documentation generation. Hosted on Uvicorn (an ASGI web server), the backend is capable of handling multiple concurrent requests without blocking the event loop. This non-blocking architecture is critical when waiting for heavy Machine Learning inference or prolonged SPARQL queries. The API is divided into logical routers (\texttt{analysis.py}, \texttt{suggestions.py}, \texttt{corrections.py}, \texttt{tashkeel.py}) to maintain a clean separation of concerns.
+
+\subsection{Pydantic Data Contracts}
+To ensure robust communication between the React frontend and the Python backend, I heavily utilized Pydantic for data validation. Every request payload and response structure is defined by strict schema models. This prevented malformed frontend requests from crashing the NLP engines and guaranteed that the editor always received predictably formatted analysis results.
+
+\subsection{Asynchronous MongoDB Integration}
+For persistence (such as saving user drafts, tracking error frequencies, and managing document histories), I integrated MongoDB using the Motor asynchronous driver. This allowed the API to perform non-blocking database I/O, keeping the endpoints highly responsive even under load.
 
 \section{Testing and Validation}
-\PlaceholderText{Explain how the individual contribution was tested and validated.}
+My contributions were validated through extensive unit and integration tests. The Dictionary Engine was tested against known OOV datasets to verify the accuracy of the Levenshtein distance rankings. The Ontology Engine's SPARQL queries were validated using a gold-standard set of manually annotated grammatical violations. Finally, the Backend API was stress-tested using \texttt{pytest-asyncio} to ensure that the routers gracefully handled high concurrency and malformed payloads without dropping connections.
 
 \chapter{Challenges, Lessons Learned, and Future Work}
 \section{Faced Challenges}
-\PlaceholderText{Discuss technical and personal challenges.}
+The most significant challenge was bridging the terminology gap between the morphological outputs of CAMeL Tools and the Web Ontology Language (OWL) properties required by the Ontology of Arabic Syntax (OAS). Because the ontology expects highly formalized axioms, creating a robust mapping dictionary was crucial to avoid SPARQL query failures. A secondary challenge was managing latency; generating all correct permutations of a sentence using SPARQL is computationally expensive, which required aggressive localization of the generation phase to only operate on specific GED error spans. Finally, designing the unified Backend API required careful orchestration to handle these heavy synchronous NLP tasks without blocking the asynchronous event loop.
 
 \section{Lessons Learned}
-\PlaceholderText{Discuss the most important skills and insights gained.}
+\begin{itemize}
+    \item \textbf{Knowledge Representation}: Semantic Web technologies (RDF/OWL) provide a powerful, explainable alternative to black-box machine learning for rigid linguistic rule systems.
+    \item \textbf{Data Contracts}: Enforcing strict Pydantic schemas between the frontend and backend is essential for preventing silent failures and guaranteeing predictable user experiences.
+\end{itemize}
 
 \section{Future Enhancements}
-\PlaceholderText{Mention how this contribution could be improved in future work.}
+Future iterations of the GEC modules could expand the Ontology of Arabic Syntax (OAS) to cover more complex rhetorical structures and semantic dependencies beyond basic morpho-syntactic agreement. Additionally, the SPARQL Query Generator could be optimized further through caching mechanisms (like Redis) for frequently corrected phrases to reduce latency.
 }
 
 % -----------------------------------------------------------------------------
@@ -694,11 +885,25 @@ def explain\_correction(sentence: str) -> str:\\
 \begin{thebibliography}{99}
 \small
 
-\bibitem{sample1}
-Author Name, ``Paper or Book Title,'' \textit{Conference or Journal Name}, Year.
+\bibitem{alhafni2023advancements}
+B. Alhafni, N. Inoue, and N. Habash,
+``Advancements in Arabic Grammatical Error Correction: The Promise of Large Language Models and a Two-Stage System,''
+in \textit{Proceedings of ArabicNLP}, 2023.
 
-\bibitem{sample2}
-Author Name, ``Another Reference Title,'' Publisher or Venue, Year.
+\bibitem{moukrim2021ontology}
+M. Moukrim, A. Namir, and M. Boulaknadel,
+``An Innovative Approach for Autocorrecting Arabic Syntactic Errors Based on Ontology,''
+\textit{International Journal of Advanced Computer Science and Applications}, 2021.
+
+\bibitem{zaghouani2015sahsoh}
+W. Zaghouani, N. Habash, O. Obeid, H. Bouamor, and S. Khalifa,
+``SAHSOH@QALB-2015 Shared Task: A Hybrid Arabic Spelling and Grammar Correction System,''
+in \textit{Proceedings of the Second Workshop on Arabic Natural Language Processing}, 2015.
+
+\bibitem{belkebir2021areta}
+R. Belkebir and N. Habash,
+``Automatic Error Type Annotation for Arabic,''
+in \textit{Proceedings of the 6th Arabic Natural Language Processing Workshop}, 2021.
 
 \end{thebibliography}
 }
@@ -706,20 +911,44 @@ Author Name, ``Another Reference Title,'' Publisher or Venue, Year.
 \newcommand{\AppendicesSection}{%
 \appendix
 
-\chapter{Development Platforms and Tools}
-\PlaceholderText{List programming languages, frameworks, libraries, operating systems, hardware, datasets, and development tools.}
+\chapter{Backend API Reference}
+This appendix summarizes the core REST endpoints exposed by the Baligh Backend API. The API is designed using FastAPI and serves as the primary gateway for the React frontend to interact with the GEC, GED, and Tashkeel modules.
 
-\chapter{Use Cases}
-\PlaceholderText{Describe system use cases, actors, preconditions, main flows, alternative flows, and expected results.}
+\section{Core Endpoints}
 
-\chapter{User Guide}
-\PlaceholderText{This appendix should be included. Explain how to install, run, and use the final system. Add screenshots or step-by-step instructions when available.}
+\subsection{Analysis Router (\texttt{/api/analysis})}
+\begin{itemize}
+    \item \textbf{Endpoint:} \texttt{POST /api/analysis}
+    \item \textbf{Description:} Accepts a raw text payload from the editor, triggers the preprocessing pipeline, and runs the configured GED sub-detectors (Rules, Lexicon, ML). Returns a fused JSON list of error spans, categories, and explanations.
+    \item \textbf{Response Structure:} List of \texttt{DetectionResponse} objects containing \texttt{start\_index}, \texttt{length}, \texttt{category}, \texttt{tier}, and \texttt{explanation}.
+\end{itemize}
 
-\chapter{Code Documentation}
-\PlaceholderText{Document important modules, classes, APIs, configuration files, and code structure.}
+\subsection{Suggestions Router (\texttt{/api/suggestions})}
+\begin{itemize}
+    \item \textbf{Endpoint:} \texttt{POST /api/suggestions}
+    \item \textbf{Description:} Triggered when a user clicks on an identified error span. It forwards the context to the GEC Dictionary Engine to generate context-aware spelling and typographical alternatives based on Arramooz trie-lookups.
+    \item \textbf{Response Structure:} List of \texttt{SuggestionResponse} objects ranked by probability.
+\end{itemize}
 
-\chapter{Feasibility Study}
-\PlaceholderText{This appendix should be included. Add market, technical, operational, and financial feasibility details.}
+\subsection{Corrections Router (\texttt{/api/corrections})}
+\begin{itemize}
+    \item \textbf{Endpoint:} \texttt{POST /api/corrections}
+    \item \textbf{Description:} Triggers the GEC Ontology Engine. It receives the error span, queries the CAMeL feature mapper, generates SPARQL axioms, and returns the strictly enforced syntactic correction (e.g., forcing accusative case on a direct object).
+    \item \textbf{Response Structure:} A \texttt{CorrectionResponse} object containing the guaranteed valid phrase and an educational breakdown of the violated axiom.
+\end{itemize}
+
+\subsection{Drafts Router (\texttt{/api/drafts})}
+\begin{itemize}
+    \item \textbf{Endpoint:} \texttt{GET /api/drafts/\{user\_id\}}
+    \item \textbf{Description:} Fetches the user's saved writing sessions from the MongoDB backend using the Motor async driver.
+    \item \textbf{Response Structure:} List of \texttt{DocumentDraft} objects containing \texttt{text}, \texttt{timestamp}, and \texttt{unresolved\_errors}.
+\end{itemize}
+
+\subsection{Tashkeel Router (\texttt{/api/tashkeel})}
+\begin{itemize}
+    \item \textbf{Endpoint:} \texttt{POST /api/tashkeel}
+    \item \textbf{Description:} Provides on-demand full diacritization (Tashkeel) for a given Arabic text payload, useful for pronunciation assistance and semantic disambiguation.
+\end{itemize}
 }
 
 % -----------------------------------------------------------------------------

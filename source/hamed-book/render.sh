@@ -4,8 +4,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MAIN_FILE="hamed-book.tex"
 EXPORTS_DIR="$SCRIPT_DIR/../../exports"
-BUILD_DIR="$(mktemp -d /tmp/hamed-book-build.XXXXXX)"
-OUTPUT_PDF="$EXPORTS_DIR/hamed-book.pdf"
+BUILD_DIR="$(mktemp -d /tmp/baligh-booklet-build.XXXXXX)"
+OUTPUT_PDF="$EXPORTS_DIR/team-5-baligh-hamed.pdf"
 cleanup() {
     rm -rf "$BUILD_DIR"
 }
