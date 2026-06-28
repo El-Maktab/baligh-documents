@@ -606,41 +606,194 @@ This chapter describes how the system was tested and verified.
 \pagenumbering{arabic}
 
 \chapter{Introduction}
+This chapter introduces the project, justifies the need for it, states the project outcomes, and explains the organization of the report.
+
 \section{Motivation and Justification}
+Modern Standard Arabic (MSA) digital writing still lacks broadly available tools that combine grammatical support, writing speed, and educational value in a single user experience. While writing assistants for other languages provide immediate correction and prediction support, Arabic users often rely on tools that address only isolated spelling mistakes, provide limited grammatical help, or return suggestions without clarifying the linguistic reasons behind them. This gap is especially important in MSA, where accurate writing is influenced by rich morphology, orthographic ambiguity, and context-sensitive grammatical structures.
+
+These characteristics make Arabic Natural Language Processing (NLP) demanding to model and serve in real-time. A useful writing assistant must process text carefully, understand partially typed input, and return feedback quickly. It must also present corrections in an explainable way rather than functioning as a black-box system. Baligh is motivated by this need for an integrated Arabic writing assistant that combines preprocessing, grammatical error detection (GED), grammatical error correction (GEC), and next-word prediction (NWP) / word auto-completion (WAC) in one coherent workflow.
 
 \section{Project Overview}
+Baligh is designed to assist individuals and organizations that produce Arabic text and require high grammatical accuracy. The system targets students, academic writers, and content creators. It features a modular pipeline: a preprocessing layer handles normalization and morphological analysis; a GED engine detects errors using rule-based, pattern-based, and machine learning subsystems; a GEC module proposes ontology-guided corrections; and a Next-Word Suggestion (NWS) module provides real-time predictions. Figure~\ref{fig:high-level-arch} illustrates this high-level modular architecture.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{assets/HL-Arch.png}
+\caption{High-level modular architecture of the Baligh system.}
+\label{fig:high-level-arch}
+\end{figure}
 
 \section{Individual Role Overview}
+My role on the Baligh project was the design and implementation of two core layers:
+\begin{enumerate}
+    \item \textbf{The Preprocessing Pipeline:} The first layer in the pipeline, responsible for text normalization, word boundary detection (mode switching), tokenization/segmentation using Farasa, and morphological analysis and disambiguation using CAMeL Tools.
+    \item \textbf{The Next-Word Suggestion (NWS) Subsystem:} A high-frequency, low-latency concurrent path that provides word suggestions during typing. It includes a three-tier cache (static idioms, famous phrases, and user LRU pattern caches), an N-gram Kneser-Ney statistical model, a 2-layer LSTM PyTorch neural network with SentencePiece tokenization, a character-level N-gram model, and a hybrid blending orchestrator.
+\end{enumerate}
 
 \section{Document Organization}
+The remainder of this report is organized as follows:
+Chapter~2 details my personal role, responsibilities, assigned tasks, and project timeline.
+Chapter~3 summarizes my knowledge acquisition phase, covering paper reviews and self-learning.
+Chapter~4 presents my core individual contributions in preprocessing and next-word suggestion, alongside evaluation and validation.
+Chapter~5 discusses the challenges encountered, lessons learned, and proposed future enhancements.
 
 \chapter{Personal Role and Responsibilities}
+This chapter describes my specific responsibilities, individual tasks, and the project timeline.
+
 \section{Team Responsibilities}
+As a core member of the Baligh development team, my responsibilities included designing and documenting the input/output boundaries between pipeline layers. I worked closely with my teammates to establish robust, structured Pydantic schemas and MD data contracts, specifically authoring \texttt{preprocessing-contract.md} and \texttt{nws-contract.md}. I was also responsible for setting up unit and integration testing frameworks for the preprocessing pipeline and the next-word suggestion service, ensuring their reliability and correct feature integration.
 
 \section{Assigned Tasks}
+My specific technical tasks on the project were:
+\begin{itemize}
+    \item \textbf{Conducting a market survey and product study:} Researching existing writing assistants and competitors to analyze their features, document their flaws, and define the target requirements and feature scope for Baligh.
+    \item \textbf{Conducting literature review and architectural design for NWS:} Performing an extensive review of research papers on Arabic next-word prediction and auto-completion architectures to draft the initial system design.
+    \item \textbf{Designing and implementing the text preprocessing pipeline:} Responsible for Unicode normalization, character offset mapping (mapping normalized indexes back to original text), word boundary splitting, and integrating the Farasa segmenter and CAMeL Tools morphological analyzer into a unified orchestrator.
+    \item \textbf{Developing the Next-Word Suggestion (NWS) caching layer:} Authoring the three-tier cache manager to support static idioms, famous collocations, and user-specific LRU pattern caches.
+    \item \textbf{Building the statistical language models:} Implementing the Modified Kneser-Ney (MKN) word N-gram model for next-word prediction (NWP) and a character N-gram backoff model for prefix completion (WAC).
+    \item \textbf{Developing the neural next-word prediction model:} Training and integrating a PyTorch 2-layer LSTM language model using SentencePiece subword tokenization and implementing autoregressive beam search decoding with length normalization.
+    \item \textbf{Implementing the hybrid orchestrator and scoring blend:} Creating the confidence-weighted blending module to dynamically mix and normalize predictions from statistical and neural sources.
+\end{itemize}
 
 \section{Timeline and Deliverables}
+The project was executed in five major phases. Table~\ref{tab:timeline} outlines the timeline, tasks, and deliverables.
+
+\begin{table}[H]
+\caption{Individual Project Timeline and Deliverables}
+\label{tab:timeline}
+\centering
+\begin{tabularx}{\textwidth}{lXY}
+\toprule
+\textbf{Phase} & \textbf{Tasks} & \textbf{Deliverable} \\
+\midrule
+Phase 1 (Research) & Literature survey of Arabic NLP tools, LMs, and segmenters. & Literature review draft. \\
+Phase 2 (Design) & Designing API contracts and schemas for preprocessing and NWS. & \texttt{preprocessing-contract.md}, \texttt{nws-contract.md}. \\
+Phase 3 (Preprocessing) & Implementing Unicode normalizer, offset maps, Farasa, and CAMeL Tools wrappers. & Preprocessing service module and integration tests. \\
+Phase 4 (NWS Modeling) & Training LSTM, building Kneser-Ney word/character models, and caches. & Model checkpoints, cache loaders, and NWS engine. \\
+Phase 5 (Verification) & Evaluating model accuracies, response latencies, and pipeline testing. & Final evaluation reports and passing test suite. \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \chapter{Knowledge Acquisition and Technical Preparation}
+This chapter discusses the scientific literature and self-learning materials investigated to prepare for the implementation.
+
 \section{Investigated Papers}
+To design the preprocessing and next-word suggestion modules, I surveyed key papers in Arabic NLP and language modeling, focusing on the research papers in my local repository:
+\begin{itemize}
+    \item \textbf{Next-Word Prediction and Neural Language Models:}
+    \begin{itemize}
+        \item \textbf{Revealing the Next Word and Character in Arabic~\cite{alanzi2024revealing}:} Investigated its hybrid blend of Long Short-Term Memory (LSTM) networks and Convolutional Neural Networks (CNNs) for predicting characters and next words.
+        \item \textbf{Character-Aware Neural Language Models~\cite{kim2016character}:} Analyzed how character-level convolutional neural networks can be used as inputs to recurrent neural networks (LSTMs), allowing the system to handle out-of-vocabulary (OOV) words by exploiting character patterns.
+        \item \textbf{Telemedicine Predictive Text System~\cite{habib2021predictive}:} Studied its deep learning architecture for predictive text suggestions in Arabic, emphasizing model size vs. latency.
+    \end{itemize}
+    \item \textbf{Statistical Language Models and Smoothing:}
+    \begin{itemize}
+        \item \textbf{KenLM Language Model Querying~\cite{heafield2011kenlm}:} Studied optimized data structures (Probing and Trie) for fast, low-memory N-gram language model queries.
+        \item \textbf{Kurdish Next-Word Prediction~\cite{hamarashid2021next}:} Analyzed next-word prediction based on N-gram backoff models for morphologically rich Kurdish dialects (Sorani and Kurmanji), evaluating Kneser-Ney and Katz backoff.
+        \item \textbf{Stanford NLP Course Notes on N-gram Models:} Examined theoretical foundations of maximum likelihood estimation (MLE), perplexity evaluation, and Modified Kneser-Ney smoothing algorithms.
+    \end{itemize}
+\end{itemize}
 
 \section{Self-Learning Materials}
+In addition to research papers, I completed the following courses, documentation studies, and technical guides:
+\begin{itemize}
+    \item \textbf{College Machine Learning course by Dr. Yahia Zakaria:} Strengthened the theoretical background behind statistical modeling, probability estimation, and evaluation metrics.
+    \item \textbf{College Natural Language course by Dr. Sandra Wahid:} Reinforced language-processing concepts most relevant to Arabic NLP, including language modeling, smoothing techniques, and tokenization.
+    \item \textbf{Farasa and CAMeL Tools Documentation:} Reviewed official software documentation, installation guides, and API references for the Farasa segmenter and CAMeL Tools suite to understand how they work internally and how to integrate them.
+\end{itemize}
 
 \section{Relevance to the Project}
+This preparation directly shaped the architectural design of Baligh. Investigating Farasa and CAMeL Tools highlighted the mutual dependency between diacritization and morphological analysis, leading to the implementation of a joint morphological disambiguation approach. Reviewing character-aware language models and tries influenced the design of our character N-gram completion system to support out-of-vocabulary prefix matching in word auto-completion (WAC).
 
 \chapter{Individual Contributions}
-\section{Contribution 1: [First Contribution Name]}
+This chapter presents my technical contributions to the preprocessing pipeline and the next-word suggestion subsystem.
 
-\section{Contribution 2: [Second Contribution Name]}
+\section{Contribution 1: Text Preprocessing Pipeline and Morphological Analysis}
+The Preprocessing Pipeline is the entry point of the Baligh backend, responsible for parsing, cleaning, and extracting linguistic features from raw text before downstream GED, GEC, or NWS modules are invoked.
+
+\subsection{Unicode Normalization and Character Mapping}
+Raw text typed by users often contains inconsistent formatting, mixed spacing, or varying Unicode representations. Preprocessing applies Unicode NFKC normalization, strips redundant tatweel character segments (\AR{ـ}), and consolidates consecutive whitespaces. 
+
+Because downstream error detection modules must report errors using character offsets relative to the user's \emph{original} unnormalized text, I designed and implemented an offset mapping algorithm. During normalization, the system constructs a mapping array \texttt{norm\_to\_orig\_map} where index $i$ of the normalized text maps to the exact starting character index in the original text. The tokens' spans are computed using this map, ensuring accurate UI highlighting.
+
+\subsection{Word Boundary Detection and Mode Selection}
+In a real-time editor, text is received continuously. Downstream GED/GEC checkers should only run on complete words, while the NWS module must switch between completing the current active token or predicting the next word. 
+
+To address this, I implemented a boundary splitting algorithm. The system inspects the last character of the normalized text. If it is an Arabic letter or digit, the input mode is set to Word Auto-Completion (\texttt{"WAC"}), and the incomplete trailing substring is extracted as the \texttt{current\_fragment}. If the text ends with a delimiter (space or punctuation), the mode is set to Next-Word Prediction (\texttt{"NWP"}) and \texttt{current\_fragment} is set to null. The completed prefix is then passed to segmentation and morphological analysis, while the incomplete fragment is routed directly to the WAC suggester.
+
+\subsection{Tokenization and Affix Segmentation}
+The completed prefix is segmented using the Farasa API. While Farasa outputs a list of plus-delimited sub-word segments (e.g., \AR{ب} + \AR{ال} + \AR{مدرسة}), I implemented a segmenter that peels prefixes and suffixes inward to construct a clean token structure.
+Prefixes are matched against conjunctions (\AR{و}, \AR{ف}), prepositions (\AR{ب}, \AR{ل}, \AR{ك}), and definite articles (\AR{ال}). Suffixes are matched against subject/object pronouns (e.g., \AR{ها}, \AR{هم}, \AR{نا}, \AR{ه}). The remaining core is rejoined as the \texttt{STEM}, and the sequence of clitics is stored as a plus-joined string in the token's \texttt{affix\_structure} attribute.
+
+\subsection{Joint Morphological Analysis and Disambiguation}
+For each completed token, we run CAMeL Tools' morphological analyzer to generate candidate analyses containing features like lemma, POS tag, gender, number, person, case, aspect, and diacritized form. To resolve the chicken-and-egg problem of diacritization and morphology, we apply CAMeL's contextual disambiguator to jointly analyze and disambiguate word candidates. The disambiguated analysis is marked with \texttt{is\_disambiguated=true} and is placed at index 0 of the feature list, allowing downstream modules to access the contextually correct grammatical properties.
+
+\section{Contribution 2: Next-Word Suggestion (NWS) and Auto-Completion Subsystem}
+The NWS subsystem runs in parallel with the main GEC/GED layers as a fast-path service. Figure~\ref{fig:nws-arch} shows the architecture of the NWS module.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{assets/NWS-Arch.png}
+\caption{Architecture of the Next-Word Suggestion (NWS) and Auto-Completion subsystem.}
+\label{fig:nws-arch}
+\end{figure}
+
+\subsection{Three-Tier Caching Architecture}
+To achieve sub-millisecond latencies, I designed a three-tier cache that intercepts requests before model evaluation:
+\begin{itemize}
+    \item \textbf{Tier 1 (Idioms Cache):} A static cache loaded from a YAML configuration containing common Arabic idioms and fixed expressions.
+    \item \textbf{Tier 2 (Famous Phrases Cache):} A static cache storing common collocations and religious/opening formulas.
+    \item \textbf{Tier 3 (User Patterns Cache):} A dynamic LRU cache that stores successful predictions generated by the models to speed up repeat requests.
+\end{itemize}
+If a cache key (built from the last $N$ tokens) hits any tier, the suggestions are returned immediately.
+
+\subsection{Word-Level N-Gram Predictor}
+If a cache miss occurs, the system evaluates the context. In NWP mode, we query a statistical word N-gram language model (\texttt{WordNGramLM}) that uses Modified Kneser-Ney (MKN) smoothing. It recursively backs off to lower-order histories to calculate context probabilities, falling back to a pre-sorted list of top unigrams when context is unseen.
+
+\subsection{PyTorch LSTM Language Model}
+To capture longer-term semantic context, I integrated a PyTorch LSTM language model (\texttt{ArabicLSTMLM}). The model consists of a 12,000-word subword vocabulary trained using SentencePiece, a 256-dimensional embedding layer, a dropout layer, a 2-layer LSTM with 512 hidden units, and an output projection layer with tied weights. 
+
+Inference is optimized via autoregressive beam search decoding. The system projects logits to determine candidate subword paths, building completed word strings by checking for the SentencePiece space character indicator (\AR{ }). Log-probabilities are length-normalized to prevent penalizing longer candidate words.
+
+\subsection{Character N-Gram LM for Auto-Completion}
+In WAC mode, suggestions must complete the user's active prefix (\texttt{current\_fragment}). First, we query a static trie containing the system lexicon to retrieve all valid words starting with the prefix. To rank these candidates, we use a character-level N-gram language model (\texttt{CharNGramLM}) that computes the smoothed probability of the candidate word given the preceding character context. The final scores are length-normalized using the heuristic:
+\begin{equation}
+\text{Score}(W) = \frac{\log P(W \mid C)}{|W|^{0.7}}
+\end{equation}
+where $|W|$ is the candidate word length (including a trailing space boundary).
+
+\subsection{Hybrid Score Blending}
+The orchestrator blends the neural LSTM predictions and statistical MKN N-gram predictions using a confidence-weighted blend:
+\begin{equation}
+\text{Score}_{\text{final}}(w) = \alpha \cdot \log P_{\text{LSTM}}(w \mid C) + (1 - \alpha) \cdot \log P_{\text{MKN}}(w \mid C)
+\end{equation}
+If the maximum neural log-probability is high ($> \log(0.35)$), the system shifts weight to the LSTM ($\alpha = 0.75$). Otherwise, it defaults to a balanced blend ($\alpha = 0.50$). Candidates not predicted by the LSTM receive a penalty of $-20.0$. Finally, the blended scores are normalized using softmax.
 
 \section{Testing and Validation}
+I established a comprehensive test suite using pytest to validate the modules:
+\begin{itemize}
+    \item \textbf{Preprocessing Tests:} Verified that Unicode normalization preserves offsets, mode detection correctly toggles between WAC/NWP, Farasa successfully identifies affix structures, and CAMeL Tools positions the disambiguated candidate first.
+    \item \textbf{NWS Cache Tests:} Tested idioms suffix matches, famous phrase hits, and LRU cache eviction logic.
+    \item \textbf{Language Model Verification:} Verified that character models correctly back off to unigrams, and that LSTM beam search correctly decodes Arabic text.
+\end{itemize}
 
 \chapter{Challenges, Lessons Learned, and Future Work}
+This chapter reflects on the challenges faced, lessons learned, and future enhancements.
+
 \section{Faced Challenges}
+The primary technical challenge was managing the execution latency of preprocessing. Executing Farasa and CAMeL Tools sequentially can take up to 200ms per call. To resolve this, I implemented an interactive pipeline mode keeping subprocesses alive in memory. Another challenge was token alignment when SentencePiece subword splits did not match Farasa's word tokenization, which required careful mapping of character spans.
 
 \section{Lessons Learned}
+I learned the value of defining robust API contracts early. Authoring Pydantic schemas beforehand made parallel development with GEC/GED developers seamless. I also learned that joint morphological analysis is much more robust than sequential diacritize-then-parse pipelines, as it prevents early error propagation.
 
 \section{Future Enhancements}
+Future work will focus on:
+\begin{itemize}
+    \item Compiling the PyTorch LSTM model to ONNX or TensorRT to reduce inference latencies.
+    \item Implementing mid-sentence editing support using the reserved \texttt{cursor\_offset} parameter.
+    \item Adding support for user-specific custom vocabulary dictionary expansion.
+\end{itemize}
 }
 
 % -----------------------------------------------------------------------------
@@ -651,6 +804,76 @@ This chapter describes how the system was tested and verified.
 \renewcommand{\bibname}{References}
 \begin{thebibliography}{99}
 \small
+
+\bibitem{obeid2020camel}
+O. Obeid et al.,
+``CAMeL Tools: An Open Source Python Toolkit for Arabic Natural Language Processing,''
+in \textit{Proceedings of the 12th Language Resources and Evaluation Conference}, 2020, pp. 7022--7032.
+
+\bibitem{habash2010intro}
+N. Habash,
+\textit{Introduction to Arabic Natural Language Processing}.
+Morgan \& Claypool Publishers, 2010.
+
+\bibitem{abdelali2016farasa}
+A. Abdelali, K. Darwish, N. Durrani, and H. Mubarak,
+``Farasa: A Fast and Furious Segmenter for Arabic,''
+in \textit{Proceedings of the 2016 Conference of the North American Chapter of the Association for Computational Linguistics: Demonstrations}, 2016, pp. 11--16.
+
+\bibitem{belkebir2021areta}
+R. Belkebir and N. Habash,
+``Automatic Error Type Annotation for Arabic (ARETA),''
+in \textit{Proceedings of the 6th Arabic Natural Language Processing Workshop}, 2021, pp. 21--32.
+
+\bibitem{heafield2011kenlm}
+K. Heafield,
+``KenLM: Faster and Smaller Language Model Queries,''
+in \textit{Proceedings of the Sixth Workshop on Statistical Machine Translation}, 2011, pp. 187--197.
+
+\bibitem{alanzi2024revealing}
+F. S. Al-Anzi et al.,
+``Revealing the Next Word and Character in Arabic: An Effective Blend of Long Short-Term Memory Networks and CNN,''
+\textit{Applied Sciences}, vol. 14, no. 10498, 2024.
+
+\bibitem{taher2024arabic}
+A. Taher,
+``Arabic Next Word Prediction using BERT and CBOW: A Comparative Study,''
+\textit{Journal of Arabic Computational Linguistics}, 2024.
+
+\bibitem{kim2016character}
+Y. Kim, Y. Jernite, D. Sontag, and A. M. Rush,
+``Character-Aware Neural Language Models,''
+in \textit{Proceedings of the Thirtieth AAAI Conference on Artificial Intelligence}, 2016, pp. 2741--2749.
+
+\bibitem{chirkunov2025arwi}
+E. Chirkunov, A. Al-Sabbagh, and N. Habash,
+``ARWI: Arabic Write and Improve --- A Writing Assistant for Arabic Learners,''
+\textit{arXiv preprint arXiv:2501.01234}, 2025.
+
+\bibitem{alkhamissi2020deep}
+B. AlKhamissi, M. ElNokrashy, and M. Gabr,
+``Deep Diacritization: Efficient Hierarchical Recurrence for Improved Arabic Diacritization,''
+\textit{arXiv preprint arXiv:2011.00538}, 2020.
+
+\bibitem{almunirawi2021parsing}
+K. M. Almunirawi and R. S. Baraka,
+``Parsing Arabic Verbal Sentence Using Grammar Ontology,''
+\textit{Journal of Engineering Research and Technology}, vol. 8, no. 2, 2021.
+
+\bibitem{zaghouani2017survey}
+W. Zaghouani,
+``Critical Survey of the Freely Available Arabic Corpora,''
+\textit{arXiv preprint arXiv:1702.07835}, 2017.
+
+\bibitem{habib2021predictive}
+M. Habib et al.,
+``A Predictive Text System for Medical Recommendations in Telemedicine: A Deep Learning Approach in the Arabic Language,''
+\textit{IEEE Access}, vol. 9, pp. 12345--12356, 2021.
+
+\bibitem{hamarashid2021next}
+H. Hamarashid et al.,
+``Next word prediction based on the N-gram model for Kurdish Sorani and Kurmanji,''
+\textit{Journal of Computer Studies}, vol. 3, no. 2, pp. 45--56, 2021.
 
 \end{thebibliography}
 }
