@@ -1161,20 +1161,142 @@ Generating every possible syntactically correct permutation of a full sentence i
         \caption{Ontology Correction}
     \end{minipage}
 \end{figure}
+\subsection{Text Editing Sub-module}
 
-\subsection{The Edit Tagger Module}
+\subsubsection{Functional Overview}
+The system implements a Grammatical Error Correction (GEC) model for Arabic using a \textbf{text editing (sequence tagging)} approach rather than a traditional sequence-to-sequence (Seq2Seq) generative model. By treating correction as a sequence of edit operations rather than generating text from scratch.
 
-\subsubsection{Functional Description}
-\PlaceholderText{Detail the functional description of the Edit Tagger Module here.}
+\textbf{Correction Generation}
+
+Instead of generating the corrected sentence autoregressively, the model predicts a sequence of edit operations for each token in the erroneous input. These predicted edits are then applied to the original text to produce the corrected sentence.
+
+\begin{itemize}
+    \item \textbf{Edit Extraction \& Alignment:} The system aligns erroneous and corrected sentence pairs using a weighted Levenshtein edit distance, accompanied by an iterative algorithm to capture multi-word errors. It then applies the character-level alignments.
+    \item \textbf{Applying Operations:} It assigns specific character-level edits to the input words to transform them. The primary operations include:
+    \begin{itemize}
+        \item \textbf{Keep (K)}
+        \item \textbf{Delete (D)}
+        \item \textbf{Insert (I\_[])}
+        \item \textbf{Replace (R\_[])}
+    \end{itemize}
+    \item \textbf{Optimization Strategies:} To keep the vocabulary of possible edits manageable and improve learning, the system uses:
+    \begin{itemize}
+        \item \textbf{Edit Compression:} Merging consecutive operations (e.g., consecutive deletes \texttt{DDD} into \texttt{D*} or insertions into \texttt{I\_[تت]} \texttt{I\_[ت*]}).
+        \item \textbf{Sub-word Projection:} Edit operations are first extracted at the word level, where grammatical corrections are naturally defined. These edits are then projected onto the corresponding sub-word tokens so that each token receives a label, matching the tokenization scheme used by Transformer models such as BERT.
+        \item \textbf{Edit Segregation:} Splitting the correction into a two-step pipeline—one model for non-punctuation errors, and a subsequent model for punctuation errors.
+        \item \textbf{Edit Pruning:} Removing rare edit operations during training to help the model focus on frequent and informative edits.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Explanation Generation (Interpretability)}
+
+Unlike autoregressive Seq2Seq models, which generate only the final corrected sentence, edit-based models explicitly predict the edit operation applied to each input token (e.g., \textbf{KEEP}, \textbf{DELETE}, \textbf{REPLACE}, or \textbf{INSERT}). These edit labels provide a transparent record of how the input was transformed, making it straightforward to identify the exact grammatical changes performed. This improves the interpretability of the correction process and facilitates error analysis, debugging, and the generation of user-friendly explanations for the applied corrections.
 
 \subsubsection{Modular Decomposition}
-\PlaceholderText{Break the Edit Tagger module down into submodules here.}
+\begin{itemize}
+    \item \textbf{Alignment Module}\\
+    The aligner is responsible for aligning the erroneous sentence with its corrected one using the Levenshtein edit distance algorithm. The alignment is performed in two stages. First, alignment is carried out at the \textbf{word level} to determine the correspondence between words in the two sentences. At this stage, operations such as \textbf{insertions}, \textbf{deletions}, \textbf{merges}, and \textbf{splits} are identified to handle cases where a single word in one sentence corresponds to multiple words in the other, or vice versa. Once the word-level alignment has been established, each aligned word pair is further aligned at the \textbf{character level} to determine the exact character insertions, deletions, and replacements required to transform the erroneous word into its corrected form. This hierarchical alignment provides the detailed edit information that serves as the basis for extracting edit labels used during model training.
+    
+    \item \textbf{Rewrite Module}\\
+    After the initial alignment, the rewriter generates an intermediate representation of the aligned sentences. This step resolves ambiguities in the character-level alignment and rewrites complex edits into a consistent form that can be more easily projected onto tokens.
+    
+    \item \textbf{Edit Projection Module}\\
+    Since grammatical edits are initially extracted at the character level while Transformer-based models operate on tokenized input, the projector maps the character-level edit operations onto the corresponding tokens or sub-word tokens. Each token is assigned an edit label describing the operation that should be applied, making the extracted edits compatible with the model's token-level prediction mechanism.
+    
+    \item \textbf{Edit Compression Module}\\
+    The projector may produce multiple consecutive edit operations for a single token. The compressor combines these individual operations into a compact edit label whenever possible. This reduces redundancy in the label sequence, simplifies the classification problem, and produces a more manageable set of edit tags for model training and inference.
+    
+    \item \textbf{Edit Pruning Module}\\
+    The pruner analyses the frequency of all generated edit labels across the training corpus and removes edit labels that occur below a predefined frequency threshold. Rare edit operations contribute little to the learning process while significantly increasing the number of output classes. Pruning these infrequent labels reduces label sparsity, decreases vocabulary size, and allows the model to focus on learning the most common and informative correction patterns.
+    
+    \item \textbf{Edit Segregation Module}\\
+    Punctuation corrections often exhibit different characteristics from grammatical and spelling corrections. The segregator separates punctuation-related edit labels from non-punctuation edits, allowing them to be processed independently. This separation improves the handling of punctuation corrections and enables the system to treat punctuation edits differently during training or inference if required.
+    
+    \item \textbf{Edit Application Module}\\
+    During inference, the model predicts a sequence of edit labels rather than generating corrected text directly. The edits applicator interprets these predicted labels and applies the corresponding operations—such as insertions, deletions, replacements, merges, or splits—to the original input tokens. The resulting sequence of modified tokens is then reconstructed to produce the final corrected sentence.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{assets/tagger_pre.png}
+\caption{Tagger Pre-processing Pipeline}
+\end{figure}
 
 \subsubsection{Design Constraints}
-\PlaceholderText{Explain constraints related to the Edit Tagger Module here.}
+\begin{itemize}
+    \item The edit tagging task exhibits a significant class imbalance, as the majority of tokens in the training corpus do not require correction and are therefore assigned the KEEP label. This imbalance may bias the model toward predicting KEEP more frequently than edit operations, potentially reducing its ability to detect less common grammatical errors.
+    \item The frequency of grammatical error types in the training corpus is highly uneven. Errors related to Hamza (\foreignlanguage{arabic}{ء,أ,إ}), Taa' Marbuta (\foreignlanguage{arabic}{ة,ه}), and punctuation constitute a large proportion of the annotated corrections, whereas many other grammatical phenomena occur much less frequently \\
+    These corpus characteristics directly influence the model's learning behavior. Frequent edit operations are learned more reliably due to their abundance in the training data, while infrequent grammatical phenomena remain more challenging to detect and correct.
+\end{itemize}
 
 \subsubsection{Results}
-\PlaceholderText{Add placeholders for Edit Tagger results here.}
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/7-2.png}
+        \caption{}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/7-1.png}
+        \caption{}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/8-2.png}
+        \caption{}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/8-1.png}
+        \caption{}
+    \end{minipage}
+\end{figure}
+
+\subsection{Ranker Sub-module}
+
+\subsubsection{Functional Description}
+The Ranker module is responsible for producing the final coherent text alongside its supporting grammatical explanations.
+
+\begin{itemize}
+    \item \textbf{Correction Generation} evaluates the corrections coming from GEC making use of the GED output. It applies a rigorous filtering and scoring pipeline to candidates from multiple modules. Overlapping or conflicting candidate edits are resolved by selecting the candidate with the highest composite score.
+    \item \textbf{Explanation Generation} is facilitated by hardcoded scoring biases that favour explainable, rule-based corrections. Specifically, if a detected error is marked as \texttt{explanation\_eligible} and the candidate correction comes from the rule-based \texttt{ONTOLOGY} module, a positive weight (\texttt{W\_EXPLAIN}: +0.05) is applied. This bias guarantees that the final selected corrections can be mapped back to transparent linguistic rules rather than relying solely on black-box predictions.
+\end{itemize}
+
+\subsubsection{Modular Decomposition}
+This module is decomposed into four primary submodules:
+
+\begin{enumerate}
+    \item \textbf{Configuration Manager}\\
+    Manages the tunable hyper-parameters used during scoring. Key configurations include base module weights (\texttt{W\_ONTOLOGY}: 0.25, \texttt{W\_TAG}: 0.15, \texttt{W\_DICTIONARY}: 0.10), confidence weightings (\texttt{W\_EDIT\_CONF}: 0.30), and penalty weights (\texttt{W\_CHAR\_DIST}: 0.10, \texttt{W\_LOW\_CONF}: 0.15).
+    
+    \item \textbf{Candidate Aggregator \& Matcher}\\
+    Maps candidate edits to specific errors detected by the GED by checking span intersections. Candidates whose correction equals the original text are immediately filtered out.
+    
+    \item \textbf{Scoring Engine}\\
+    Computes a comprehensive \texttt{score} for each candidate edit using multiple weighted heuristics:
+    \begin{itemize}
+        \item \textbf{Base Module \& Confidence}: Adds base module weight, edit confidence (\texttt{W\_EDIT\_CONF}), and GED confidence (\texttt{W\_GED\_CONF}).
+        \item \textbf{Provenance Tiers}: Boosts scores for \texttt{tier\_1\_rule\_derived} (+0.15) and \texttt{tier\_2\_rule\_supported} (+0.08) error spans.
+        \item \textbf{Linguistic Alignment}: Awards +0.10 (\texttt{W\_SPELL\_DICT}) if a Dictionary module corrects an \texttt{ORTHOGRAPHY} error, and +0.10 (\texttt{W\_GRAM\_ONT}) if the Ontology module corrects a \texttt{SYNTAX} or \texttt{MORPHOLOGY} errors. Out-of-vocabulary (\texttt{is\_oov}) tokens receive a +0.05 bonus.
+        \item \textbf{Multi-Source Agreement}: Awards +0.20 (\texttt{W\_AGREEMENT}) for each peer module that suggests the exact same correction string.
+    \end{itemize}
+    
+    \item \textbf{Final Selection \& Metadata Generator}\\
+    Sorts the scored candidates per error using a strict tuple key: \texttt{(score, edit\_confidence, module\_priority, -length\_of\_correction)}. \texttt{module\_priority} is strictly ranked: Ontology (3) > Tag (2) > Dictionary (1).
+    It then iterates chronologically through the text, applying the best candidate. Finally, it emits the final correction.
+\end{enumerate}
+
+\subsubsection{Design Constraints}
+\begin{itemize}
+    \item \textbf{Grammatical Accuracy and Precision}:\\
+    The system penalizes edits that diverge too much from the original text. A penalty (\texttt{W\_CHAR\_DIST}: -0.10) is applied proportionately to the normalized Levenshtein distance, and another penalty (\texttt{W\_LENGTH\_RATIO}: -0.05) is applied for deviations in string length. Furthermore, if a candidate's \texttt{edit\_confidence} falls below \texttt{CONF\_LOW\_THRESHOLD} (0.30), a flat penalty of -0.15 (\texttt{W\_LOW\_CONF}) is applied.
+\end{itemize}
 
 \section{Module 3: Web Client}
 The web client is the user-facing application that exposes Baligh's capabilities through an interactive writing environment. Built with React and Vite, it provides a lightweight, design-system-aligned interface that communicates with the backend API to present analysis results, corrections, and suggestions to the user.
