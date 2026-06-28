@@ -713,21 +713,64 @@ This chapter presents my technical contributions to the preprocessing pipeline a
 The Preprocessing Pipeline is the entry point of the Baligh backend, responsible for parsing, cleaning, and extracting linguistic features from raw text before downstream GED, GEC, or NWS modules are invoked.
 
 \subsection{Unicode Normalization and Character Mapping}
-Raw text typed by users often contains inconsistent formatting, mixed spacing, or varying Unicode representations. Preprocessing applies Unicode NFKC normalization, strips redundant tatweel character segments (\AR{ـ}), and consolidates consecutive whitespaces. 
-
-Because downstream error detection modules must report errors using character offsets relative to the user's \emph{original} unnormalized text, I designed and implemented an offset mapping algorithm. During normalization, the system constructs a mapping array \texttt{norm\_to\_orig\_map} where index $i$ of the normalized text maps to the exact starting character index in the original text. The tokens' spans are computed using this map, ensuring accurate UI highlighting.
+To ensure consistent processing, raw text typed by users goes through a normalization and cleaning stage. I designed and implemented this pipeline using the following steps:
+\begin{itemize}
+    \item \textbf{Unicode NFKC Normalization:} Normalizes the input text using the Unicode NFKC standard to canonicalize varying character codepoints and ligature representations into standard forms.
+    \item \textbf{Text Cleaning and Tatweel Stripping:} Strips redundant tatweel character segments (\AR{ـ}) and consolidates consecutive whitespaces into single spaces to remove orthographic noise.
+    \item \textbf{Offset Mapping Array Construction:} Builds a mapping array, \texttt{norm\_to\_orig\_map}, where index $i$ in the normalized string maps back to the corresponding character index in the original, unnormalized user input.
+\end{itemize}
 
 \subsection{Word Boundary Detection and Mode Selection}
-In a real-time editor, text is received continuously. Downstream GED/GEC checkers should only run on complete words, while the NWS module must switch between completing the current active token or predicting the next word. 
-
-To address this, I implemented a boundary splitting algorithm. The system inspects the last character of the normalized text. If it is an Arabic letter or digit, the input mode is set to Word Auto-Completion (\texttt{"WAC"}), and the incomplete trailing substring is extracted as the \texttt{current\_fragment}. If the text ends with a delimiter (space or punctuation), the mode is set to Next-Word Prediction (\texttt{"NWP"}) and \texttt{current\_fragment} is set to null. The completed prefix is then passed to segmentation and morphological analysis, while the incomplete fragment is routed directly to the WAC suggester.
+In a real-time editor, text is received continuously. Downstream GED/GEC checkers must only run on completed words, while the NWS module must decide whether to complete the active word fragment or predict the next word. To address this, I implemented a boundary splitting algorithm that analyzes the trailing character of the normalized input, resulting in one of two outcomes:
+\begin{itemize}
+    \item \textbf{Word Auto-Completion (\texttt{"WAC"}) Mode:}
+    \begin{itemize}
+        \item \textbf{Condition:} The trailing character is an Arabic letter or digit, indicating the user is in the middle of typing a word.
+        \item \textbf{Behavior:} The last whitespace-delimited chunk is split off and extracted as the \texttt{current\_fragment}. The remaining preceding text is treated as the completed prefix and passed to the segmentation and morphological analysis pipeline.
+    \end{itemize}
+    \item \textbf{Next-Word Prediction (\texttt{"NWP"}) Mode:}
+    \begin{itemize}
+        \item \textbf{Condition:} The trailing character is a delimiter (such as a whitespace or a punctuation mark like \AR{،}, \AR{؟}, or a period), indicating the last word is complete.
+        \item \textbf{Behavior:} The \texttt{current\_fragment} is set to null. The entire input is treated as completed tokens and parsed to serve as context for predicting the next word.
+    \end{itemize}
+\end{itemize}
 
 \subsection{Tokenization and Affix Segmentation}
-The completed prefix is segmented using the Farasa API. While Farasa outputs a list of plus-delimited sub-word segments (e.g., \AR{ب} + \AR{ال} + \AR{مدرسة}), I implemented a segmenter that peels prefixes and suffixes inward to construct a clean token structure.
-Prefixes are matched against conjunctions (\AR{و}, \AR{ف}), prepositions (\AR{ب}, \AR{ل}, \AR{ك}), and definite articles (\AR{ال}). Suffixes are matched against subject/object pronouns (e.g., \AR{ها}, \AR{هم}, \AR{نا}, \AR{ه}). The remaining core is rejoined as the \texttt{STEM}, and the sequence of clitics is stored as a plus-joined string in the token's \texttt{affix\_structure} attribute.
+Our core goal in this stage was to use the Farasa segmenter to identify morphological components (prefixes, stems, and suffixes) while ensuring that Farasa's aggressive Arabic NLP engine does not alter, fix, or ruin the raw user text intended for downstream Grammatical Error Detection (GED) modules. Because GED relies on identifying spelling and layout errors directly from the user's raw input, any implicit corrections or structural modifications performed by Farasa would mask errors and prevent their detection.
+
+To resolve this conflict, I designed and implemented a series of custom bypass mechanisms to handle the following issues encountered during integration:
+\begin{enumerate}
+    \item \textbf{Implicit Spelling Corrections:}
+    \begin{itemize}
+        \item \textbf{The Problem:} Farasa acts as an automatic spell-checker. When a user types a word with a spelling mistake, such as missing a Hamza (\AR{اكرم} instead of \AR{أكرم}) or a Ta-Marbuta typo (\AR{مدرسه} instead of \AR{مدرسة}), Farasa silently corrects the token in its output. Consequently, the downstream GED module would receive the corrected forms and fail to detect the user's typo.
+        \item \textbf{Resolution Strategy:} I implemented a character-by-character mapping bridge using Python's \texttt{difflib.SequenceMatcher}. Before alignment, the algorithm standardizes characters (such as neutralizing Hamza variants and Ta-Marbuta/Ha differences) on both the raw and Farasa-processed strings to prevent alignment mismatches. The algorithm then reconstructs the segmented tokens by pulling the exact characters typed by the user at each position, effectively restoring the user's spelling mistakes while keeping Farasa's segmented boundaries intact.
+    \end{itemize}
+    \item \textbf{Aggressive Word and Number Splitting:}
+    \begin{itemize}
+        \item \textbf{The Problem:} When users omit space boundaries (e.g., typing \AR{اكرم100} as a single block), Farasa splits the input into two separate, grammatically valid tokens: \AR{أكرم} and \AR{100}. This hides spacing errors, making it impossible for the GED module to flag a missing space.
+        \item \textbf{Resolution Strategy:} We stripped Farasa of its authority to define word boundaries by enforcing a regex-first tokenization pass. I implemented a regex pattern designed to capture contiguous blocks of Arabic letters, digits, and diacritics as single tokens, while isolating punctuation and whitespace. If this regex pass groups a segment as a single token but Farasa splits it, our orchestrator merges the pieces back together, overrides Farasa's output, and sets the token's \texttt{affix\_structure} to null. This enables downstream modules to correctly flag it as an error.
+    \end{itemize}
+    \item \textbf{Dropped Diacritics (Tashkeel):}
+    \begin{itemize}
+        \item \textbf{The Problem:} Farasa frequently strips Arabic short vowels (diacritics) during segment analysis (e.g., segmenting \AR{المنَزل} as \AR{ال} + \AR{منزل} or \AR{لَأكلها} as \AR{ل} + \AR{أكل} + \AR{ها}). Additionally, standard Python regular expressions (\texttt{\textbackslash{}w}) do not capture Arabic diacritics as word characters, causing words to break.
+        \item \textbf{Resolution Strategy:} First, the regex tokenization pattern was updated to explicitly include the Unicode ranges for all Arabic diacritics. Second, I built a lookahead alignment algorithm in the token reconstruction loop. If a diacritic present in the raw text is missing from Farasa's segmented output, the algorithm retrieves the diacritic character from the raw text and dynamically re-injects it before the plus clitic boundary (yielding \AR{لَ} + \AR{أكل} + \AR{ها}).
+    \end{itemize}
+    \item \textbf{Inserted and Hidden Characters:}
+    \begin{itemize}
+        \item \textbf{The Problem:} Farasa sometimes inserts letters that do not exist in the raw text to reconstruct clitics grammatically. For instance, the token \AR{للحج} is segmented as \AR{ل} + \AR{ال} + \AR{حج}, inserting an implicit Alif (\AR{ا}) that was not typed by the user.
+        \item \textbf{Resolution Strategy:} The character-mapping bridge was designed to handle unmapped characters. When the reconstruction loop encounters an inserted character in Farasa's output that has no index in the raw text, it accepts Farasa's inserted character and continues the mapping sequence without crashing or dropping tokens.
+    \end{itemize}
+\end{enumerate}
+
+After reconstructing the spelling-preserved segmented tokens, the clitics are identified by peeling prefixes and suffixes. Prefixes are matched against conjunctions (\AR{و}, \AR{ف}), prepositions (\AR{ب}, \AR{ل}, \AR{ك}), and definite articles (\AR{ال}). Suffixes are matched against subject/object pronouns (e.g., \AR{ها}, \AR{هم}, \AR{نا}, \AR{ه}). The remaining core is rejoined as the \texttt{STEM}, and the sequence of clitics is stored as a plus-joined string in the token's \texttt{affix\_structure} attribute.
 
 \subsection{Joint Morphological Analysis and Disambiguation}
-For each completed token, we run CAMeL Tools' morphological analyzer to generate candidate analyses containing features like lemma, POS tag, gender, number, person, case, aspect, and diacritized form. To resolve the chicken-and-egg problem of diacritization and morphology, we apply CAMeL's contextual disambiguator to jointly analyze and disambiguate word candidates. The disambiguated analysis is marked with \texttt{is\_disambiguated=true} and is placed at index 0 of the feature list, allowing downstream modules to access the contextually correct grammatical properties.
+To provide downstream layers with high-fidelity grammatical and syntactic metadata, the pipeline implements a joint analysis and contextual disambiguation process:
+\begin{itemize}
+    \item \textbf{Candidate Feature Generation:} Each completed token is processed through CAMeL Tools' morphological analyzer to generate a comprehensive list of potential analyses. Each candidate captures lexical and morphological properties, including lemma, Part-of-Speech (POS) tag, gender, number, person, case, aspect, and diacritized form.
+    \item \textbf{Contextual Disambiguation:} Because written Arabic is highly homographic (often omitting short vowels), a single token can have multiple valid morphological analyses out of context. To resolve this ambiguity, we apply CAMeL Tools' sequence-based disambiguator, which analyzes the surrounding sentence context to identify the single most probable candidate.
+    \item \textbf{Downstream API Integration:} The chosen disambiguated candidate is marked with the flag \texttt{is\_disambiguated=true} and positioned at index 0 of the token's morphological candidate array. This establishes a clean interface for downstream GEC and GED modules, allowing them to retrieve the correct context-aware features immediately.
+\end{itemize}
 
 \section{Contribution 2: Next-Word Suggestion (NWS) and Auto-Completion Subsystem}
 The NWS subsystem runs in parallel with the main GEC/GED layers as a fast-path service. Figure~\ref{fig:nws-arch} shows the architecture of the NWS module.
