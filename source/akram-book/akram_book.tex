@@ -911,6 +911,25 @@ When the system detects that the user is actively typing a word (mode \texttt{"W
     where $|W|$ is the length of the candidate word.
 \end{itemize}
 
+The evaluation of the character N-gram model for word auto-completion yields the overall performance metrics presented in Table~\ref{tab:wac-results}.
+
+\begin{table}[H]
+\centering
+\caption{Overall evaluation metrics for the Word Auto-Completion (WAC) character N-gram model.}
+\label{tab:wac-results}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.58\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth}}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Top-1 Accuracy & 30.00\% \\
+Top-3 Accuracy & 40.80\% \\
+Top-5 Accuracy & 46.40\% \\
+Mean Reciprocal Rank (MRR) & 0.3699 \\
+Keystroke Savings Rate (KSR) & 7.40\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \newpage
 
 \subsection{System Suggestions}
