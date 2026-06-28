@@ -1230,7 +1230,73 @@ Unlike autoregressive Seq2Seq models, which generate only the final corrected se
 \end{itemize}
 
 \subsubsection{Results}
-\PlaceholderText{Add placeholders for Edit Tagger results here.}
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/7-2.png}
+        \caption{}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/7-1.png}
+        \caption{}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/8-2.png}
+        \caption{}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/8-1.png}
+        \caption{}
+    \end{minipage}
+\end{figure}
+
+\subsection{Ranker Sub-module}
+
+\subsubsection{Functional Description}
+The Ranker module is responsible for producing the final coherent text alongside its supporting grammatical explanations.
+
+\begin{itemize}
+    \item \textbf{Correction Generation} evaluates the corrections coming from GEC making use of the GED output. It applies a rigorous filtering and scoring pipeline to candidates from multiple modules. Overlapping or conflicting candidate edits are resolved by selecting the candidate with the highest composite score.
+    \item \textbf{Explanation Generation} is facilitated by hardcoded scoring biases that favour explainable, rule-based corrections. Specifically, if a detected error is marked as \texttt{explanation\_eligible} and the candidate correction comes from the rule-based \texttt{ONTOLOGY} module, a positive weight (\texttt{W\_EXPLAIN}: +0.05) is applied. This bias guarantees that the final selected corrections can be mapped back to transparent linguistic rules rather than relying solely on black-box predictions.
+\end{itemize}
+
+\subsubsection{Modular Decomposition}
+This module is decomposed into four primary submodules:
+
+\begin{enumerate}
+    \item \textbf{Configuration Manager}\\
+    Manages the tunable hyper-parameters used during scoring. Key configurations include base module weights (\texttt{W\_ONTOLOGY}: 0.25, \texttt{W\_TAG}: 0.15, \texttt{W\_DICTIONARY}: 0.10), confidence weightings (\texttt{W\_EDIT\_CONF}: 0.30), and penalty weights (\texttt{W\_CHAR\_DIST}: 0.10, \texttt{W\_LOW\_CONF}: 0.15).
+    
+    \item \textbf{Candidate Aggregator \& Matcher}\\
+    Maps candidate edits to specific errors detected by the GED by checking span intersections. Candidates whose correction equals the original text are immediately filtered out.
+    
+    \item \textbf{Scoring Engine}\\
+    Computes a comprehensive \texttt{score} for each candidate edit using multiple weighted heuristics:
+    \begin{itemize}
+        \item \textbf{Base Module \& Confidence}: Adds base module weight, edit confidence (\texttt{W\_EDIT\_CONF}), and GED confidence (\texttt{W\_GED\_CONF}).
+        \item \textbf{Provenance Tiers}: Boosts scores for \texttt{tier\_1\_rule\_derived} (+0.15) and \texttt{tier\_2\_rule\_supported} (+0.08) error spans.
+        \item \textbf{Linguistic Alignment}: Awards +0.10 (\texttt{W\_SPELL\_DICT}) if a Dictionary module corrects an \texttt{ORTHOGRAPHY} error, and +0.10 (\texttt{W\_GRAM\_ONT}) if the Ontology module corrects a \texttt{SYNTAX} or \texttt{MORPHOLOGY} errors. Out-of-vocabulary (\texttt{is\_oov}) tokens receive a +0.05 bonus.
+        \item \textbf{Multi-Source Agreement}: Awards +0.20 (\texttt{W\_AGREEMENT}) for each peer module that suggests the exact same correction string.
+    \end{itemize}
+    
+    \item \textbf{Final Selection \& Metadata Generator}\\
+    Sorts the scored candidates per error using a strict tuple key: \texttt{(score, edit\_confidence, module\_priority, -length\_of\_correction)}. \texttt{module\_priority} is strictly ranked: Ontology (3) > Tag (2) > Dictionary (1).
+    It then iterates chronologically through the text, applying the best candidate. Finally, it emits the final correction.
+\end{enumerate}
+
+\subsubsection{Design Constraints}
+\begin{itemize}
+    \item \textbf{Grammatical Accuracy and Precision}:\\
+    The system penalizes edits that diverge too much from the original text. A penalty (\texttt{W\_CHAR\_DIST}: -0.10) is applied proportionately to the normalized Levenshtein distance, and another penalty (\texttt{W\_LENGTH\_RATIO}: -0.05) is applied for deviations in string length. Furthermore, if a candidate's \texttt{edit\_confidence} falls below \texttt{CONF\_LOW\_THRESHOLD} (0.30), a flat penalty of -0.15 (\texttt{W\_LOW\_CONF}) is applied.
+\end{itemize}
 
 \section{Module 3: Web Client}
 The web client is the user-facing application that exposes Baligh's capabilities through an interactive writing environment. Built with React and Vite, it provides a lightweight, design-system-aligned interface that communicates with the backend API to present analysis results, corrections, and suggestions to the user.
