@@ -764,7 +764,7 @@ To resolve this conflict, I designed and implemented a series of custom bypass m
 
 After reconstructing the spelling-preserved segmented tokens, the clitics are identified by peeling prefixes and suffixes. Prefixes are matched against conjunctions (\AR{و}, \AR{ف}), prepositions (\AR{ب}, \AR{ل}, \AR{ك}), and definite articles (\AR{ال}). Suffixes are matched against subject/object pronouns (e.g., \AR{ها}, \AR{هم}, \AR{نا}, \AR{ه}). The remaining core is rejoined as the \texttt{STEM}, and the sequence of clitics is stored as a plus-joined string in the token's \texttt{affix\_structure} attribute.
 
-\subsection{Joint Morphological Analysis and Disambiguation}
+\subsection{Morphological Analysis and Disambiguation}
 To provide downstream layers with high-fidelity grammatical and syntactic metadata, the pipeline implements a joint analysis and contextual disambiguation process:
 \begin{itemize}
     \item \textbf{Candidate Feature Generation:} Each completed token is processed through CAMeL Tools' morphological analyzer to generate a comprehensive list of potential analyses. Each candidate captures lexical and morphological properties, including lemma, Part-of-Speech (POS) tag, gender, number, person, case, aspect, and diacritized form.
@@ -884,6 +884,8 @@ The NWS pipeline generates predictions by combining the following subsystems:
 
 In conclusion, training both the statistical model and the neural network on the exact same dataset (\texttt{final\_corpus}) fixed domain differences and created a highly effective predictor. The Word N-Gram model successfully memorized common phrases to help cover the LSTM's weaknesses, proving that the hybrid approach works very well.
 
+\newpage
+
 \subsection{Word Auto-Completion (WAC) Subsystem}
 When the system detects that the user is actively typing a word (mode \texttt{"WAC"}), it predicts the rest of the word using the following steps:
 \begin{itemize}
@@ -898,7 +900,7 @@ When the system detects that the user is actively typing a word (mode \texttt{"W
 
 \newpage
 
-\subsection{System Suggestions Demonstration}
+\subsection{System Suggestions}
 To illustrate the functionality of the Next-Word Suggestion (NWS) and Word Auto-Completion (WAC) subsystem, Figure~\ref{fig:wac-demo} shows an example of active auto-completion word suggestions, and Figures~\ref{fig:nwp-demo-1} and~\ref{fig:nwp-demo-2} present examples of next-word predictions generated dynamically within the user editor interface.
 
 \begin{figure}[H]
@@ -923,28 +925,56 @@ To illustrate the functionality of the Next-Word Suggestion (NWS) and Word Auto-
 \end{figure}
 
 \section{Testing and Validation}
-I established a comprehensive test suite using pytest to validate the modules:
+To ensure the reliability of the modules I developed, a comprehensive testing strategy was implemented focusing on isolated unit tests and system-level checks.
+
+\subsection{Preprocessing Testing}
+Unit tests in the \texttt{tests/services/preprocessing/} directory verify normalizer rules (such as Alif and Ya normalization), sentence boundary detection, word segmenters, and morphological analyzers. For example, \texttt{test\_analyzer.py} validates that out-of-vocabulary (OOV) tokens (e.g., typos like ``\foreignlanguage{arabic}{الطلابب}'' containing an extra letter) are correctly flagged with an \texttt{is\_oov = True} attribute to prevent cascading errors in downstream grammar checks.
+
+\subsection{Next-Word Suggestion (NWS) Testing}
+Verified in the \texttt{tests/services/nws/} directory:
 \begin{itemize}
-    \item \textbf{Preprocessing Tests:} Verified that Unicode normalization preserves offsets, mode detection correctly toggles between WAC/NWP, Farasa successfully identifies affix structures, and CAMeL Tools positions the disambiguated candidate first.
-    \item \textbf{NWS Cache Tests:} Tested idioms suffix matches, famous phrase hits, and LRU cache eviction logic.
-    \item \textbf{Language Model Verification:} Verified that character models correctly back off to unigrams, and that LSTM beam search correctly decodes Arabic text.
+    \item \textit{Next-Word Prediction (NWP) Subsystem:} Tests candidate word predictions generated from the LSTM model and the Word N-Gram model, validating their hybrid confidence blending.
+    \item \textit{Word Auto-Completion (WAC) Subsystem:} Tests typing completions using the Character N-Gram model to verify MRR and KSR metrics.
+    \item \textit{Prototyping \& Orchestration:} Utilized interactive Jupyter Notebooks to visually evaluate beam search rankings and maintained a local orchestrator test (\texttt{test\_orchestrator.py}), which was excluded from final submission to avoid requiring large CUDA library dependencies.
 \end{itemize}
 
 \chapter{Challenges, Lessons Learned, and Future Work}
 This chapter reflects on the challenges faced, lessons learned, and future enhancements.
 
 \section{Faced Challenges}
-The primary technical challenge was managing the execution latency of preprocessing. Executing Farasa and CAMeL Tools sequentially can take up to 200ms per call. To resolve this, I implemented an interactive pipeline mode keeping subprocesses alive in memory. Another challenge was token alignment when SentencePiece subword splits did not match Farasa's word tokenization, which required careful mapping of character spans.
+Throughout the development, several research, technical, and integration challenges were encountered regarding the Preprocessing and NWS modules:
+
+\subsection{Research Challenges}
+\begin{itemize}
+    \item \textbf{Next-Word Suggestion (NWS) Module:} One of the primary difficulties encountered during the research phase was the poorness of literature on Next-Word Suggestion for the Arabic language. The available research was found to be limited in quantity and often lacking in quality. To compensate for this gap and achieve reliable results, it was necessary to look beyond Arabic and review papers focusing on other morphologically rich languages that share similar structural complexities.
+\end{itemize}
+
+\subsection{Technical and Integration Challenges}
+\begin{itemize}
+    \item \textbf{Model Latency vs. Accuracy (NWS):} Balancing the fast response time required for typing with the context-awareness of neural models was difficult. This was done by implementing a hybrid approach that blends a fast Word N-Gram model with an LSTM model.
+    \item \textbf{Misleading Literature on N-Gram Performance (NWS):} Most papers claiming that simple N-Gram models are highly fit for NWS tasks often exaggerate their performance and use unrealistic numbers, which caused us to question our own results for a time. Furthermore, these studies assume the availability of massive corpora containing hundreds of millions to over a billion tokens to achieve good accuracy. Due to computing power limitations, training on such massive datasets was not feasible for our project.
+    \item \textbf{Data Scarcity for Interactive Evaluation (NWS):} While there are standard corpora for Arabic, finding datasets that closely mimic user keystrokes for evaluating Word Auto-Completion was challenging. We had to synthesize evaluation strategies using MRR and KSR metrics.
+    \item \textbf{Morphological Ambiguity (Preprocessing):} Arabic's rich morphology often caused the system to misidentify word boundaries or grammatical roles. Integrating Farasa and CAMeL Tools for accurate morphological analysis prior to detection was crucial to resolving this.
+    \item \textbf{Pipeline Latency (Integration):} Running preprocessing, error detection, and NWS sequentially for every user keystroke caused noticeable delays. We resolved this by making NWS requests independent from grammar checks.
+\end{itemize}
 
 \section{Lessons Learned}
-I learned the value of defining robust API contracts early. Authoring Pydantic schemas beforehand made parallel development with GEC/GED developers seamless. I also learned that joint morphological analysis is much more robust than sequential diacritize-then-parse pipelines, as it prevents early error propagation.
+I learned the value of defining robust API contracts early. I also learned not to blindly trust any published literature or academic papers without validating their claims first, especially by critically checking the datasets they used to ensure their results are realistic.
 
 \section{Future Enhancements}
-Future work will focus on:
+To build upon the foundation established by the preprocessing and NWS modules, future development can focus on:
+
+\subsection{Next-Word Suggestion (NWS) Enhancements}
 \begin{itemize}
-    \item Compiling the PyTorch LSTM model to ONNX or TensorRT to reduce inference latencies.
-    \item Implementing mid-sentence editing support using the reserved \texttt{cursor\_offset} parameter.
-    \item Adding support for user-specific custom vocabulary dictionary expansion.
+    \item \textbf{In-Sentence Completions:} Expanding the suggestion capabilities to support completions anywhere within the sentence context, rather than strictly predicting the next word at the end of a sentence.
+    \item \textbf{Extensive Model Benchmarking:} Experimenting with and benchmarking a wider variety of models to determine the highest achievable results and accuracies for Arabic text.
+    \item \textbf{Domain-Specific Training and User Personalization:} Training models on higher volume datasets and providing distinct models customized for specific text domains (e.g., legal, medical, or casual text). The system could then dynamically switch to a model based on the specific domain of the user currently using the application.
+\end{itemize}
+
+\subsection{Preprocessing and System Extensions}
+\begin{itemize}
+    \item \textbf{Dialectal Support:} Expanding the datasets and models to support common Arabic dialects alongside MSA.
+    \item \textbf{Offline Mode:} Packaging the core lightweight models (like N-Grams and MARISA Tries) for offline usage on mobile devices or desktop applications.
 \end{itemize}
 }
 
