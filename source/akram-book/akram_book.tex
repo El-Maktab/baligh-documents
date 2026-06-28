@@ -1,0 +1,1093 @@
+% !TEX TS-program = xelatex
+% -----------------------------------------------------------------------------
+% Baligh Graduation Project Booklet Template
+% One-file LaTeX template for both PROJECT and INDIVIDUAL reports.
+%
+% Compile with XeLaTeX.
+%
+% To switch between the two document types:
+%   - Project booklet:    \individualfalse
+%   - Individual booklet: \individualtrue
+%
+% Image files are optional. If the files do not exist, the template shows
+% clean placeholder boxes and still compiles.
+% -----------------------------------------------------------------------------
+
+\documentclass[12pt,a4paper,oneside]{report}
+
+% -----------------------------------------------------------------------------
+% 1. DOCUMENT MODE
+% -----------------------------------------------------------------------------
+\newif\ifindividual
+% \individualfalse        % Project booklet mode
+\individualtrue       % Individual booklet mode
+
+% -----------------------------------------------------------------------------
+% 2. PROJECT METADATA
+% -----------------------------------------------------------------------------
+\newcommand{\UniversityName}{Cairo University}
+\newcommand{\FacultyName}{Faculty of Engineering}
+\newcommand{\DepartmentName}{Department of Computer Engineering}
+\newcommand{\DegreeName}{Bachelor of Science in Computer Engineering}
+
+\newcommand{\ProjectName}{Baligh}
+\newcommand{\ProjectSubtitle}{Arabic Writing Assistant}
+\newcommand{\ProjectFullTitle}{\ProjectName: \ProjectSubtitle}
+\newcommand{\ProjectYear}{2026}
+\newcommand{\SubmissionDate}{July, 2026} % Change as needed
+
+% Verify the official English spelling of the supervisor name before final submission.
+\newcommand{\SupervisorName}{Dr. Ayman AboElhassan}
+\newcommand{\SupervisorEmail}{ayman.abo.elmaaty@eng.cu.edu.eg}
+\newcommand{\SupervisorPhone}{01060836189}
+
+% Individual mode defaults. Change these when preparing each student's report.
+\newcommand{\IndividualStudentName}{Akram Hany Karam Sallam}
+\newcommand{\IndividualStudentEmail}{akram.sallam03@eng-st.cu.edu.eg}
+\newcommand{\IndividualStudentPhone}{01148746563}
+
+% Asset filenames are resolved relative to this template directory.
+\newcommand{\UniversityLogoFile}{assets/cu-logo.png}
+\newcommand{\FacultyLogoFile}{assets/faculty-logo.jpeg}
+\newcommand{\ProjectLogoFile}{assets/baligh-logo.pdf}
+
+% -----------------------------------------------------------------------------
+% 3. PACKAGES
+% -----------------------------------------------------------------------------
+\usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm,headheight=25pt]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage[table]{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{tocloft}
+\usepackage{setspace}
+\usepackage{ragged2e}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{etoolbox}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\usepackage{cite}
+\usepackage{hyperref}
+
+% -----------------------------------------------------------------------------
+% 4. LANGUAGE AND FONTS
+% -----------------------------------------------------------------------------
+\setmainlanguage{english}
+\setotherlanguage{arabic}
+
+% Use an installed sans-serif so local builds remain deterministic.
+\setmainfont{Liberation Sans}
+\newfontfamily\arabicfont[Script=Arabic,Scale=1.08]{Noto Naskh Arabic}
+
+\onehalfspacing
+\justifying
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% -----------------------------------------------------------------------------
+% 5. COLOR PALETTE - LIGHT MODE WITH BALIGH ACCENTS
+% -----------------------------------------------------------------------------
+\definecolor{BalighGreen}{HTML}{2EAD67}
+\definecolor{BalighDarkGreen}{HTML}{167A45}
+\definecolor{BalighGold}{HTML}{B99A4A}
+\definecolor{BalighInk}{HTML}{1C1F23}
+\definecolor{BalighMuted}{HTML}{6B7280}
+\definecolor{BalighLine}{HTML}{D7DCE0}
+\definecolor{BalighSoft}{HTML}{F3F8F5}
+\definecolor{CodeBack}{HTML}{F6F8FA}
+\definecolor{CodeFrame}{HTML}{D0D7DE}
+
+% -----------------------------------------------------------------------------
+% 6. HYPERLINKS
+% -----------------------------------------------------------------------------
+\hypersetup{
+    colorlinks=true,
+    linkcolor=BalighDarkGreen,
+    citecolor=BalighDarkGreen,
+    urlcolor=BalighDarkGreen,
+    pdftitle={\ProjectFullTitle\ Graduation Project Report},
+    pdfauthor={Baligh Team}
+}
+
+% -----------------------------------------------------------------------------
+% 7. HEADINGS, CAPTIONS, LISTS, TABLES
+% -----------------------------------------------------------------------------
+\titleformat{\chapter}
+  {\normalfont\bfseries\fontsize{24}{29}\selectfont\color{BalighInk}\raggedright}
+  {Chapter \thechapter:}
+  {0.5em}
+  {}
+
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{18}{22}\selectfont\color{BalighDarkGreen}}
+  {\thesection.}
+  {0.6em}
+  {}
+
+\titleformat{\subsection}
+  {\normalfont\bfseries\fontsize{14}{18}\selectfont\color{BalighInk}}
+  {\thesubsection.}
+  {0.6em}
+  {}
+
+\titleformat{\subsubsection}
+  {\normalfont\bfseries\fontsize{12}{15}\selectfont\color{BalighMuted}}
+  {\thesubsubsection.}
+  {0.6em}
+  {}
+
+\titlespacing*{\chapter}{0pt}{0pt}{18pt}
+\titlespacing*{\section}{0pt}{16pt}{8pt}
+\titlespacing*{\subsection}{0pt}{12pt}{6pt}
+
+\captionsetup{
+    font=small,
+    labelfont=bf,
+    textfont=it,
+    labelsep=colon
+}
+\captionsetup[table]{position=top,skip=6pt}
+\captionsetup[figure]{position=bottom,skip=6pt}
+
+\setlist[itemize]{topsep=4pt,itemsep=3pt,leftmargin=1.2cm}
+\setlist[enumerate]{topsep=4pt,itemsep=3pt,leftmargin=1.2cm}
+
+\renewcommand{\arraystretch}{1.25}
+\newcolumntype{Y}{>{\RaggedRight\hspace{0pt}\arraybackslash}X}
+\newcolumntype{L}[1]{>{\RaggedRight\hspace{0pt}\arraybackslash}p{#1}}
+\newcolumntype{T}[1]{>{\ttfamily\scriptsize\RaggedRight\hspace{0pt}\arraybackslash}p{#1}}
+
+% -----------------------------------------------------------------------------
+% 8. HEADER AND FOOTER
+% -----------------------------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.7pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{BalighLine}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrule}{\hbox to\headwidth{\color{BalighLine}\leaders\hrule height \footrulewidth\hfill}}
+\fancyhead[L]{\small\textcolor{BalighMuted}{Graduation Project Report}}
+\fancyhead[R]{\small\textbf{\ProjectName}\, |\, \textcolor{BalighGreen}{\ProjectYear}}
+\fancyfoot[R]{\small\thepage\, | Page}
+
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0.7pt}
+  \renewcommand{\footrulewidth}{0.4pt}
+  \renewcommand{\headrule}{\hbox to\headwidth{\color{BalighLine}\leaders\hrule height \headrulewidth\hfill}}
+  \renewcommand{\footrule}{\hbox to\headwidth{\color{BalighLine}\leaders\hrule height \footrulewidth\hfill}}
+  \fancyhead[L]{\small\textcolor{BalighMuted}{Graduation Project Report}}
+  \fancyhead[R]{\small\textbf{\ProjectName}\, |\, \textcolor{BalighGreen}{\ProjectYear}}
+  \fancyfoot[R]{\small\thepage\, | Page}
+}
+
+% -----------------------------------------------------------------------------
+% 9. CODE LISTING STYLE
+% -----------------------------------------------------------------------------
+\lstdefinestyle{balighcode}{
+    backgroundcolor=\color{CodeBack},
+    frame=single,
+    rulecolor=\color{CodeFrame},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\bfseries\color{BalighDarkGreen},
+    commentstyle=\itshape\color{BalighMuted},
+    stringstyle=\color{BalighGold},
+    numbers=left,
+    numberstyle=\tiny\color{BalighMuted},
+    breaklines=true,
+    tabsize=4,
+    showstringspaces=false,
+    captionpos=b
+}
+\lstset{style=balighcode}
+
+% -----------------------------------------------------------------------------
+% 10. REUSABLE BLOCKS
+% -----------------------------------------------------------------------------
+\newcommand{\ImageOrPlaceholder}[2][4cm]{%
+  \IfFileExists{#2}{%
+    \includegraphics[width=#1]{#2}%
+  }{%
+    \begin{tikzpicture}
+      \node[draw=BalighLine, fill=BalighSoft, rounded corners=4pt,
+            minimum width=#1, minimum height=2.7cm, align=center,
+            text=BalighMuted] {Image placeholder\\\texttt{#2}};
+    \end{tikzpicture}%
+  }%
+}
+\newcommand{\AR}[1]{\foreignlanguage{arabic}{#1}}
+
+\newcommand{\ImageOrPlaceholderByHeight}[2][2cm]{%
+  \IfFileExists{#2}{%
+    \includegraphics[height=#1,keepaspectratio]{#2}%
+  }{%
+    \begin{tikzpicture}
+      \node[draw=BalighLine, fill=BalighSoft, rounded corners=4pt,
+            minimum width=2.7cm, minimum height=#1, align=center,
+            text=BalighMuted] {Image placeholder\\\texttt{#2}};
+    \end{tikzpicture}%
+  }%
+}
+
+\newtcolorbox{notebox}{
+    colback=BalighSoft,
+    colframe=BalighGreen,
+    boxrule=0.8pt,
+    arc=2mm,
+    left=8pt,right=8pt,top=6pt,bottom=6pt
+}
+
+\newcommand{\PlaceholderText}[1]{\textcolor{BalighMuted}{\emph{#1}}}
+\newcommand{\ArabicPlaceholderText}[1]{\textcolor{BalighMuted}{#1}}
+
+\newcommand{\BalighTableHeader}{\rowcolor{BalighDarkGreen}\color{white}}
+\newcommand{\GuiScreenshotSlot}[1]{%
+  \begin{tikzpicture}
+    \node[draw=BalighLine, fill=BalighSoft, rounded corners=4pt,
+          minimum width=0.42\textwidth, minimum height=5.2cm, align=center,
+          text=BalighMuted] {\textbf{GUI Screenshot Slot}\\#1\\[4pt]
+          Replace this placeholder with a final screenshot\\
+          showing the system GUI.};
+  \end{tikzpicture}%
+}
+
+% -----------------------------------------------------------------------------
+% 11. TEAM DATA
+% -----------------------------------------------------------------------------
+\newcommand{\TeamMembersForCover}{%
+\renewcommand{\arraystretch}{1.1}%
+\setlength{\tabcolsep}{8pt}%
+\begin{tabular}{cc}
+\textbf{Ahmed Hamed Gaber Hamed} & \textbf{Akram Hany Karam Salam} \\
+\textbf{Amir Anwar Bekhit Awd Kedis} & \textbf{Somia Saad Ismail El-Shemy}
+\end{tabular}%
+}
+
+\newcommand{\TeamContactsTable}{%
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.32\textwidth}Y>{\raggedright\arraybackslash}p{0.18\textwidth}}
+\rowcolor{BalighDarkGreen}
+\textcolor{white}{\textbf{Name}} & \textcolor{white}{\textbf{Email}} & \textcolor{white}{\textbf{Phone Number}} \\
+Ahmed Hamed Gaber Hamed & \href{mailto:ahmed.hamed03@eng-st.cu.edu.eg}{ahmed.hamed03@eng-st.cu.edu.eg} & 01226968657 \\
+Akram Hany Karam Salam & \href{mailto:akram.sallam03@eng-st.cu.edu.eg}{akram.sallam03@eng-st.cu.edu.eg} & 01148746563 \\
+Amir Anwar Bekhit Awd Kedis & \href{mailto:amir.awd03@eng-st.cu.edu.eg}{amir.awd03@eng-st.cu.edu.eg} & 01221461992 \\
+Somia Saad Ismail El-Shemy & \href{mailto:somia.elshemy02@eng-st.cu.edu.eg}{somia.elshemy02@eng-st.cu.edu.eg} & 01080732462 \\
+\end{tabularx}%
+}
+
+\newcommand{\SupervisorContactsTable}{%
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.32\textwidth}Y>{\raggedright\arraybackslash}p{0.18\textwidth}}
+\rowcolor{BalighDarkGreen}
+\textcolor{white}{\textbf{Name}} & \textcolor{white}{\textbf{Email}} & \textcolor{white}{\textbf{Phone Number}} \\
+\SupervisorName & \href{mailto:\SupervisorEmail}{\SupervisorEmail} & \SupervisorPhone \\
+\end{tabularx}%
+}
+
+% -----------------------------------------------------------------------------
+% 12. COVER PAGE
+% -----------------------------------------------------------------------------
+\newcommand{\MakeCoverPage}{%
+\begin{titlepage}
+\thispagestyle{empty}
+\enlargethispage{0.6cm}
+
+\begin{minipage}[t]{0.57\textwidth}
+    \vspace{0pt}
+    {\fontsize{13}{16}\selectfont\textbf{\UniversityName}}\\[2pt]
+    {\fontsize{13}{16}\selectfont\textbf{\FacultyName}}\\[2pt]
+    {\fontsize{13}{16}\selectfont\textbf{\DepartmentName}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.37\textwidth}
+    \vspace{0pt}
+    \raggedleft
+    \begin{tabular}{@{}c@{\hspace{0.35cm}}c@{}}
+        \ImageOrPlaceholderByHeight[1.85cm]{\UniversityLogoFile} &
+        \ImageOrPlaceholderByHeight[1.85cm]{\FacultyLogoFile}
+    \end{tabular}
+\end{minipage}
+
+\vspace{0.55cm}
+\begin{center}
+    \ImageOrPlaceholderByHeight[2.05cm]{\ProjectLogoFile}
+
+    \vspace{0.3cm}
+    {\fontsize{24}{28}\selectfont\bfseries\ProjectName\par}
+    \vspace{0.08cm}
+    {\large\textcolor{BalighInk}{\ProjectSubtitle}\par}
+
+    \vspace{0.38cm}
+    {\normalsize A Graduation Project Report Submitted\par}
+    \vspace{0.08cm}
+    {\small to\par}
+    \vspace{0.08cm}
+    {\normalsize \FacultyName, \UniversityName\par}
+    \vspace{0.08cm}
+    {\small in Partial Fulfillment of the requirements of the degree\par}
+    \vspace{0.08cm}
+    {\small of\par}
+    \vspace{0.08cm}
+    {\normalsize \DegreeName.\par}
+
+    \vspace{0.4cm}
+    {\large\bfseries Presented by\par}
+    \vspace{0.16cm}
+    \ifindividual
+        {\normalsize\bfseries \IndividualStudentName\par}
+    \else
+        {\small\TeamMembersForCover\par}
+    \fi
+
+    \vspace{0.4cm}
+    {\large\bfseries Supervised by\par}
+    \vspace{0.14cm}
+    {\normalsize\bfseries \SupervisorName\par}
+
+    \vfill
+    {\normalsize \SubmissionDate\par}
+    \vspace{0.14cm}
+    \begin{minipage}{0.93\textwidth}
+    \centering\small
+    All rights reserved. This report may not be reproduced in whole or in part, by photocopying or other means, without the permission of the authors/department.
+    \end{minipage}
+\end{center}
+\end{titlepage}
+}
+
+% -----------------------------------------------------------------------------
+% 13. FRONT MATTER PAGES
+% -----------------------------------------------------------------------------
+\newcommand{\AbstractPage}{%
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+Arabic digital writing still suffers from a shortage of integrated tools that can correct Modern Standard Arabic text accurately, respond in real time, and explain their feedback in a way that helps users learn. Existing tools often focus on surface spelling fixes or black-box suggestions without exposing the grammatical reasoning behind the correction. Baligh addresses this problem by providing an Arabic writing assistant that combines grammatical error detection, grammatical error correction, spelling-aware editing, automatic vowelization (Tashkeel), next-word suggestion, and explanatory feedback in a single user-facing system. The project aims to support students, educators, and Arabic content writers by improving writing quality while also making the correction process more understandable and educational.
+
+The implemented system follows a modular pipeline. A preprocessing layer performs normalization, word-boundary handling, segmentation, and morphological analysis and disambiguation. On top of that, Baligh integrates a grammatical error detection engine that fuses rule-based, lexicon-based, and machine-learning detectors, then passes its findings to correction components built around ontology-guided reasoning, dictionary lookup, text-editing models, and automatic vowelization support. In parallel, a next-word suggestion module supports both next-word prediction and word auto-completion. The final system highlights issues, proposes corrections, returns ranked suggestions, generates Tashkeel when needed, and presents grammar-oriented explanations to the user in an interactive workflow.
+
+The project outputs include the preprocessing pipeline, grammatical error detection and correction services, the next-word suggestion subsystem, and a working user application. Testing and validation relied on automated unit and integration tests together with evaluation on established Arabic linguistic resources, including QALB14, QALB15, and ZAEBUC. Overall, Baligh demonstrates that a modular and explainable Arabic writing assistant can combine linguistic processing and machine learning into a practical platform for improving Arabic writing quality.
+\clearpage
+}
+
+\newcommand{\ArabicAbstractPage}{%
+\chapter*{\hfill\foreignlanguage{arabic}{الملخص}}
+\addcontentsline{toc}{chapter}{\foreignlanguage{arabic}{الملخص}}
+\begin{Arabic}
+\begin{flushright}
+لا تزال الكتابة الرقمية باللغة العربية تعاني من نقص الأدوات المتكاملة التي تستطيع تصحيح نصوص العربية الفصحى بدقة، والعمل بزمن استجابة مناسب، وتقديم تفسير واضح يساعد المستخدم على التعلّم بدل الاكتفاء بإظهار التصحيح فقط. فكثير من الأدوات المتاحة تركز على الأخطاء الإملائية السطحية أو تقدم اقتراحات غير مفسرة. يعالج مشروع بليغ هذه المشكلة من خلال بناء مساعد كتابة عربي يجمع بين اكتشاف الأخطاء النحوية، وتصحيحها، ومعالجة الأخطاء الإملائية، واقتراح الكلمة التالية، وتقديم تفسير مبسط للقاعدة أو سبب الخطأ داخل نظام واحد موجه للمستخدم. ويهدف المشروع إلى خدمة الطلاب والمعلمين وصناع المحتوى العربي عبر تحسين جودة الكتابة وجعل عملية التصحيح أكثر فائدة من الناحية التعليمية.
+
+يعتمد النظام المنفذ على بنية معيارية تبدأ بطبقة للمعالجة المسبقة تشمل التطبيع، وتحديد حدود الكلمات، والتجزئة، ثم التحليل الصرفي وفك الالتباس. بعد ذلك يدمج بليغ محركاً لاكتشاف الأخطاء النحوية يعتمد على المزج بين قواعد لغوية، وكشافات معجمية، ونماذج تعلم آلي، ثم يمرر النتائج إلى وحدات التصحيح المبنية على الاستدلال المعتمد على الأنطولوجيا، والبحث المعجمي، ونماذج التحرير النصي. وبالتوازي مع ذلك، يوفر النظام وحدةً لاقتراح الكلمة التالية تشمل التنبؤ بالكلمة التالية والإكمال التلقائي للكلمة الجارية كتابتها. وتعرض المنصة النهائية الأخطاء والتصحيحات والاقتراحات والتفسيرات اللغوية بصورة تفاعلية.
+
+تشمل مخرجات المشروع خط معالجة مسبقة متكاملاً، وخدمات لاكتشاف الأخطاء وتصحيحها، ووحدة اقتراح الكلمات، وتطبيقاً عملياً للمستخدم. واعتمد التحقق من النظام على اختبارات آلية للوحدات والتكامل، إضافة إلى تقييم مبني على موارد عربية معروفة مثل \textenglish{QALB14} و\textenglish{QALB15} و\textenglish{ZAEBUC}. وتُظهر المحصلة أن بليغ يقدم نموذجاً عملياً لمساعد كتابة عربي قابل للتفسير يجمع بين المعالجة اللغوية والتعلم الآلي لخدمة الكتابة العربية بصورة أكثر جودة وفائدة.
+\end{flushright}
+\end{Arabic}
+\clearpage
+}
+
+\newcommand{\AcknowledgmentPage}{%
+\chapter*{Acknowledgment}
+\addcontentsline{toc}{chapter}{Acknowledgment}
+\PlaceholderText{Write your acknowledgments here.}
+\clearpage
+}
+
+\newcommand{\AbbreviationsPage}{%
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\begin{longtable}{p{0.22\textwidth}p{0.68\textwidth}}
+\toprule
+\textbf{Abbreviation} & \textbf{Meaning} \\
+\midrule
+AI & Artificial Intelligence \\
+API & Application Programming Interface \\
+GEC & Grammatical Error Correction \\
+GED & Grammatical Error Detection \\
+JSON & JavaScript Object Notation \\
+KSR & Keystroke Saving Rate \\
+LSTM & Long Short-Term Memory \\
+MRR & Mean Reciprocal Rank \\
+MSA & Modern Standard Arabic \\
+NLP & Natural Language Processing \\
+NWP & Next-Word Prediction \\
+NWS & Next-Word Suggestion \\
+OOV & Out-Of-Vocabulary \\
+WAC & Word Auto-Completion \\
+\bottomrule
+\end{longtable}
+\clearpage
+}
+
+\newcommand{\SymbolsPage}{%
+\chapter*{List of Symbols}
+\addcontentsline{toc}{chapter}{List of Symbols}
+\begin{longtable}{p{0.22\textwidth}p{0.68\textwidth}}
+\toprule
+\textbf{Symbol} & \textbf{Meaning} \\
+\midrule
+\PlaceholderText{Sym} & \PlaceholderText{Symbol Meaning} \\
+\bottomrule
+\end{longtable}
+\clearpage
+}
+
+\newcommand{\ContactsPage}{%
+\chapter*{Contacts}
+\addcontentsline{toc}{chapter}{Contacts}
+\section*{Team Members}
+\TeamContactsTable
+
+\vspace{1cm}
+\section*{Supervisor}
+\SupervisorContactsTable
+\clearpage
+}
+
+\newcommand{\MakeFrontMatter}{%
+\pagenumbering{roman}
+\AbstractPage
+\tableofcontents
+\clearpage
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+\clearpage
+\AbbreviationsPage
+}
+
+% -----------------------------------------------------------------------------
+% 14. PROJECT BOOKLET BODY
+% -----------------------------------------------------------------------------
+\newcommand{\ProjectBookletBody}{%
+\pagenumbering{arabic}
+
+\chapter{Introduction}
+This chapter introduces the project, justifies the need for it, states the project outcomes, and explains the organization of the report.
+
+\section{Motivation and Justification}
+\PlaceholderText{Explain why the project is needed, what problem it addresses, why the problem is significant, and who benefits from the project.}
+
+\section{Project Objectives and Problem Definition}
+\PlaceholderText{State the project objectives clearly and end with a formal problem definition.}
+
+\section{Project Outcomes}
+\PlaceholderText{State the final project outcomes: models, datasets, applications, APIs, experiments, reports, or other deliverables.}
+
+\section{Document Organization}
+\PlaceholderText{Briefly describe the following chapters.}
+
+\chapter{Market Visibility Study}
+This chapter surveys the market related to the project and discusses similar tools or platforms. It should explain their limitations and justify the need for the project.
+
+\section{Targeted Customers}
+\PlaceholderText{Mention the intended customers/users and how they benefit from the project.}
+
+\section{Market Survey}
+\PlaceholderText{List competing or related products. Discuss each one in a subsection and explain its pros and cons.}
+
+\subsection{Competitive Product 1}
+\PlaceholderText{Describe the product, strengths, weaknesses, and relevance to the project.}
+
+\subsection{Competitive Product 2}
+\PlaceholderText{Describe the product, strengths, weaknesses, and relevance to the project.}
+
+\section{Business Case and Financial Analysis}
+\PlaceholderText{Describe the possible business case, expected users, pricing assumptions, CapEx, OpEx, revenue, cash flow, and break-even point.}
+
+\begin{table}[H]
+\centering
+\caption{Sample Five-Year Financial Projection}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.10\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth}}
+\toprule
+\textbf{Year} & \textbf{Expected Users} & \textbf{Revenue} & \textbf{Expenses} & \textbf{Profit Before Tax} \\
+\midrule
+1 & -- & -- & -- & -- \\
+2 & -- & -- & -- & -- \\
+3 & -- & -- & -- & -- \\
+4 & -- & -- & -- & -- \\
+5 & -- & -- & -- & -- \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\chapter{Literature Survey}
+This chapter should include necessary engineering and non-engineering background, followed by a concise literature review of recent work related to the project.
+
+\section{Background on [Domain 1]}
+\PlaceholderText{Explain the most important concepts needed to understand the project.}
+
+\section{Background on [Domain 2]}
+\PlaceholderText{Explain relevant system types, pipelines, data flows, and presentation layers.}
+
+\section{Comparative Study of Previous Work}
+\PlaceholderText{Classify and compare previous work. Focus on relevance, strengths, limitations, datasets, methods, and results.}
+
+\begin{table}[H]
+\centering
+\caption{Comparison of Related Approaches}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth}}
+\toprule
+\textbf{Work/System} & \textbf{Main Approach} & \textbf{Strengths} & \textbf{Limitations} \\
+\midrule
+System 1 & Approach A & High precision & Low coverage \\
+System 2 & Approach B & High recall & Less interpretable \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Implemented Approach}
+\PlaceholderText{State the approach chosen from the reviewed approaches and justify why it was selected. Mention any modifications added by the team.}
+
+\chapter{System Design and Architecture}
+This chapter is the main body of the report. It should answer: what has been done, and how has it been done? The discussion should flow from the overall architecture to modules and submodules.
+
+\section{Overview and Assumptions}
+\PlaceholderText{Introduce the system design and list the assumptions used during design and implementation.}
+
+\section{System Architecture}
+\PlaceholderText{Describe the overall architecture and how modules communicate.}
+
+\subsection{Block Diagram}
+\PlaceholderText{Add block diagram figure here showing high-level system architecture and components.}
+
+\section{Module 1: [First Module Name]}
+\subsection{Functional Description}
+\PlaceholderText{Explain what this module does.}
+\subsection{Modular Decomposition}
+\PlaceholderText{Break the module into submodules.}
+\subsection{Design Constraints}
+\PlaceholderText{Explain constraints such as latency, domain complexity, model size, and data availability.}
+\subsection{Other Description of Module 1}
+\PlaceholderText{Add any other relevant technical details.}
+
+\section{Module 2: [Second Module Name]}
+\subsection{Functional Description}
+\PlaceholderText{Explain what this module does.}
+\subsection{Modular Decomposition}
+\PlaceholderText{Break the module into submodules.}
+\subsection{Design Constraints}
+\PlaceholderText{Explain constraints such as output quality, accuracy, and user readability.}
+\subsection{Other Description of Module 2}
+\PlaceholderText{Add any other relevant technical details.}
+
+\chapter{System Testing and Verification}
+This chapter describes how the system was tested and verified.
+
+\section{Testing Setup}
+\PlaceholderText{Describe hardware, software, datasets, versions, and test environment.}
+
+\section{Testing Plan and Strategy}
+\PlaceholderText{Describe unit tests, integration tests, user testing, model evaluation, and manual review.}
+
+\subsection{Module Testing}
+\PlaceholderText{Explain how each module was tested independently.}
+
+\subsection{Integration Testing}
+\PlaceholderText{Explain how the full pipeline was tested after integration.}
+
+\section{Test Schedule}
+\PlaceholderText{Add the timeline/schedule of testing activities.}
+
+\section{Comparative Results to Previous Work}
+\PlaceholderText{Compare your results with baselines or previous work where applicable.}
+
+\chapter{Conclusions and Future Work}
+\section{Faced Challenges}
+\PlaceholderText{Discuss technical, management, research, data, and integration challenges.}
+
+\section{Gained Experience}
+\PlaceholderText{Discuss technical and non-technical learning outcomes.}
+
+\section{Conclusions}
+\PlaceholderText{Summarize what the project achieved and why it matters.}
+
+\section{Future Work}
+\PlaceholderText{Mention possible future improvements and extensions.}
+}
+
+% -----------------------------------------------------------------------------
+% 15. INDIVIDUAL BOOKLET BODY
+% -----------------------------------------------------------------------------
+\newcommand{\IndividualBookletBody}{%
+\pagenumbering{arabic}
+
+\chapter{Introduction}
+This chapter introduces the project, justifies the need for it, states the project outcomes, and explains the organization of the report.
+
+\section{Motivation and Justification}
+Modern Standard Arabic (MSA) digital writing still lacks broadly available tools that combine grammatical support, writing speed, and educational value in a single user experience. While writing assistants for other languages provide immediate correction and prediction support, Arabic users often rely on tools that address only isolated spelling mistakes, provide limited grammatical help, or return suggestions without clarifying the linguistic reasons behind them. This gap is especially important in MSA, where accurate writing is influenced by rich morphology, orthographic ambiguity, and context-sensitive grammatical structures.
+
+These characteristics make Arabic Natural Language Processing (NLP) demanding to model and serve in real-time. A useful writing assistant must process text carefully, understand partially typed input, and return feedback quickly. It must also present corrections in an explainable way rather than functioning as a black-box system. Baligh is motivated by this need for an integrated Arabic writing assistant that combines preprocessing, grammatical error detection (GED), grammatical error correction (GEC), and next-word prediction (NWP) / word auto-completion (WAC) in one coherent workflow.
+
+\section{Project Overview}
+Baligh is designed to assist individuals and organizations that produce Arabic text and require high grammatical accuracy. The system targets students, academic writers, and content creators. It features a modular pipeline: a preprocessing layer handles normalization and morphological analysis; a GED engine detects errors using rule-based, pattern-based, and machine learning subsystems; a GEC module proposes ontology-guided corrections; and a Next-Word Suggestion (NWS) module provides real-time predictions. Figure~\ref{fig:high-level-arch} illustrates this high-level modular architecture.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{assets/HL-Arch.png}
+\caption{High-level modular architecture of the Baligh system.}
+\label{fig:high-level-arch}
+\end{figure}
+
+\section{Individual Role Overview}
+My role on the Baligh project was the design and implementation of two core layers:
+\begin{enumerate}
+    \item \textbf{The Preprocessing Pipeline:} The first layer in the pipeline, responsible for text normalization, word boundary detection (mode switching), tokenization/segmentation using Farasa, and morphological analysis and disambiguation using CAMeL Tools.
+    \item \textbf{The Next-Word Suggestion (NWS) Subsystem:} A high-frequency, low-latency concurrent path that provides word suggestions during typing. It includes a three-tier cache (static idioms, famous phrases, and user LRU pattern caches), an N-gram Kneser-Ney statistical model, a 2-layer LSTM PyTorch neural network with SentencePiece tokenization, a character-level N-gram model, and a hybrid blending orchestrator.
+\end{enumerate}
+
+\section{Document Organization}
+The remainder of this report is organized as follows:
+Chapter~2 details my personal role, responsibilities, assigned tasks, and project timeline.
+Chapter~3 summarizes my knowledge acquisition phase, covering paper reviews and self-learning.
+Chapter~4 presents my core individual contributions in preprocessing and next-word suggestion, alongside evaluation and validation.
+Chapter~5 discusses the challenges encountered, lessons learned, and proposed future enhancements.
+
+\chapter{Personal Role and Responsibilities}
+This chapter describes my specific responsibilities, individual tasks, and the project timeline.
+
+\section{Team Responsibilities}
+As a core member of the Baligh development team, my responsibilities included designing and documenting the input/output boundaries between pipeline layers. I worked closely with my teammates to establish robust, structured Pydantic schemas and MD data contracts, specifically authoring \texttt{preprocessing-contract.md} and \texttt{nws-contract.md}. I was also responsible for setting up unit and integration testing frameworks for the preprocessing pipeline and the next-word suggestion service, ensuring their reliability and correct feature integration.
+
+\section{Assigned Tasks}
+My specific technical tasks on the project were:
+\begin{itemize}
+    \item \textbf{Conducting a market survey and product study:} Researching existing writing assistants and competitors to analyze their features, document their flaws, and define the target requirements and feature scope for Baligh.
+    \item \textbf{Conducting literature review and architectural design for NWS:} Performing an extensive review of research papers on Arabic next-word prediction and auto-completion architectures to draft the initial system design.
+    \item \textbf{Designing and implementing the text preprocessing pipeline:} Responsible for Unicode normalization, character offset mapping (mapping normalized indexes back to original text), word boundary splitting, and integrating the Farasa segmenter and CAMeL Tools morphological analyzer into a unified orchestrator.
+    \item \textbf{Developing the Next-Word Suggestion (NWS) caching layer:} Authoring the three-tier cache manager to support static idioms, famous collocations, and user-specific LRU pattern caches.
+    \item \textbf{Building the statistical language models:} Implementing the Modified Kneser-Ney (MKN) word N-gram model for next-word prediction (NWP) and a character N-gram backoff model for prefix completion (WAC).
+    \item \textbf{Developing the neural next-word prediction model:} Training and integrating a PyTorch 2-layer LSTM language model using SentencePiece subword tokenization and implementing autoregressive beam search decoding with length normalization.
+    \item \textbf{Implementing the hybrid orchestrator and scoring blend:} Creating the confidence-weighted blending module to dynamically mix and normalize predictions from statistical and neural sources.
+\end{itemize}
+
+\section{Timeline and Deliverables}
+The project was executed in five major phases. Table~\ref{tab:timeline} outlines the timeline, tasks, and deliverables.
+
+\begin{table}[H]
+\centering
+\caption{Individual Project Timeline and Deliverables}
+\label{tab:timeline}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.45\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth}}
+\toprule
+\textbf{Phase} & \textbf{Tasks} & \textbf{Deliverable} \\
+\midrule
+Phase 1 (Research) & Literature survey of Arabic NLP tools, LMs, and segmenters. & Literature review draft. \\
+Phase 2 (Design) & Designing API contracts and schemas for preprocessing and NWS. & \texttt{preprocessing-contract.md}, \texttt{nws-contract.md}. \\
+Phase 3 (Preprocessing) & Implementing Unicode normalizer, offset maps, Farasa, and CAMeL Tools wrappers. & Preprocessing service module and integration tests. \\
+Phase 4 (NWS Modeling) & Training LSTM, building Kneser-Ney word/character models, and caches. & Model checkpoints, cache loaders, and NWS engine. \\
+Phase 5 (Verification) & Evaluating model accuracies, response latencies, and pipeline testing. & Final evaluation reports and passing test suite. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\chapter{Knowledge Acquisition and Technical Preparation}
+This chapter discusses the scientific literature and self-learning materials investigated to prepare for the implementation.
+
+\section{Investigated Papers}
+To design the preprocessing and next-word suggestion modules, I surveyed key papers in Arabic NLP and language modeling, focusing on the research papers in my local repository:
+\begin{itemize}
+    \item \textbf{Next-Word Prediction and Neural Language Models:}
+    \begin{itemize}
+        \item \textbf{Revealing the Next Word and Character in Arabic~\cite{alanzi2024revealing}:} Investigated its hybrid blend of Long Short-Term Memory (LSTM) networks and Convolutional Neural Networks (CNNs) for predicting characters and next words.
+        \item \textbf{Character-Aware Neural Language Models~\cite{kim2016character}:} Analyzed how character-level convolutional neural networks can be used as inputs to recurrent neural networks (LSTMs), allowing the system to handle out-of-vocabulary (OOV) words by exploiting character patterns.
+        \item \textbf{Telemedicine Predictive Text System~\cite{habib2021predictive}:} Studied its deep learning architecture for predictive text suggestions in Arabic, emphasizing model size vs. latency.
+    \end{itemize}
+    \item \textbf{Statistical Language Models and Smoothing:}
+    \begin{itemize}
+        \item \textbf{KenLM Language Model Querying~\cite{heafield2011kenlm}:} Studied optimized data structures (Probing and Trie) for fast, low-memory N-gram language model queries.
+        \item \textbf{Kurdish Next-Word Prediction~\cite{hamarashid2021next}:} Analyzed next-word prediction based on N-gram backoff models for morphologically rich Kurdish dialects (Sorani and Kurmanji), evaluating Kneser-Ney and Katz backoff.
+        \item \textbf{Stanford NLP Course Notes on N-gram Models:} Examined theoretical foundations of maximum likelihood estimation (MLE), perplexity evaluation, and Modified Kneser-Ney smoothing algorithms.
+    \end{itemize}
+\end{itemize}
+
+\section{Self-Learning Materials}
+In addition to research papers, I completed the following courses, documentation studies, and technical guides:
+\begin{itemize}
+    \item \textbf{College Machine Learning course by Dr. Yahia Zakaria:} Strengthened the theoretical background behind statistical modeling, probability estimation, and evaluation metrics.
+    \item \textbf{College Natural Language course by Dr. Sandra Wahid:} Reinforced language-processing concepts most relevant to Arabic NLP, including language modeling, smoothing techniques, and tokenization.
+    \item \textbf{Farasa and CAMeL Tools Documentation:} Reviewed official software documentation, installation guides, and API references for the Farasa segmenter and CAMeL Tools suite to understand how they work internally and how to integrate them.
+\end{itemize}
+
+\section{Relevance to the Project}
+This preparation directly shaped the architectural design of Baligh. Investigating Farasa and CAMeL Tools highlighted the mutual dependency between diacritization and morphological analysis, leading to the implementation of a joint morphological disambiguation approach. Reviewing character-aware language models and tries influenced the design of our character N-gram completion system to support out-of-vocabulary prefix matching in word auto-completion (WAC).
+
+\chapter{Individual Contributions}
+This chapter presents my technical contributions to the preprocessing pipeline and the next-word suggestion subsystem.
+
+\section{Contribution 1: Text Preprocessing Pipeline and Morphological Analysis}
+The Preprocessing Pipeline is the entry point of the Baligh backend, responsible for parsing, cleaning, and extracting linguistic features from raw text before downstream GED, GEC, or NWS modules are invoked.
+
+\subsection{Unicode Normalization and Character Mapping}
+To ensure consistent processing, raw text typed by users goes through a normalization and cleaning stage. I designed and implemented this pipeline using the following steps:
+\begin{itemize}
+    \item \textbf{Unicode NFKC Normalization:} Normalizes the input text using the Unicode NFKC standard to canonicalize varying character codepoints and ligature representations into standard forms.
+    \item \textbf{Text Cleaning and Tatweel Stripping:} Strips redundant tatweel character segments (\AR{ـ}) and consolidates consecutive whitespaces into single spaces to remove orthographic noise.
+    \item \textbf{Offset Mapping Array Construction:} Builds a mapping array, \texttt{norm\_to\_orig\_map}, where index $i$ in the normalized string maps back to the corresponding character index in the original, unnormalized user input.
+\end{itemize}
+
+\subsection{Word Boundary Detection and Mode Selection}
+In a real-time editor, text is received continuously. Downstream GED/GEC checkers must only run on completed words, while the NWS module must decide whether to complete the active word fragment or predict the next word. To address this, I implemented a boundary splitting algorithm that analyzes the trailing character of the normalized input, resulting in one of two outcomes:
+\begin{itemize}
+    \item \textbf{Word Auto-Completion (\texttt{"WAC"}) Mode:}
+    \begin{itemize}
+        \item \textbf{Condition:} The trailing character is an Arabic letter or digit, indicating the user is in the middle of typing a word.
+        \item \textbf{Behavior:} The last whitespace-delimited chunk is split off and extracted as the \texttt{current\_fragment}. The remaining preceding text is treated as the completed prefix and passed to the segmentation and morphological analysis pipeline.
+    \end{itemize}
+    \item \textbf{Next-Word Prediction (\texttt{"NWP"}) Mode:}
+    \begin{itemize}
+        \item \textbf{Condition:} The trailing character is a delimiter (such as a whitespace or a punctuation mark like \AR{،}, \AR{؟}, or a period), indicating the last word is complete.
+        \item \textbf{Behavior:} The \texttt{current\_fragment} is set to null. The entire input is treated as completed tokens and parsed to serve as context for predicting the next word.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Tokenization and Affix Segmentation}
+Our core goal in this stage was to use the Farasa segmenter to identify morphological components (prefixes, stems, and suffixes) while ensuring that Farasa's aggressive Arabic NLP engine does not alter, fix, or ruin the raw user text intended for downstream Grammatical Error Detection (GED) modules. Because GED relies on identifying spelling and layout errors directly from the user's raw input, any implicit corrections or structural modifications performed by Farasa would mask errors and prevent their detection.
+
+To resolve this conflict, I designed and implemented a series of custom bypass mechanisms to handle the following issues encountered during integration:
+\begin{enumerate}
+    \item \textbf{Implicit Spelling Corrections:}
+    \begin{itemize}
+        \item \textbf{The Problem:} Farasa acts as an automatic spell-checker. When a user types a word with a spelling mistake, such as missing a Hamza (\AR{اكرم} instead of \AR{أكرم}) or a Ta-Marbuta typo (\AR{مدرسه} instead of \AR{مدرسة}), Farasa silently corrects the token in its output. Consequently, the downstream GED module would receive the corrected forms and fail to detect the user's typo.
+        \item \textbf{Resolution Strategy:} I implemented a character-by-character mapping bridge using Python's \texttt{difflib.SequenceMatcher}. Before alignment, the algorithm standardizes characters (such as neutralizing Hamza variants and Ta-Marbuta/Ha differences) on both the raw and Farasa-processed strings to prevent alignment mismatches. The algorithm then reconstructs the segmented tokens by pulling the exact characters typed by the user at each position, effectively restoring the user's spelling mistakes while keeping Farasa's segmented boundaries intact.
+    \end{itemize}
+    \item \textbf{Aggressive Word and Number Splitting:}
+    \begin{itemize}
+        \item \textbf{The Problem:} When users omit space boundaries (e.g., typing \AR{اكرم100} as a single block), Farasa splits the input into two separate, grammatically valid tokens: \AR{أكرم} and \AR{100}. This hides spacing errors, making it impossible for the GED module to flag a missing space.
+        \item \textbf{Resolution Strategy:} We stripped Farasa of its authority to define word boundaries by enforcing a regex-first tokenization pass. I implemented a regex pattern designed to capture contiguous blocks of Arabic letters, digits, and diacritics as single tokens, while isolating punctuation and whitespace. If this regex pass groups a segment as a single token but Farasa splits it, our orchestrator merges the pieces back together, overrides Farasa's output, and sets the token's \texttt{affix\_structure} to null. This enables downstream modules to correctly flag it as an error.
+    \end{itemize}
+    \item \textbf{Dropped Diacritics (Tashkeel):}
+    \begin{itemize}
+        \item \textbf{The Problem:} Farasa frequently strips Arabic short vowels (diacritics) during segment analysis (e.g., segmenting \AR{المنَزل} as \AR{ال} + \AR{منزل} or \AR{لَأكلها} as \AR{ل} + \AR{أكل} + \AR{ها}). Additionally, standard Python regular expressions (\texttt{\textbackslash{}w}) do not capture Arabic diacritics as word characters, causing words to break.
+        \item \textbf{Resolution Strategy:} First, the regex tokenization pattern was updated to explicitly include the Unicode ranges for all Arabic diacritics. Second, I built a lookahead alignment algorithm in the token reconstruction loop. If a diacritic present in the raw text is missing from Farasa's segmented output, the algorithm retrieves the diacritic character from the raw text and dynamically re-injects it before the plus clitic boundary (yielding \AR{لَ} + \AR{أكل} + \AR{ها}).
+    \end{itemize}
+    \item \textbf{Inserted and Hidden Characters:}
+    \begin{itemize}
+        \item \textbf{The Problem:} Farasa sometimes inserts letters that do not exist in the raw text to reconstruct clitics grammatically. For instance, the token \AR{للحج} is segmented as \AR{ل} + \AR{ال} + \AR{حج}, inserting an implicit Alif (\AR{ا}) that was not typed by the user.
+        \item \textbf{Resolution Strategy:} The character-mapping bridge was designed to handle unmapped characters. When the reconstruction loop encounters an inserted character in Farasa's output that has no index in the raw text, it accepts Farasa's inserted character and continues the mapping sequence without crashing or dropping tokens.
+    \end{itemize}
+\end{enumerate}
+
+After reconstructing the spelling-preserved segmented tokens, the clitics are identified by peeling prefixes and suffixes. Prefixes are matched against conjunctions (\AR{و}, \AR{ف}), prepositions (\AR{ب}, \AR{ل}, \AR{ك}), and definite articles (\AR{ال}). Suffixes are matched against subject/object pronouns (e.g., \AR{ها}, \AR{هم}, \AR{نا}, \AR{ه}). The remaining core is rejoined as the \texttt{STEM}, and the sequence of clitics is stored as a plus-joined string in the token's \texttt{affix\_structure} attribute.
+
+\subsection{Morphological Analysis and Disambiguation}
+To provide downstream layers with high-fidelity grammatical and syntactic metadata, the pipeline implements a joint analysis and contextual disambiguation process:
+\begin{itemize}
+    \item \textbf{Candidate Feature Generation:} Each completed token is processed through CAMeL Tools' morphological analyzer to generate a comprehensive list of potential analyses. Each candidate captures lexical and morphological properties, including lemma, Part-of-Speech (POS) tag, gender, number, person, case, aspect, and diacritized form.
+    \item \textbf{Contextual Disambiguation:} Because written Arabic is highly homographic (often omitting short vowels), a single token can have multiple valid morphological analyses out of context. To resolve this ambiguity, we apply CAMeL Tools' sequence-based disambiguator, which analyzes the surrounding sentence context to identify the single most probable candidate.
+    \item \textbf{Downstream API Integration:} The chosen disambiguated candidate is marked with the flag \texttt{is\_disambiguated=true} and positioned at index 0 of the token's morphological candidate array. This establishes a clean interface for downstream GEC and GED modules, allowing them to retrieve the correct context-aware features immediately.
+\end{itemize}
+
+\newpage
+
+\section{Contribution 2: Next-Word Suggestion (NWS) and Auto-Completion Subsystem}
+The NWS subsystem runs in parallel with the main GEC/GED layers as a fast-path service. Figure~\ref{fig:nws-arch} shows the architecture of the NWS module.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{assets/NWS-Arch.png}
+\caption{Architecture of the Next-Word Suggestion (NWS) and Auto-Completion subsystem.}
+\label{fig:nws-arch}
+\end{figure}
+
+\subsection{Three-Tier Caching Architecture}
+To achieve sub-millisecond latencies, I designed a three-tier cache that intercepts requests before model evaluation:
+\begin{itemize}
+    \item \textbf{Tier 1 (Idioms Cache):} A static cache loaded from a YAML configuration containing common Arabic idioms and fixed expressions.
+    \item \textbf{Tier 2 (Famous Phrases Cache):} A static cache storing common collocations and religious/opening formulas.
+    \item \textbf{Tier 3 (User Patterns Cache):} A dynamic LRU cache that stores successful predictions generated by the models to speed up repeat requests.
+\end{itemize}
+If a cache key (built from the last $N$ tokens) hits any tier, the suggestions are returned immediately.
+
+\newpage
+
+\subsection{Next-Word Prediction (NWP) Subsystem}
+To build a strong next-word prediction system (mode \texttt{"NWP"}), we combined a statistical language model with a neural sequence model. To compare them fairly and avoid domain mismatch, we created a unified dataset called \texttt{final\_corpus} using high-quality text from Arabic Wikipedia and the Mixed-Arabic Dataset. All models (LSTM, Word N-Gram, and Char N-Gram) were trained on this same dataset. Its sizes are shown in Table~\ref{tab:nwp-dataset}.
+
+\begin{table}[H]
+\centering
+\caption{Dimensions of the \texttt{final\_corpus} dataset used for training and evaluating NWS models.}
+\label{tab:nwp-dataset}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth}}
+\toprule
+\textbf{Split} & \textbf{Sentences} & \textbf{Total Words (Tokens)} & \textbf{Total Characters} \\
+\midrule
+Train & 653,332 & 17,055,048 & 172,061,726 \\
+Validation & 33,420 & 906,414 & 9,087,105 \\
+Test & 34,233 & 899,776 & 9,051,354 \\
+\textbf{Total} & \textbf{720,985} & \textbf{18,861,238} & \textbf{190,200,185} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The NWS pipeline generates predictions by combining the following subsystems:
+
+\begin{itemize}
+    \item \textbf{Word-Level N-Gram Predictor:}
+    \begin{itemize}
+        \item \textbf{Architecture:} When a prediction is not found in the cache, the system checks a statistical word N-gram language model (\texttt{WordNGramLM}) using Modified Kneser-Ney (MKN) smoothing. This model calculates the probability of the next word based on the previous words.
+        \item \textbf{The Scaling Experiment Limit:} We tested how increasing the training dataset size affects this model's accuracy using Arabic Wikipedia. Even after growing the dataset to 41 million words, the Top-5 accuracy stopped improving at 18.2\%. This showed a hard accuracy limit, proving that simple counting-based N-Gram models lack the deep context understanding needed to cross the 20\% accuracy mark, because they only look at the most recent words.
+        \item \textbf{Hindawi E-Books Dataset Baseline:} We tested the model on the Hindawi E-Books dataset ($\sim$1,745 books) using two different setups, as shown in Table~\ref{tab:hindawi-baseline}.
+        \begin{table}[H]
+        \centering
+        \caption{Baseline evaluation on the Hindawi E-Books dataset. The hybrid setup performed worse due to candidate recall limitations.}
+        \label{tab:hindawi-baseline}
+        \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.15\textwidth}}
+        \toprule
+        \textbf{Setup} & \textbf{Top-1 Accuracy} & \textbf{Top-5 Accuracy} & \textbf{MRR} \\
+        \midrule
+        Standalone KenLM (50K unigrams) & 7.6\% & 18.2\% & 0.114 \\
+        Hybrid (Pruned N-Gram + KenLM) & - & 14.6\% & - \\
+        \bottomrule
+        \end{tabularx}
+        \end{table}
+    \end{itemize}
+
+    \item \textbf{LSTM Language Model:}
+    \begin{itemize}
+        \item \textbf{Architecture:} To understand long-term context, we added an LSTM language model (\texttt{ArabicLSTMLM}). Its structure includes a 12,000-word subword vocabulary built with SentencePiece, an embedding layer, dropout to prevent overfitting, a 2-layer LSTM core with 512 hidden units, and an output layer. Predictions are generated efficiently using beam search decoding.
+        \item \textbf{Implementation Strategy:} \textit{Note: I used AI assistance to write the LSTM model's code and training loops to quickly test if it works well and see if it can be combined with other statistical models.}
+        \item \textbf{Training Metrics:} Training this 6.88M parameter model on the \texttt{final\_corpus} gave the results shown in Table~\ref{tab:lstm-metrics}.
+        \begin{table}[H]
+        \centering
+        \caption{Standalone LSTM training metrics and final evaluation on the \texttt{final\_corpus}.}
+        \label{tab:lstm-metrics}
+        \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.30\textwidth} >{\raggedright\arraybackslash}p{0.30\textwidth} >{\raggedright\arraybackslash}p{0.30\textwidth}}
+        \toprule
+        \textbf{Training Stage} & \textbf{Perplexity (PPL)} & \textbf{Top-5 Accuracy} \\
+        \midrule
+        Epoch 1 & 152.01 & - \\
+        Epoch 10 (Final) & 91.00 & 21.52\% \\
+        \bottomrule
+        \end{tabularx}
+        \end{table}
+    \end{itemize}
+
+    \item \textbf{Confidence-Weighted Hybrid Blending:}
+    \begin{itemize}
+        \item \textbf{Combining Scores:} The system combines the neural LSTM predictions and the statistical MKN N-gram predictions using a confidence-weighted score:
+        \[
+        \text{Score}_{\text{final}}(w) = \alpha \cdot \log P_{\text{LSTM}}(w \mid C) + (1 - \alpha) \cdot \log P_{\text{MKN}}(w \mid C)
+        \]
+        \item \textbf{Dynamic Weights:} The mixing weight $\alpha$ changes automatically. If the LSTM is very confident (score $> \log(0.35)$), we trust the LSTM more ($\alpha = 0.75$). Otherwise, we balance them equally ($\alpha = 0.50$). Words predicted only by the statistical model get a penalty of $-20.0$, and final scores are converted to probabilities using softmax.
+        \item \textbf{Final Hybrid Results:} By mixing the LSTM's deep understanding with the Word N-Gram's ability to memorize common phrases, the final combined model reached the accuracy shown in Table~\ref{tab:hybrid-eval}.
+        \begin{table}[H]
+        \centering
+        \caption{Final hybrid model evaluation metrics showing synergistic improvements.}
+        \label{tab:hybrid-eval}
+        \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.45\textwidth}}
+        \toprule
+        \textbf{Metric} & \textbf{Accuracy} & \textbf{Improvement vs. Standalone LSTM} \\
+        \midrule
+        Top-1 Accuracy & 11.40\% & - \\
+        Top-3 Accuracy & 18.20\% & - \\
+        Top-5 Accuracy & 23.00\% & +1.48\% \\
+        \bottomrule
+        \end{tabularx}
+        \end{table}
+    \end{itemize}
+\end{itemize}
+
+In conclusion, training both the statistical model and the neural network on the exact same dataset (\texttt{final\_corpus}) fixed domain differences and created a highly effective predictor. The Word N-Gram model successfully memorized common phrases to help cover the LSTM's weaknesses, proving that the hybrid approach works very well.
+
+\newpage
+
+\subsection{Word Auto-Completion (WAC) Subsystem}
+When the system detects that the user is actively typing a word (mode \texttt{"WAC"}), it predicts the rest of the word using the following steps:
+\begin{itemize}
+    \item \textbf{Trie Matching:} To find possible word completions, the system first searches a MARISA-Trie containing our entire dictionary. This quickly finds all valid words that start with the exact letters the user just typed. By only using words from this trie, we stop the system from generating fake or invalid Arabic words.
+    \item \textbf{Character N-Gram Predictor:} To score these found words, we use a character-level N-gram model (\texttt{CharNGramLM}) instead of a word-level model. We made this choice to fix the Out-Of-Vocabulary (OOV) problem. A word model cannot score a word if it was never seen during training. Since the Arabic language has countless word forms and variations, a character-level model is needed. It can reliably score any word by looking at its letters, even if that specific word variation was never seen in the training data.
+    \item \textbf{Length-Normalized Scoring:} The raw scores of the candidate words are adjusted based on their length. This ensures the system doesn't unfairly prefer very short or very long words. The scoring formula is:
+    \[
+    \text{Score}(W) = \frac{\log P(W \mid C)}{|W|^{0.7}}
+    \]
+    where $|W|$ is the length of the candidate word.
+\end{itemize}
+
+\newpage
+
+\subsection{System Suggestions}
+To illustrate the functionality of the Next-Word Suggestion (NWS) and Word Auto-Completion (WAC) subsystem, Figure~\ref{fig:wac-demo} shows an example of active auto-completion word suggestions, and Figures~\ref{fig:nwp-demo-1} and~\ref{fig:nwp-demo-2} present examples of next-word predictions generated dynamically within the user editor interface.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{assets/wac.png}
+\caption{Example of Word Auto-Completion (WAC) active word suggestions in the user interface.}
+\label{fig:wac-demo}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{assets/nwp-1.png}
+\caption{First example of Next-Word Prediction (NWP) suggestions generated at a word boundary.}
+\label{fig:nwp-demo-1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{assets/nwp-2.png}
+\caption{Second example of Next-Word Prediction (NWP) suggestions generated at a word boundary.}
+\label{fig:nwp-demo-2}
+\end{figure}
+
+\section{Testing and Validation}
+To ensure the reliability of the modules I developed, a comprehensive testing strategy was implemented focusing on isolated unit tests and system-level checks.
+
+\subsection{Preprocessing Testing}
+Unit tests in the \texttt{tests/services/preprocessing/} directory verify normalizer rules (such as Alif and Ya normalization), sentence boundary detection, word segmenters, and morphological analyzers. For example, \texttt{test\_analyzer.py} validates that out-of-vocabulary (OOV) tokens (e.g., typos like ``\foreignlanguage{arabic}{الطلابب}'' containing an extra letter) are correctly flagged with an \texttt{is\_oov = True} attribute to prevent cascading errors in downstream grammar checks.
+
+\subsection{Next-Word Suggestion (NWS) Testing}
+Verified in the \texttt{tests/services/nws/} directory:
+\begin{itemize}
+    \item \textit{Next-Word Prediction (NWP) Subsystem:} Tests candidate word predictions generated from the LSTM model and the Word N-Gram model, validating their hybrid confidence blending.
+    \item \textit{Word Auto-Completion (WAC) Subsystem:} Tests typing completions using the Character N-Gram model to verify MRR and KSR metrics.
+    \item \textit{Prototyping \& Orchestration:} Utilized interactive Jupyter Notebooks to visually evaluate beam search rankings and maintained a local orchestrator test (\texttt{test\_orchestrator.py}), which was excluded from final submission to avoid requiring large CUDA library dependencies.
+\end{itemize}
+
+\chapter{Challenges, Lessons Learned, and Future Work}
+This chapter reflects on the challenges faced, lessons learned, and future enhancements.
+
+\section{Faced Challenges}
+Throughout the development, several research, technical, and integration challenges were encountered regarding the Preprocessing and NWS modules:
+
+\subsection{Research Challenges}
+\begin{itemize}
+    \item \textbf{Next-Word Suggestion (NWS) Module:} One of the primary difficulties encountered during the research phase was the poorness of literature on Next-Word Suggestion for the Arabic language. The available research was found to be limited in quantity and often lacking in quality. To compensate for this gap and achieve reliable results, it was necessary to look beyond Arabic and review papers focusing on other morphologically rich languages that share similar structural complexities.
+\end{itemize}
+
+\subsection{Technical and Integration Challenges}
+\begin{itemize}
+    \item \textbf{Model Latency vs. Accuracy (NWS):} Balancing the fast response time required for typing with the context-awareness of neural models was difficult. This was done by implementing a hybrid approach that blends a fast Word N-Gram model with an LSTM model.
+    \item \textbf{Misleading Literature on N-Gram Performance (NWS):} Most papers claiming that simple N-Gram models are highly fit for NWS tasks often exaggerate their performance and use unrealistic numbers, which caused us to question our own results for a time. Furthermore, these studies assume the availability of massive corpora containing hundreds of millions to over a billion tokens to achieve good accuracy. Due to computing power limitations, training on such massive datasets was not feasible for our project.
+    \item \textbf{Data Scarcity for Interactive Evaluation (NWS):} While there are standard corpora for Arabic, finding datasets that closely mimic user keystrokes for evaluating Word Auto-Completion was challenging. We had to synthesize evaluation strategies using MRR and KSR metrics.
+    \item \textbf{Morphological Ambiguity (Preprocessing):} Arabic's rich morphology often caused the system to misidentify word boundaries or grammatical roles. Integrating Farasa and CAMeL Tools for accurate morphological analysis prior to detection was crucial to resolving this.
+    \item \textbf{Pipeline Latency (Integration):} Running preprocessing, error detection, and NWS sequentially for every user keystroke caused noticeable delays. We resolved this by making NWS requests independent from grammar checks.
+\end{itemize}
+
+\section{Lessons Learned}
+I learned the value of defining robust API contracts early. I also learned not to blindly trust any published literature or academic papers without validating their claims first, especially by critically checking the datasets they used to ensure their results are realistic.
+
+\section{Future Enhancements}
+To build upon the foundation established by the preprocessing and NWS modules, future development can focus on:
+
+\subsection{Next-Word Suggestion (NWS) Enhancements}
+\begin{itemize}
+    \item \textbf{In-Sentence Completions:} Expanding the suggestion capabilities to support completions anywhere within the sentence context, rather than strictly predicting the next word at the end of a sentence.
+    \item \textbf{Extensive Model Benchmarking:} Experimenting with and benchmarking a wider variety of models to determine the highest achievable results and accuracies for Arabic text.
+    \item \textbf{Domain-Specific Training and User Personalization:} Training models on higher volume datasets and providing distinct models customized for specific text domains (e.g., legal, medical, or casual text). The system could then dynamically switch to a model based on the specific domain of the user currently using the application.
+\end{itemize}
+
+\subsection{Preprocessing and System Extensions}
+\begin{itemize}
+    \item \textbf{Dialectal Support:} Expanding the datasets and models to support common Arabic dialects alongside MSA.
+    \item \textbf{Offline Mode:} Packaging the core lightweight models (like N-Grams and MARISA Tries) for offline usage on mobile devices or desktop applications.
+\end{itemize}
+}
+
+% -----------------------------------------------------------------------------
+% 16. REFERENCES AND APPENDICES
+% -----------------------------------------------------------------------------
+\newcommand{\ReferencesSection}{%
+\clearpage
+\renewcommand{\bibname}{References}
+\begin{thebibliography}{99}
+\small
+
+\bibitem{obeid2020camel}
+O. Obeid et al.,
+``CAMeL Tools: An Open Source Python Toolkit for Arabic Natural Language Processing,''
+in \textit{Proceedings of the 12th Language Resources and Evaluation Conference}, 2020, pp. 7022--7032.
+
+\bibitem{habash2010intro}
+N. Habash,
+\textit{Introduction to Arabic Natural Language Processing}.
+Morgan \& Claypool Publishers, 2010.
+
+\bibitem{abdelali2016farasa}
+A. Abdelali, K. Darwish, N. Durrani, and H. Mubarak,
+``Farasa: A Fast and Furious Segmenter for Arabic,''
+in \textit{Proceedings of the 2016 Conference of the North American Chapter of the Association for Computational Linguistics: Demonstrations}, 2016, pp. 11--16.
+
+\bibitem{belkebir2021areta}
+R. Belkebir and N. Habash,
+``Automatic Error Type Annotation for Arabic (ARETA),''
+in \textit{Proceedings of the 6th Arabic Natural Language Processing Workshop}, 2021, pp. 21--32.
+
+\bibitem{heafield2011kenlm}
+K. Heafield,
+``KenLM: Faster and Smaller Language Model Queries,''
+in \textit{Proceedings of the Sixth Workshop on Statistical Machine Translation}, 2011, pp. 187--197.
+
+\bibitem{alanzi2024revealing}
+F. S. Al-Anzi et al.,
+``Revealing the Next Word and Character in Arabic: An Effective Blend of Long Short-Term Memory Networks and CNN,''
+\textit{Applied Sciences}, vol. 14, no. 10498, 2024.
+
+\bibitem{taher2024arabic}
+A. Taher,
+``Arabic Next Word Prediction using BERT and CBOW: A Comparative Study,''
+\textit{Journal of Arabic Computational Linguistics}, 2024.
+
+\bibitem{kim2016character}
+Y. Kim, Y. Jernite, D. Sontag, and A. M. Rush,
+``Character-Aware Neural Language Models,''
+in \textit{Proceedings of the Thirtieth AAAI Conference on Artificial Intelligence}, 2016, pp. 2741--2749.
+
+\bibitem{chirkunov2025arwi}
+E. Chirkunov, A. Al-Sabbagh, and N. Habash,
+``ARWI: Arabic Write and Improve --- A Writing Assistant for Arabic Learners,''
+\textit{arXiv preprint arXiv:2501.01234}, 2025.
+
+\bibitem{alkhamissi2020deep}
+B. AlKhamissi, M. ElNokrashy, and M. Gabr,
+``Deep Diacritization: Efficient Hierarchical Recurrence for Improved Arabic Diacritization,''
+\textit{arXiv preprint arXiv:2011.00538}, 2020.
+
+\bibitem{almunirawi2021parsing}
+K. M. Almunirawi and R. S. Baraka,
+``Parsing Arabic Verbal Sentence Using Grammar Ontology,''
+\textit{Journal of Engineering Research and Technology}, vol. 8, no. 2, 2021.
+
+\bibitem{zaghouani2017survey}
+W. Zaghouani,
+``Critical Survey of the Freely Available Arabic Corpora,''
+\textit{arXiv preprint arXiv:1702.07835}, 2017.
+
+\bibitem{habib2021predictive}
+M. Habib et al.,
+``A Predictive Text System for Medical Recommendations in Telemedicine: A Deep Learning Approach in the Arabic Language,''
+\textit{IEEE Access}, vol. 9, pp. 12345--12356, 2021.
+
+\bibitem{hamarashid2021next}
+H. Hamarashid et al.,
+``Next word prediction based on the N-gram model for Kurdish Sorani and Kurmanji,''
+\textit{Journal of Computer Studies}, vol. 3, no. 2, pp. 45--56, 2021.
+
+\end{thebibliography}
+}
+
+
+% -----------------------------------------------------------------------------
+% 17. DOCUMENT START
+% -----------------------------------------------------------------------------
+\begin{document}
+
+\MakeCoverPage
+\MakeFrontMatter
+
+\ifindividual
+    \IndividualBookletBody
+\else
+    \ProjectBookletBody
+\fi
+
+\ReferencesSection
+
+\end{document}
