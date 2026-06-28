@@ -489,9 +489,9 @@ This chapter surveys the market related to the project and discusses similar too
 \PlaceholderText{Describe the possible business case, expected users, pricing assumptions, CapEx, OpEx, revenue, cash flow, and break-even point.}
 
 \begin{table}[H]
-\caption{Sample Five-Year Financial Projection}
 \centering
-\begin{tabularx}{\textwidth}{lYYYY}
+\caption{Sample Five-Year Financial Projection}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.10\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth}}
 \toprule
 \textbf{Year} & \textbf{Expected Users} & \textbf{Revenue} & \textbf{Expenses} & \textbf{Profit Before Tax} \\
 \midrule
@@ -517,9 +517,9 @@ This chapter should include necessary engineering and non-engineering background
 \PlaceholderText{Classify and compare previous work. Focus on relevance, strengths, limitations, datasets, methods, and results.}
 
 \begin{table}[H]
-\caption{Comparison of Related Approaches}
 \centering
-\begin{tabularx}{\textwidth}{p{0.2\textwidth}YYY}
+\caption{Comparison of Related Approaches}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth}}
 \toprule
 \textbf{Work/System} & \textbf{Main Approach} & \textbf{Strengths} & \textbf{Limitations} \\
 \midrule
@@ -618,7 +618,7 @@ Baligh is designed to assist individuals and organizations that produce Arabic t
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.82\textwidth]{assets/HL-Arch.png}
+\includegraphics[width=0.95\textwidth]{assets/HL-Arch.png}
 \caption{High-level modular architecture of the Baligh system.}
 \label{fig:high-level-arch}
 \end{figure}
@@ -659,10 +659,10 @@ My specific technical tasks on the project were:
 The project was executed in five major phases. Table~\ref{tab:timeline} outlines the timeline, tasks, and deliverables.
 
 \begin{table}[H]
+\centering
 \caption{Individual Project Timeline and Deliverables}
 \label{tab:timeline}
-\centering
-\begin{tabularx}{\textwidth}{lXY}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.45\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth}}
 \toprule
 \textbf{Phase} & \textbf{Tasks} & \textbf{Deliverable} \\
 \midrule
@@ -772,12 +772,14 @@ To provide downstream layers with high-fidelity grammatical and syntactic metada
     \item \textbf{Downstream API Integration:} The chosen disambiguated candidate is marked with the flag \texttt{is\_disambiguated=true} and positioned at index 0 of the token's morphological candidate array. This establishes a clean interface for downstream GEC and GED modules, allowing them to retrieve the correct context-aware features immediately.
 \end{itemize}
 
+\newpage
+
 \section{Contribution 2: Next-Word Suggestion (NWS) and Auto-Completion Subsystem}
 The NWS subsystem runs in parallel with the main GEC/GED layers as a fast-path service. Figure~\ref{fig:nws-arch} shows the architecture of the NWS module.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.75\textwidth]{assets/NWS-Arch.png}
+\includegraphics[width=0.95\textwidth]{assets/NWS-Arch.png}
 \caption{Architecture of the Next-Word Suggestion (NWS) and Auto-Completion subsystem.}
 \label{fig:nws-arch}
 \end{figure}
@@ -791,27 +793,134 @@ To achieve sub-millisecond latencies, I designed a three-tier cache that interce
 \end{itemize}
 If a cache key (built from the last $N$ tokens) hits any tier, the suggestions are returned immediately.
 
-\subsection{Word-Level N-Gram Predictor}
-If a cache miss occurs, the system evaluates the context. In NWP mode, we query a statistical word N-gram language model (\texttt{WordNGramLM}) that uses Modified Kneser-Ney (MKN) smoothing. It recursively backs off to lower-order histories to calculate context probabilities, falling back to a pre-sorted list of top unigrams when context is unseen.
+\newpage
 
-\subsection{PyTorch LSTM Language Model}
-To capture longer-term semantic context, I integrated a PyTorch LSTM language model (\texttt{ArabicLSTMLM}). The model consists of a 12,000-word subword vocabulary trained using SentencePiece, a 256-dimensional embedding layer, a dropout layer, a 2-layer LSTM with 512 hidden units, and an output projection layer with tied weights. 
+\subsection{Next-Word Prediction (NWP) Subsystem}
+To build a strong next-word prediction system (mode \texttt{"NWP"}), we combined a statistical language model with a neural sequence model. To compare them fairly and avoid domain mismatch, we created a unified dataset called \texttt{final\_corpus} using high-quality text from Arabic Wikipedia and the Mixed-Arabic Dataset. All models (LSTM, Word N-Gram, and Char N-Gram) were trained on this same dataset. Its sizes are shown in Table~\ref{tab:nwp-dataset}.
 
-Inference is optimized via autoregressive beam search decoding. The system projects logits to determine candidate subword paths, building completed word strings by checking for the SentencePiece space character indicator (\AR{ }). Log-probabilities are length-normalized to prevent penalizing longer candidate words.
+\begin{table}[H]
+\centering
+\caption{Dimensions of the \texttt{final\_corpus} dataset used for training and evaluating NWS models.}
+\label{tab:nwp-dataset}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth}}
+\toprule
+\textbf{Split} & \textbf{Sentences} & \textbf{Total Words (Tokens)} & \textbf{Total Characters} \\
+\midrule
+Train & 653,332 & 17,055,048 & 172,061,726 \\
+Validation & 33,420 & 906,414 & 9,087,105 \\
+Test & 34,233 & 899,776 & 9,051,354 \\
+\textbf{Total} & \textbf{720,985} & \textbf{18,861,238} & \textbf{190,200,185} \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
-\subsection{Character N-Gram LM for Auto-Completion}
-In WAC mode, suggestions must complete the user's active prefix (\texttt{current\_fragment}). First, we query a static trie containing the system lexicon to retrieve all valid words starting with the prefix. To rank these candidates, we use a character-level N-gram language model (\texttt{CharNGramLM}) that computes the smoothed probability of the candidate word given the preceding character context. The final scores are length-normalized using the heuristic:
-\begin{equation}
-\text{Score}(W) = \frac{\log P(W \mid C)}{|W|^{0.7}}
-\end{equation}
-where $|W|$ is the candidate word length (including a trailing space boundary).
+The NWS pipeline generates predictions by combining the following subsystems:
 
-\subsection{Hybrid Score Blending}
-The orchestrator blends the neural LSTM predictions and statistical MKN N-gram predictions using a confidence-weighted blend:
-\begin{equation}
-\text{Score}_{\text{final}}(w) = \alpha \cdot \log P_{\text{LSTM}}(w \mid C) + (1 - \alpha) \cdot \log P_{\text{MKN}}(w \mid C)
-\end{equation}
-If the maximum neural log-probability is high ($> \log(0.35)$), the system shifts weight to the LSTM ($\alpha = 0.75$). Otherwise, it defaults to a balanced blend ($\alpha = 0.50$). Candidates not predicted by the LSTM receive a penalty of $-20.0$. Finally, the blended scores are normalized using softmax.
+\begin{itemize}
+    \item \textbf{Word-Level N-Gram Predictor:}
+    \begin{itemize}
+        \item \textbf{Architecture:} When a prediction is not found in the cache, the system checks a statistical word N-gram language model (\texttt{WordNGramLM}) using Modified Kneser-Ney (MKN) smoothing. This model calculates the probability of the next word based on the previous words.
+        \item \textbf{The Scaling Experiment Limit:} We tested how increasing the training dataset size affects this model's accuracy using Arabic Wikipedia. Even after growing the dataset to 41 million words, the Top-5 accuracy stopped improving at 18.2\%. This showed a hard accuracy limit, proving that simple counting-based N-Gram models lack the deep context understanding needed to cross the 20\% accuracy mark, because they only look at the most recent words.
+        \item \textbf{Hindawi E-Books Dataset Baseline:} We tested the model on the Hindawi E-Books dataset ($\sim$1,745 books) using two different setups, as shown in Table~\ref{tab:hindawi-baseline}.
+        \begin{table}[H]
+        \centering
+        \caption{Baseline evaluation on the Hindawi E-Books dataset. The hybrid setup performed worse due to candidate recall limitations.}
+        \label{tab:hindawi-baseline}
+        \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.15\textwidth}}
+        \toprule
+        \textbf{Setup} & \textbf{Top-1 Accuracy} & \textbf{Top-5 Accuracy} & \textbf{MRR} \\
+        \midrule
+        Standalone KenLM (50K unigrams) & 7.6\% & 18.2\% & 0.114 \\
+        Hybrid (Pruned N-Gram + KenLM) & - & 14.6\% & - \\
+        \bottomrule
+        \end{tabularx}
+        \end{table}
+    \end{itemize}
+
+    \item \textbf{LSTM Language Model:}
+    \begin{itemize}
+        \item \textbf{Architecture:} To understand long-term context, we added an LSTM language model (\texttt{ArabicLSTMLM}). Its structure includes a 12,000-word subword vocabulary built with SentencePiece, an embedding layer, dropout to prevent overfitting, a 2-layer LSTM core with 512 hidden units, and an output layer. Predictions are generated efficiently using beam search decoding.
+        \item \textbf{Implementation Strategy:} \textit{Note: I used AI assistance to write the LSTM model's code and training loops to quickly test if it works well and see if it can be combined with other statistical models.}
+        \item \textbf{Training Metrics:} Training this 6.88M parameter model on the \texttt{final\_corpus} gave the results shown in Table~\ref{tab:lstm-metrics}.
+        \begin{table}[H]
+        \centering
+        \caption{Standalone LSTM training metrics and final evaluation on the \texttt{final\_corpus}.}
+        \label{tab:lstm-metrics}
+        \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.30\textwidth} >{\raggedright\arraybackslash}p{0.30\textwidth} >{\raggedright\arraybackslash}p{0.30\textwidth}}
+        \toprule
+        \textbf{Training Stage} & \textbf{Perplexity (PPL)} & \textbf{Top-5 Accuracy} \\
+        \midrule
+        Epoch 1 & 152.01 & - \\
+        Epoch 10 (Final) & 91.00 & 21.52\% \\
+        \bottomrule
+        \end{tabularx}
+        \end{table}
+    \end{itemize}
+
+    \item \textbf{Confidence-Weighted Hybrid Blending:}
+    \begin{itemize}
+        \item \textbf{Combining Scores:} The system combines the neural LSTM predictions and the statistical MKN N-gram predictions using a confidence-weighted score:
+        \[
+        \text{Score}_{\text{final}}(w) = \alpha \cdot \log P_{\text{LSTM}}(w \mid C) + (1 - \alpha) \cdot \log P_{\text{MKN}}(w \mid C)
+        \]
+        \item \textbf{Dynamic Weights:} The mixing weight $\alpha$ changes automatically. If the LSTM is very confident (score $> \log(0.35)$), we trust the LSTM more ($\alpha = 0.75$). Otherwise, we balance them equally ($\alpha = 0.50$). Words predicted only by the statistical model get a penalty of $-20.0$, and final scores are converted to probabilities using softmax.
+        \item \textbf{Final Hybrid Results:} By mixing the LSTM's deep understanding with the Word N-Gram's ability to memorize common phrases, the final combined model reached the accuracy shown in Table~\ref{tab:hybrid-eval}.
+        \begin{table}[H]
+        \centering
+        \caption{Final hybrid model evaluation metrics showing synergistic improvements.}
+        \label{tab:hybrid-eval}
+        \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.45\textwidth}}
+        \toprule
+        \textbf{Metric} & \textbf{Accuracy} & \textbf{Improvement vs. Standalone LSTM} \\
+        \midrule
+        Top-1 Accuracy & 11.40\% & - \\
+        Top-3 Accuracy & 18.20\% & - \\
+        Top-5 Accuracy & 23.00\% & +1.48\% \\
+        \bottomrule
+        \end{tabularx}
+        \end{table}
+    \end{itemize}
+\end{itemize}
+
+In conclusion, training both the statistical model and the neural network on the exact same dataset (\texttt{final\_corpus}) fixed domain differences and created a highly effective predictor. The Word N-Gram model successfully memorized common phrases to help cover the LSTM's weaknesses, proving that the hybrid approach works very well.
+
+\subsection{Word Auto-Completion (WAC) Subsystem}
+When the system detects that the user is actively typing a word (mode \texttt{"WAC"}), it predicts the rest of the word using the following steps:
+\begin{itemize}
+    \item \textbf{Trie Matching:} To find possible word completions, the system first searches a MARISA-Trie containing our entire dictionary. This quickly finds all valid words that start with the exact letters the user just typed. By only using words from this trie, we stop the system from generating fake or invalid Arabic words.
+    \item \textbf{Character N-Gram Predictor:} To score these found words, we use a character-level N-gram model (\texttt{CharNGramLM}) instead of a word-level model. We made this choice to fix the Out-Of-Vocabulary (OOV) problem. A word model cannot score a word if it was never seen during training. Since the Arabic language has countless word forms and variations, a character-level model is needed. It can reliably score any word by looking at its letters, even if that specific word variation was never seen in the training data.
+    \item \textbf{Length-Normalized Scoring:} The raw scores of the candidate words are adjusted based on their length. This ensures the system doesn't unfairly prefer very short or very long words. The scoring formula is:
+    \[
+    \text{Score}(W) = \frac{\log P(W \mid C)}{|W|^{0.7}}
+    \]
+    where $|W|$ is the length of the candidate word.
+\end{itemize}
+
+\newpage
+
+\subsection{System Suggestions Demonstration}
+To illustrate the functionality of the Next-Word Suggestion (NWS) and Word Auto-Completion (WAC) subsystem, Figure~\ref{fig:wac-demo} shows an example of active auto-completion word suggestions, and Figures~\ref{fig:nwp-demo-1} and~\ref{fig:nwp-demo-2} present examples of next-word predictions generated dynamically within the user editor interface.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{assets/wac.png}
+\caption{Example of Word Auto-Completion (WAC) active word suggestions in the user interface.}
+\label{fig:wac-demo}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{assets/nwp-1.png}
+\caption{First example of Next-Word Prediction (NWP) suggestions generated at a word boundary.}
+\label{fig:nwp-demo-1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{assets/nwp-2.png}
+\caption{Second example of Next-Word Prediction (NWP) suggestions generated at a word boundary.}
+\label{fig:nwp-demo-2}
+\end{figure}
 
 \section{Testing and Validation}
 I established a comprehensive test suite using pytest to validate the modules:
