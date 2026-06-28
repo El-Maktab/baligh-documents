@@ -941,7 +941,7 @@ To illustrate the functionality of the Next-Word Suggestion (NWS) and Word Auto-
 To ensure the reliability of the modules I developed, a comprehensive testing strategy was implemented focusing on isolated unit tests and system-level checks.
 
 \subsection{Preprocessing Testing}
-Unit tests in the \texttt{tests/services/preprocessing/} directory verify normalizer rules (such as Alif and Ya normalization), sentence boundary detection, word segmenters, and morphological analyzers. For example, \texttt{test\_analyzer.py} validates that out-of-vocabulary (OOV) tokens (e.g., typos like ``\foreignlanguage{arabic}{الطلابب}'' containing an extra letter) are correctly flagged with an \texttt{is\_oov = True} attribute to prevent cascading errors in downstream grammar checks.
+Unit tests in the \texttt{tests/services/preprocessing/} directory verify normalizer rules (such as Alif and Ya normalization), sentence boundary detection, word segmenters, and morphological analyzers. For example, \texttt{test\_analyzer.py} validates that out-of-vocabulary (OOV) tokens (e.g., typos like ``\AR{الطلابب}'' containing an extra letter) are correctly flagged with an \texttt{is\_oov = True} attribute to prevent cascading errors in downstream grammar checks.
 
 \subsection{Next-Word Suggestion (NWS) Testing}
 Verified in the \texttt{tests/services/nws/} directory:

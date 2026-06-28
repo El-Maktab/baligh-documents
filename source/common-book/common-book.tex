@@ -842,7 +842,71 @@ Once the text is preprocessed, it is dispatched into the \textbf{Core Features L
 \label{fig:high_level_architecture}
 \end{figure}
 
-\section{Module 1: Grammatical Error Detection}
+\newpage
+\section{Module 1: Preprocessing Pipeline}
+The Preprocessing Pipeline is the entry point of the Baligh backend, responsible for parsing, cleaning, and extracting linguistic features from raw text before downstream Grammatical Error Detection (GED), Correction (GEC), or Next-Word Suggestion (NWS) modules are invoked.
+
+\subsection{Unicode Normalization and Character Mapping}
+To ensure consistent processing, raw text typed by users goes through a normalization and cleaning stage. The team designed and implemented this pipeline using the following steps:
+\begin{itemize}
+    \item \textbf{Unicode NFKC Normalization:} Normalizes the input text using the Unicode NFKC standard to canonicalize varying character codepoints and ligature representations into standard forms.
+    \item \textbf{Text Cleaning and Tatweel Stripping:} Strips redundant tatweel character segments (\AR{ـ}) and consolidates consecutive whitespaces into single spaces to remove orthographic noise.
+    \item \textbf{Offset Mapping Array Construction:} Builds a mapping array, \texttt{norm\_to\_orig\_map}, where index $i$ in the normalized string maps back to the corresponding character index in the original, unnormalized user input.
+\end{itemize}
+
+\subsection{Word Boundary Detection and Mode Selection}
+In a real-time editor, text is received continuously. Downstream GED/GEC checkers must only run on completed words, while the NWS module must decide whether to complete the active word fragment or predict the next word. To address this, a boundary splitting algorithm analyzes the trailing character of the normalized input, resulting in one of two outcomes:
+\begin{itemize}
+    \item \textbf{Word Auto-Completion (\texttt{"WAC"}) Mode:}
+    \begin{itemize}
+        \item \textbf{Condition:} The trailing character is an Arabic letter or digit, indicating the user is in the middle of typing a word.
+        \item \textbf{Behavior:} The last whitespace-delimited chunk is split off and extracted as the \texttt{current\_fragment}. The remaining preceding text is treated as the completed prefix and passed to the segmentation and morphological analysis pipeline.
+    \end{itemize}
+    \item \textbf{Next-Word Prediction (\texttt{"NWP"}) Mode:}
+    \begin{itemize}
+        \item \textbf{Condition:} The trailing character is a delimiter (such as a whitespace or a punctuation mark like \AR{،}, \AR{؟}, or a period), indicating the last word is complete.
+        \item \textbf{Behavior:} The \texttt{current\_fragment} is set to null. The entire input is treated as completed tokens and parsed to serve as context for predicting the next word.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Tokenization and Affix Segmentation}
+The core goal in this stage was to use the Farasa segmenter to identify morphological components (prefixes, stems, and suffixes) while ensuring that Farasa's aggressive Arabic NLP engine does not alter, fix, or ruin the raw user text intended for downstream Grammatical Error Detection (GED) modules. Because GED relies on identifying spelling and layout errors directly from the user's raw input, any implicit corrections or structural modifications performed by Farasa would mask errors and prevent their detection.
+
+To resolve this conflict, the team designed and implemented a series of custom bypass mechanisms to handle the following issues encountered during integration:
+\begin{enumerate}
+    \item \textbf{Implicit Spelling Corrections:}
+    \begin{itemize}
+        \item \textbf{The Problem:} Farasa acts as an automatic spell-checker. When a user types a word with a spelling mistake, such as missing a Hamza (\AR{اكرم} instead of \AR{أكرم}) or a Ta-Marbuta typo (\AR{مدرسه} instead of \AR{مدرسة}), Farasa silently corrects the token in its output. Consequently, the downstream GED module would receive the corrected forms and fail to detect the user's typo.
+        \item \textbf{Resolution Strategy:} A character-by-character mapping bridge was implemented using Python's \texttt{difflib.SequenceMatcher}. Before alignment, the algorithm standardizes characters (such as neutralizing Hamza variants and Ta-Marbuta/Ha differences) on both the raw and Farasa-processed strings to prevent alignment mismatches. The algorithm then reconstructs the segmented tokens by pulling the exact characters typed by the user at each position, effectively restoring the user's spelling mistakes while keeping Farasa's segmented boundaries intact.
+    \end{itemize}
+    \item \textbf{Aggressive Word and Number Splitting:}
+    \begin{itemize}
+        \item \textbf{The Problem:} When users omit space boundaries (e.g., typing \AR{اكرم100} as a single block), Farasa splits the input into two separate, grammatically valid tokens: \AR{أكرم} and \AR{100}. This hides spacing errors, making it impossible for the GED module to flag a missing space.
+        \item \textbf{Resolution Strategy:} Farasa was stripped of its authority to define word boundaries by enforcing a regex-first tokenization pass. A regex pattern was designed to capture contiguous blocks of Arabic letters, digits, and diacritics as single tokens, while isolating punctuation and whitespace. If this regex pass groups a segment as a single token but Farasa splits it, the orchestrator merges the pieces back together, overrides Farasa's output, and sets the token's \texttt{affix\_structure} to null. This enables downstream modules to correctly flag it as an error.
+    \end{itemize}
+    \item \textbf{Dropped Diacritics (Tashkeel):}
+    \begin{itemize}
+        \item \textbf{The Problem:} Farasa frequently strips Arabic short vowels (diacritics) during segment analysis (e.g., segmenting \AR{المنَزل} as \AR{ال} + \AR{منزل} or \AR{لَأكلها} as \AR{ل} + \AR{أكل} + \AR{ها}). Additionally, standard Python regular expressions (\texttt{\textbackslash{}w}) do not capture Arabic diacritics as word characters, causing words to break.
+        \item \textbf{Resolution Strategy:} First, the regex tokenization pattern was updated to explicitly include the Unicode ranges for all Arabic diacritics. Second, a lookahead alignment algorithm was built in the token reconstruction loop. If a diacritic present in the raw text is missing from Farasa's segmented output, the algorithm retrieves the diacritic character from the raw text and dynamically re-injects it before the plus clitic boundary (yielding \AR{لَ} + \AR{أكل} + \AR{ها}).
+    \end{itemize}
+    \item \textbf{Inserted and Hidden Characters:}
+    \begin{itemize}
+        \item \textbf{The Problem:} Farasa sometimes inserts letters that do not exist in the raw text to reconstruct clitics grammatically. For instance, the token \AR{للحج} is segmented as \AR{ل} + \AR{ال} + \AR{حج}, inserting an implicit Alif (\AR{ا}) that was not typed by the user.
+        \item \textbf{Resolution Strategy:} The character-mapping bridge was designed to handle unmapped characters. When the reconstruction loop encounters an inserted character in Farasa's output that has no index in the raw text, it accepts Farasa's inserted character and continues the mapping sequence without crashing or dropping tokens.
+    \end{itemize}
+\end{enumerate}
+
+After reconstructing the spelling-preserved segmented tokens, the clitics are identified by peeling prefixes and suffixes. Prefixes are matched against conjunctions (\AR{و}, \AR{ف}), prepositions (\AR{ب}, \AR{ل}, \AR{ك}), and definite articles (\AR{ال}). Suffixes are matched against subject/object pronouns (e.g., \AR{ها}, \AR{هم}, \AR{نا}, \AR{ه}). The remaining core is rejoined as the \texttt{STEM}, and the sequence of clitics is stored as a plus-joined string in the token's \texttt{affix\_structure} attribute.
+
+\subsection{Morphological Analysis and Disambiguation}
+To provide downstream layers with high-fidelity grammatical and syntactic metadata, the pipeline implements a joint analysis and contextual disambiguation process:
+\begin{itemize}
+    \item \textbf{Candidate Feature Generation:} Each completed token is processed through CAMeL Tools' morphological analyzer to generate a comprehensive list of potential analyses. Each candidate captures lexical and morphological properties, including lemma, Part-of-Speech (POS) tag, gender, number, person, case, aspect, and diacritized form.
+    \item \textbf{Contextual Disambiguation:} Because written Arabic is highly homographic (often omitting short vowels), a single token can have multiple valid morphological analyses out of context. To resolve this ambiguity, the system applies CAMeL Tools' sequence-based disambiguator, which analyzes the surrounding sentence context to identify the single most probable candidate.
+    \item \textbf{Downstream API Integration:} The chosen disambiguated candidate is marked with the flag \texttt{is\_disambiguated=true} and positioned at index 0 of the token's morphological candidate array. This establishes a clean interface for downstream GEC and GED modules, allowing them to retrieve the correct context-aware features immediately.
+\end{itemize}
+
+\section{Module 2: Grammatical Error Detection}
 The Grammatical Error Detection (GED) module is the primary analysis engine responsible for identifying linguistic issues in preprocessed Arabic text. It receives normalized tokens and morphological features from the preprocessing pipeline and produces a unified set of annotated error spans, each enriched with a category label, confidence score, and optional explanation. The GED module follows a multi-detector architecture in which three complementary subsystems run in parallel before a fusion layer reconciles their outputs into one consistent result set.
 
 \subsection{Functional Description}
@@ -1021,7 +1085,7 @@ Because Baligh is ultimately a user-facing writing assistant, the detector outpu
 \label{fig:ged-gui-output}
 \end{figure}
 
-\section{Module 2: Correction and Explanation Generation}
+\section{Module 3: Correction and Explanation Generation}
 The Grammatical Error Correction (GEC) module processes text to generate accurate correction candidates for grammatical and spelling mistakes. This module is divided into three primary components: the Dictionary Module, the Ontology Module, and the Edit Tagger Module.
 
 \subsection{The Dictionary Module}
@@ -1298,7 +1362,147 @@ This module is decomposed into four primary submodules:
     The system penalizes edits that diverge too much from the original text. A penalty (\texttt{W\_CHAR\_DIST}: -0.10) is applied proportionately to the normalized Levenshtein distance, and another penalty (\texttt{W\_LENGTH\_RATIO}: -0.05) is applied for deviations in string length. Furthermore, if a candidate's \texttt{edit\_confidence} falls below \texttt{CONF\_LOW\_THRESHOLD} (0.30), a flat penalty of -0.15 (\texttt{W\_LOW\_CONF}) is applied.
 \end{itemize}
 
-\section{Module 3: Web Client}
+\newpage
+\section{Module 4: Next-Word Suggestion (NWS)}
+The NWS subsystem runs in parallel with the main GEC/GED layers as a fast-path service. Figure~\ref{fig:nws-arch} shows the architecture of the NWS module.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{assets/NWS-Arch.png}
+\caption{Architecture of the Next-Word Suggestion (NWS) and Auto-Completion subsystem.}
+\label{fig:nws-arch}
+\end{figure}
+
+\subsection{Three-Tier Caching Architecture}
+To achieve sub-millisecond latencies, a three-tier cache was designed to intercept requests before model evaluation:
+\begin{itemize}
+    \item \textbf{Tier 1 (Idioms Cache):} A static cache loaded from a YAML configuration containing common Arabic idioms and fixed expressions.
+    \item \textbf{Tier 2 (Famous Phrases Cache):} A static cache storing common collocations and religious/opening formulas.
+    \item \textbf{Tier 3 (User Patterns Cache):} A dynamic LRU cache that stores successful predictions generated by the models to speed up repeat requests.
+\end{itemize}
+If a cache key (built from the last $N$ tokens) hits any tier, the suggestions are returned immediately.
+
+\subsection{Next-Word Prediction (NWP) Subsystem}
+To build a strong next-word prediction system (mode \texttt{"NWP"}), the system combines a statistical language model with a neural sequence model. To compare them fairly and avoid domain mismatch, a unified dataset called \texttt{final\_corpus} was created using high-quality text from Arabic Wikipedia and the Mixed-Arabic Dataset. All models (LSTM, Word N-Gram, and Char N-Gram) were trained on this same dataset. Its sizes are shown in Table~\ref{tab:nwp-dataset}.
+
+\begin{table}[H]
+\centering
+\caption{Dimensions of the \texttt{final\_corpus} dataset used for training and evaluating NWS models.}
+\label{tab:nwp-dataset}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth}}
+\toprule
+\textbf{Split} & \textbf{Sentences} & \textbf{Total Words (Tokens)} & \textbf{Total Characters} \\
+\midrule
+Train & 653,332 & 17,055,048 & 172,061,726 \\
+Validation & 33,420 & 906,414 & 9,087,105 \\
+Test & 34,233 & 899,776 & 9,051,354 \\
+\textbf{Total} & \textbf{720,985} & \textbf{18,861,238} & \textbf{190,200,185} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The NWS pipeline generates predictions by combining the following subsystems:
+
+\begin{itemize}
+    \item \textbf{Word-Level N-Gram Predictor:}
+    \begin{itemize}
+        \item \textbf{Architecture:} When a prediction is not found in the cache, the system checks a statistical word N-gram language model (\texttt{WordNGramLM}) using Modified Kneser-Ney (MKN) smoothing. This model calculates the probability of the next word based on the previous words.
+        \item \textbf{The Scaling Experiment Limit:} The team tested how increasing the training dataset size affects this model's accuracy using Arabic Wikipedia. Even after growing the dataset to 41 million words, the Top-5 accuracy stopped improving at 18.2\%. This showed a hard accuracy limit, proving that simple counting-based N-Gram models lack the deep context understanding needed to cross the 20\% accuracy mark, because they only look at the most recent words.
+        \item \textbf{Hindawi E-Books Dataset Baseline:} The model was tested on the Hindawi E-Books dataset ($\sim$1,745 books) using two different setups, as shown in Table~\ref{tab:hindawi-baseline}.
+        \begin{table}[H]
+        \centering
+        \caption{Baseline evaluation on the Hindawi E-Books dataset. The hybrid setup performed worse due to candidate recall limitations.}
+        \label{tab:hindawi-baseline}
+        \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.15\textwidth}}
+        \toprule
+        \textbf{Setup} & \textbf{Top-1 Accuracy} & \textbf{Top-5 Accuracy} & \textbf{MRR} \\
+        \midrule
+        Standalone KenLM (50K unigrams) & 7.6\% & 18.2\% & 0.114 \\
+        Hybrid (Pruned N-Gram + KenLM) & - & 14.6\% & - \\
+        \bottomrule
+        \end{tabularx}
+        \end{table}
+    \end{itemize}
+
+    \item \textbf{LSTM Language Model:}
+    \begin{itemize}
+        \item \textbf{Architecture:} To understand long-term context, an LSTM language model (\texttt{ArabicLSTMLM}) was added. Its structure includes a 12,000-word subword vocabulary built with SentencePiece, an embedding layer, dropout to prevent overfitting, a 2-layer LSTM core with 512 hidden units, and an output layer. Predictions are generated efficiently using beam search decoding.
+        \item \textbf{Training Metrics:} Training this 6.88M parameter model on the \texttt{final\_corpus} gave the results shown in Table~\ref{tab:lstm-metrics}.
+        \begin{table}[H]
+        \centering
+        \caption{Standalone LSTM training metrics and final evaluation on the \texttt{final\_corpus}.}
+        \label{tab:lstm-metrics}
+        \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.30\textwidth} >{\raggedright\arraybackslash}p{0.30\textwidth} >{\raggedright\arraybackslash}p{0.30\textwidth}}
+        \toprule
+        \textbf{Training Stage} & \textbf{Perplexity (PPL)} & \textbf{Top-5 Accuracy} \\
+        \midrule
+        Epoch 1 & 152.01 & - \\
+        Epoch 10 (Final) & 91.00 & 21.52\% \\
+        \bottomrule
+        \end{tabularx}
+        \end{table}
+    \end{itemize}
+
+    \item \textbf{Confidence-Weighted Hybrid Blending:}
+    \begin{itemize}
+        \item \textbf{Combining Scores:} The system combines the neural LSTM predictions and the statistical MKN N-gram predictions using a confidence-weighted score:
+        \[
+        \text{Score}_{\text{final}}(w) = \alpha \cdot \log P_{\text{LSTM}}(w \mid C) + (1 - \alpha) \cdot \log P_{\text{MKN}}(w \mid C)
+        \]
+        \item \textbf{Dynamic Weights:} The mixing weight $\alpha$ changes automatically. If the LSTM is very confident (score $> \log(0.35)$), it is trusted more ($\alpha = 0.75$). Otherwise, they are balanced equally ($\alpha = 0.50$). Words predicted only by the statistical model get a penalty of $-20.0$, and final scores are converted to probabilities using softmax.
+        \item \textbf{Final Hybrid Results:} By mixing the LSTM's deep understanding with the Word N-Gram's ability to memorize common phrases, the final combined model reached the accuracy shown in Table~\ref{tab:hybrid-eval}.
+        \begin{table}[H]
+        \centering
+        \caption{Final hybrid model evaluation metrics showing synergistic improvements.}
+        \label{tab:hybrid-eval}
+        \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.45\textwidth}}
+        \toprule
+        \textbf{Metric} & \textbf{Accuracy} & \textbf{Improvement vs. Standalone LSTM} \\
+        \midrule
+        Top-1 Accuracy & 11.40\% & - \\
+        Top-3 Accuracy & 18.20\% & - \\
+        Top-5 Accuracy & 23.00\% & +1.48\% \\
+        \bottomrule
+        \end{tabularx}
+        \end{table}
+    \end{itemize}
+\end{itemize}
+
+In conclusion, training both the statistical model and the neural network on the exact same dataset (\texttt{final\_corpus}) fixed domain differences and created a highly effective predictor. The Word N-Gram model successfully memorized common phrases to help cover the LSTM's weaknesses, proving that the hybrid approach works very well.
+
+\subsection{Word Auto-Completion (WAC)}
+When the system detects that the user is actively typing a word (mode \texttt{"WAC"}), it predicts the rest of the word using the following steps:
+\begin{itemize}
+    \item \textbf{Trie Matching:} To find possible word completions, the system first searches a MARISA-Trie containing the entire dictionary. This quickly finds all valid words that start with the exact letters the user just typed. By only using words from this trie, the system is prevented from generating fake or invalid Arabic words.
+    \item \textbf{Character N-Gram Predictor:} To score these found words, a character-level N-gram model (\texttt{CharNGramLM}) is used instead of a word-level model. This choice solves the Out-Of-Vocabulary (OOV) problem. A word model cannot score a word if it was never seen during training. Since the Arabic language has countless word forms and variations, a character-level model is needed to reliably score any word by looking at its letters, even if that specific word variation was never seen in the training data.
+    \item \textbf{Length-Normalized Scoring:} The raw scores of the candidate words are adjusted based on their length to ensure the system doesn't unfairly prefer very short or very long words. The scoring formula is:
+    \[
+    \text{Score}(W) = \frac{\log P(W \mid C)}{|W|^{0.7}}
+    \]
+    where $|W|$ is the length of the candidate word.
+\end{itemize}
+\newpage
+\subsection{System Suggestions}
+To illustrate the functionality of the Next-Word Suggestion (NWS) and Word Auto-Completion (WAC) subsystem, Figure~\ref{fig:wac-demo} shows an example of active auto-completion word suggestions, and Figure~\ref{fig:nwp-demo} presents examples of next-word predictions generated dynamically within the user editor interface.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{assets/wac.png}
+\caption{Example of Word Auto-Completion (WAC) active word suggestions in the user interface.}
+\label{fig:wac-demo}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tabular}{cc}
+\includegraphics[width=0.45\textwidth]{assets/nwp-1.png} &
+\includegraphics[width=0.45\textwidth]{assets/nwp-2.png}
+\end{tabular}
+\caption{Examples of Next-Word Prediction (NWP) suggestions generated at a word boundary.}
+\label{fig:nwp-demo}
+\end{figure}
+\newpage
+\section{Module 5: Web Client}
 The web client is the user-facing application that exposes Baligh's capabilities through an interactive writing environment. Built with React and Vite, it provides a lightweight, design-system-aligned interface that communicates with the backend API to present analysis results, corrections, and suggestions to the user.
 
 \subsection{Functional Description}
@@ -1345,7 +1549,7 @@ The verification strategy relies on testing components in isolation (module test
 \subsection{Module Testing}
 Each subsystem in Baligh is validated independently using automated unit tests to guarantee functional correctness under diverse inputs.
 \begin{itemize}
-    \item \textbf{Preprocessing Service:} Unit tests in the \texttt{tests/services/preprocessing/} directory verify normalizer rules (such as Alif and Ya normalization), sentence boundary detection, word segmenters, and morphological analyzers. For example, \texttt{test\_analyzer.py} validates that out-of-vocabulary (OOV) tokens (e.g., typos like ``\foreignlanguage{arabic}{الطلابب}'' containing an extra letter) are correctly flagged with an \texttt{is\_oov = True} attribute to prevent cascading errors in downstream grammar checks.
+    \item \textbf{Preprocessing Service:} Unit tests in the \texttt{tests/services/preprocessing/} directory verify normalizer rules (such as Alif and Ya normalization), sentence boundary detection, word segmenters, and morphological analyzers. For example, \texttt{test\_analyzer.py} validates that out-of-vocabulary (OOV) tokens (e.g., typos like ``\AR{الطلابب}'' containing an extra letter) are correctly flagged with an \texttt{is\_oov = True} attribute to prevent cascading errors in downstream grammar checks.
     \item \textbf{Grammatical Error Detection (GED):}
     \begin{itemize}
         \item \textit{Rule-Based Subsystem:} Unit tests verify syntactic, semantic, punctuation, and orthographical rules. Files like \texttt{test\_syntax.py} and \texttt{test\_punctuation.py} check specific grammar patterns, such as subject-verb agreement or missing spaces before punctuation.
